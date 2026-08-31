@@ -217,6 +217,22 @@
         if (!event.matches) closeNav();
       });
     }
+
+    document.addEventListener("click", function (event) {
+      if (!nav.classList.contains("is-open")) return;
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest(".site-header")) return;
+      closeNav();
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape") return;
+      if (!nav.classList.contains("is-open")) return;
+      event.preventDefault();
+      closeNav();
+      toggle.focus();
+    });
   }
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -869,6 +885,7 @@
     const pageInput = document.getElementById("q-page");
     const openBtns = document.querySelectorAll("[data-search-open]");
     const prefix = indexPrefix();
+    let searchOpener = null;
 
     function setOpen(open) {
       if (!overlay) return;
@@ -877,12 +894,20 @@
       openBtns.forEach(function (btn) {
         btn.setAttribute("aria-expanded", open ? "true" : "false");
       });
-      if (open && liveInput) liveInput.focus();
+      if (open && liveInput) {
+        liveInput.focus();
+        return;
+      }
+      if (!open && searchOpener && typeof searchOpener.focus === "function") {
+        searchOpener.focus();
+        searchOpener = null;
+      }
     }
 
     openBtns.forEach(function (btn) {
       btn.setAttribute("aria-expanded", "false");
       btn.addEventListener("click", function () {
+        searchOpener = btn;
         setOpen(true);
       });
     });
@@ -897,7 +922,10 @@
       });
     }
     document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape" && overlay && !overlay.hidden) {
+        event.preventDefault();
+        setOpen(false);
+      }
     });
 
     function paint(host, query) {

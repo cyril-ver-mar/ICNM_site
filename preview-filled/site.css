@@ -69,6 +69,10 @@ a:hover { color: var(--accent); }
   outline-offset: 3px;
 }
 
+.site-header :focus-visible {
+  outline-color: #fff;
+}
+
 .skip-link {
   position: absolute;
   left: 0.75rem;
@@ -80,7 +84,8 @@ a:hover { color: var(--accent); }
   min-height: 44px;
 }
 
-.skip-link:focus {
+.skip-link:focus,
+.skip-link:focus-visible {
   top: 0.75rem;
 }
 
@@ -107,6 +112,8 @@ a:hover { color: var(--accent); }
   top: 0;
   z-index: 20;
   color: var(--header-fg);
+  background: var(--header-bg);
+  padding-top: env(safe-area-inset-top);
 }
 
 .masthead {
@@ -281,14 +288,17 @@ html.theme-night body.is-home .site-header.is-scrolled .brand-mark {
   text-decoration: none;
   vertical-align: middle;
   cursor: pointer;
-  transition: transform 160ms var(--ease-out), background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+  touch-action: manipulation;
+  transition: transform 100ms ease-out, background-color 160ms ease, color 160ms ease, border-color 160ms ease;
 }
 
-.tool-btn:hover,
-.menu-toggle:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  text-decoration: none;
+@media (hover: hover) and (pointer: fine) {
+  .tool-btn:hover,
+  .menu-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    text-decoration: none;
+  }
 }
 
 .tool-btn:active,
@@ -1874,6 +1884,31 @@ html.is-bvi .stat-value {
   }
 }
 
+@media (prefers-contrast: more) {
+  :root {
+    --header-glass: var(--navy);
+    --header-btn-border: rgba(255, 255, 255, 0.92);
+    --line: rgba(26, 32, 44, 0.45);
+  }
+
+  html.theme-night {
+    --header-glass: var(--navy);
+    --line: rgba(255, 255, 255, 0.45);
+  }
+
+  body.is-home .site-header:not(.is-scrolled) .masthead {
+    backdrop-filter: none;
+  }
+
+  :focus-visible {
+    outline-width: 3px;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -2005,6 +2040,14 @@ html.is-bvi .stat-value {
 
   body.nav-open {
     overflow: hidden;
+  }
+
+  body.nav-open::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 19;
+    background: rgba(10, 28, 46, 0.4);
   }
 
   body.is-home .hero {
@@ -2299,7 +2342,7 @@ html.theme-night .cover-card .cover-meta {
 .cookie-banner {
   position: fixed;
   right: 1rem;
-  bottom: 1rem;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
   z-index: 30;
   width: min(28rem, calc(100% - 2rem));
   padding: 1rem 1.1rem;
@@ -2322,12 +2365,13 @@ html.cookies-ok .cookie-banner {
 
 .cookie-actions button,
 .cookie-settings button {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0.4rem 0.7rem;
   border: 1px solid var(--line);
   background: var(--navy);
   color: #fff;
   cursor: pointer;
+  touch-action: manipulation;
   font: 600 0.82rem Montserrat, sans-serif;
 }
 
@@ -2469,7 +2513,25 @@ html.is-bvi .page-body .lab-contacts p {
 @media (max-width: 720px) {
   .about-gallery { grid-template-columns: 1fr; }
   .lab-split { grid-template-columns: 1fr; }
-  .cookie-banner { left: 1rem; right: 1rem; width: auto; }
+
+  .cookie-banner {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom));
+    box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.18);
+  }
+
+  .cookie-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .site-search {
+    padding: calc(4.5rem + env(safe-area-inset-top)) 1rem calc(1.25rem + env(safe-area-inset-bottom));
+    align-items: start;
+  }
 }
 
 /* Page-open motion (NAS-like navy veil + stagger). Off for BVI and reduced motion. */

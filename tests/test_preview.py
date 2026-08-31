@@ -63,6 +63,15 @@ def test_language_stubs_and_aist():
     assert "Пра інстытут" in files["be/about.html"]
     assert "关于研究所" in files["zh/about.html"]
     assert "Russian version" in en
+    assert "Font size" in en
+    assert "Standard version" in en
+    assert "On this site" in en
+    assert "Cookie policy" in files["en/cookies.html"]
+    assert 'lang="en"' in files["en/cookies.html"]
+    assert "Шрыфт" in files["be/index.html"]
+    assert "标准版" in files["zh/index.html"]
+    assert "Версия для слабовидящих" not in en
+    assert "Политика cookie" in files["cookies.html"]
     aist = files["aist.html"]
     assert "aist.ichnm.by" in aist
     assert "conf-card" in aist
@@ -371,3 +380,17 @@ def test_mobile_header_keeps_a_single_bar():
     assert "data-search-open" not in tools_chunk
     assert "data-nav-toggle" in tools_chunk
     assert "data-search-open" in home
+
+
+def test_hig_chrome_safe_area_contrast_and_dismiss():
+    files = render_site_files(load_site_model())
+    home = files["index.html"]
+    css = files["site.css"]
+    js = files["site.js"]
+    assert "viewport-fit=cover" in home
+    assert "env(safe-area-inset-top)" in css
+    assert "prefers-contrast: more" in css
+    assert "aria-modal" in home
+    assert "searchOpener" in js
+    assert "toggle.focus" in js
+    assert "(hover: hover)" in css

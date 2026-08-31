@@ -210,6 +210,230 @@ _CHROME: dict[str, dict[str, str]] = {
     },
 }
 
+_CHROME_MORE: dict[str, dict[str, str]] = {
+    "ru": {
+        "bvi_font": "Шрифт",
+        "bvi_colors": "Цвета",
+        "bvi_images": "Изображения",
+        "bvi_spacing": "Интервал",
+        "bvi_off": "Обычная версия",
+        "footer_institute": "Институт",
+        "footer_on_site": "На сайте",
+        "footer_nas_socials": "Соцсети НАН",
+        "footer_webmail": "Веб-почта института — адрес появится после PHP-тарифа.",
+        "footer_find_us": "Как нас найти",
+        "footer_map_alt": "Институт на карте Минска, ул. Ф. Скорины, 36",
+        "footer_pictograms": "Ресурсы Академии и государственные порталы",
+        "footer_media": "СМИ о нас",
+        "footer_education": "Научно-ориентированное образование",
+        "footer_union": "Профсоюз",
+        "footer_publications": "Публикации",
+        "footer_feedback": "Обратная связь",
+        "footer_lattice": "Демо сетки атомов",
+        "search_label": "Поиск по сайту",
+        "search_placeholder": "Персоналии, подразделения, приборы, разработки",
+        "search_submit": "Найти",
+        "search_close": "Закрыть",
+        "search_hint": "Как на портале НАН: живой список и отдельная страница результатов.",
+        "cookies_page_title": "Политика cookie",
+        "cookies_p1": (
+            "Институт использует файлы cookie, чтобы сайт работал и чтобы запомнить "
+            "ваш выбор оформления. Это тот же класс юридических элементов, что на "
+            "bsu.by (баннер, политика, настройка категорий)."
+        ),
+        "cookies_h_needed": "Необходимые",
+        "cookies_p_needed": (
+            "Язык интерфейса, дневная/ночная тема, панель для слабовидящих, решение по cookie. "
+            "Без них страница каждый раз сбрасывается к виду по умолчанию."
+        ),
+        "cookies_h_analytics": "Аналитические",
+        "cookies_p_analytics": (
+            "В макете выключены. Если институт позже подключит счётчик, категория появится "
+            "в настройках баннера. Сейчас отказ и согласие только сохраняют ваш выбор."
+        ),
+        "cookies_personal_link": "Обработка персональных данных",
+        "cookies_appeals_link": "Электронные обращения",
+        "personal_page_title": "Персональные данные",
+        "personal_operator": (
+            "Оператор: Государственное научное учреждение «Институт химии новых материалов "
+            "Национальной академии наук Беларуси», ул. Ф. Скорины, 36, Минск."
+        ),
+        "personal_p2": (
+            "Обращения по персональным данным — через электронные обращения или форму обратной связи. "
+            "Полный текст политики появится после передачи юридического файла Институтом. "
+            "Этот текст — каркас страницы, не официальная политика."
+        ),
+        "legal_mock": "Макет. Не используйте формулировку как утверждённый документ.",
+    },
+    "en": {
+        "bvi_font": "Font size",
+        "bvi_colors": "Colours",
+        "bvi_images": "Images",
+        "bvi_spacing": "Spacing",
+        "bvi_off": "Standard version",
+        "footer_institute": "Institute",
+        "footer_on_site": "On this site",
+        "footer_nas_socials": "NAS social media",
+        "footer_webmail": "Institute webmail — the address will appear after the PHP hosting plan.",
+        "footer_find_us": "How to find us",
+        "footer_map_alt": "The institute on the Minsk map, 36 Skaryna Street",
+        "footer_pictograms": "Academy resources and government portals",
+        "footer_media": "Media about us",
+        "footer_education": "Research-oriented education",
+        "footer_union": "Trade union",
+        "footer_publications": "Publications",
+        "footer_feedback": "Feedback",
+        "footer_lattice": "Atom lattice demo",
+        "search_label": "Site search",
+        "search_placeholder": "People, units, instruments, developments",
+        "search_submit": "Search",
+        "search_close": "Close",
+        "search_hint": "Live results and a separate results page, as on the NAS portal.",
+        "cookies_page_title": "Cookie policy",
+        "cookies_p1": (
+            "The institute uses cookies so the site can work and so it can remember "
+            "your display choices. This is the same class of legal elements as on bsu.by "
+            "(banner, policy, category settings)."
+        ),
+        "cookies_h_needed": "Necessary",
+        "cookies_p_needed": (
+            "Interface language, light/dark theme, visually impaired panel, and your cookie choice. "
+            "Without them the page resets to the default look every time."
+        ),
+        "cookies_h_analytics": "Analytics",
+        "cookies_p_analytics": (
+            "Off in this mock. If the institute later adds a counter, the category will appear "
+            "in the banner settings. For now, accept and reject only store your choice."
+        ),
+        "cookies_personal_link": "Personal data",
+        "cookies_appeals_link": "Electronic appeals",
+        "personal_page_title": "Personal data",
+        "personal_operator": (
+            "Controller: State scientific institution “Institute of Chemistry of New Materials "
+            "of the National Academy of Sciences of Belarus”, 36 F. Skaryna Street, Minsk."
+        ),
+        "personal_p2": (
+            "Requests about personal data go through electronic appeals or the feedback form. "
+            "The full policy will appear after the institute supplies the legal file. "
+            "This page is a shell, not an approved policy."
+        ),
+        "legal_mock": "Mock. Do not treat this wording as an approved document.",
+    },
+    "be": {
+        "bvi_font": "Шрыфт",
+        "bvi_colors": "Колеры",
+        "bvi_images": "Выявы",
+        "bvi_spacing": "Інтэрвал",
+        "bvi_off": "Звычайная версія",
+        "footer_institute": "Інстытут",
+        "footer_on_site": "На сайце",
+        "footer_nas_socials": "Сацсеткі НАН",
+        "footer_webmail": "Вэб-пошта інстытута — адрас з’явіцца пасля PHP-тарыфу.",
+        "footer_find_us": "Як нас знайсці",
+        "footer_map_alt": "Інстытут на карце Мінска, вул. Ф. Скарыны, 36",
+        "footer_pictograms": "Рэсурсы Акадэміі і дзяржаўныя парталы",
+        "footer_media": "СМІ пра нас",
+        "footer_education": "Навукова-арыентаваная адукацыя",
+        "footer_union": "Прафсаюз",
+        "footer_publications": "Публікацыі",
+        "footer_feedback": "Зваротная сувязь",
+        "footer_lattice": "Дэма сеткі атамаў",
+        "search_label": "Пошук па сайце",
+        "search_placeholder": "Персаналіі, падраздзяленні, прыборы, распрацоўкі",
+        "search_submit": "Знайсці",
+        "search_close": "Закрыць",
+        "search_hint": "Як на партале НАН: жывы спіс і асобная старонка вынікаў.",
+        "cookies_page_title": "Палітыка cookie",
+        "cookies_p1": (
+            "Інстытут выкарыстоўвае файлы cookie, каб сайт працаваў і каб запомніць "
+            "ваш выбар афармлення. Гэта той жа клас юрыдычных элементаў, што на bsu.by "
+            "(банер, палітыка, налады катэгорый)."
+        ),
+        "cookies_h_needed": "Неабходныя",
+        "cookies_p_needed": (
+            "Мова інтэрфейсу, дзённая/начная тэма, панэль для слабавідушчых, рашэнне па cookie. "
+            "Без іх старонка кожны раз скідаецца да выгляду па змаўчанні."
+        ),
+        "cookies_h_analytics": "Аналітычныя",
+        "cookies_p_analytics": (
+            "У макеце выключаны. Калі інстытут пазней падключыць лічыльнік, катэгорыя з’явіцца "
+            "ў наладах банера. Зараз адмова і згода толькі захоўваюць ваш выбар."
+        ),
+        "cookies_personal_link": "Апрацоўка персанальных даных",
+        "cookies_appeals_link": "Электронныя звароты",
+        "personal_page_title": "Персанальныя даныя",
+        "personal_operator": (
+            "Аператар: Дзяржаўная навуковая ўстанова «Інстытут хіміі новых матэрыялаў "
+            "Нацыянальнай акадэміі навук Беларусі», вул. Ф. Скарыны, 36, Мінск."
+        ),
+        "personal_p2": (
+            "Звароты па персанальных даных — праз электронныя звароты або форму зваротнай сувязі. "
+            "Поўны тэкст палітыкі з’явіцца пасля перадачы юрыдычнага файла Інстытутам. "
+            "Гэты тэкст — каркас старонкі, не афіцыйная палітыка."
+        ),
+        "legal_mock": "Макет. Не выкарыстоўвайце фармулёўку як зацверджаны дакумент.",
+    },
+    "zh": {
+        "bvi_font": "字体",
+        "bvi_colors": "颜色",
+        "bvi_images": "图像",
+        "bvi_spacing": "间距",
+        "bvi_off": "标准版",
+        "footer_institute": "研究所",
+        "footer_on_site": "本站",
+        "footer_nas_socials": "科学院社交账号",
+        "footer_webmail": "研究所网页邮箱——地址将在开通 PHP 主机后公布。",
+        "footer_find_us": "如何找到我们",
+        "footer_map_alt": "明斯克地图上的研究所，斯卡里纳大街 36 号",
+        "footer_pictograms": "科学院资源与政府门户",
+        "footer_media": "媒体报道",
+        "footer_education": "科研导向教育",
+        "footer_union": "工会",
+        "footer_publications": "论文",
+        "footer_feedback": "反馈",
+        "footer_lattice": "原子网格演示",
+        "search_label": "站内搜索",
+        "search_placeholder": "人员、部门、仪器、成果",
+        "search_submit": "搜索",
+        "search_close": "关闭",
+        "search_hint": "与科学院门户同类：即时列表和单独的结果页。",
+        "cookies_page_title": "Cookie 政策",
+        "cookies_p1": (
+            "研究所使用 Cookie，以便网站运行并记住您的显示选择。"
+            "这与 bsu.by 上的同类法律要素相同（横幅、政策、分类设置）。"
+        ),
+        "cookies_h_needed": "必要",
+        "cookies_p_needed": (
+            "界面语言、浅色/深色主题、无障碍面板，以及您对 Cookie 的选择。"
+            "没有它们，页面每次都会恢复为默认外观。"
+        ),
+        "cookies_h_analytics": "分析",
+        "cookies_p_analytics": (
+            "本预览中已关闭。若研究所日后接入统计，该类别会出现在横幅设置中。"
+            "目前接受与拒绝仅保存您的选择。"
+        ),
+        "cookies_personal_link": "个人数据处理",
+        "cookies_appeals_link": "电子诉求",
+        "personal_page_title": "个人数据",
+        "personal_operator": (
+            "控制者：白俄罗斯国家科学院新材料化学研究所（国家科学机构），"
+            "明斯克斯卡里纳大街 36 号。"
+        ),
+        "personal_p2": (
+            "有关个人数据的请求可通过电子诉求或反馈表提交。"
+            "完整政策将在研究所提供法律文件后发布。"
+            "本页仅为框架，不是已批准的政策。"
+        ),
+        "legal_mock": "预览稿。请勿将此表述视为已批准文件。",
+    },
+}
+for _code, _keys in _CHROME_MORE.items():
+    _CHROME[_code].update(_keys)
+
+_LOCALE_CHROME_PAGES = frozenset(
+    {"cookies.html", "personal-data.html", "about.html", "news.html", "events.html", "contacts.html"}
+)
+
 _STUB_SECTION_LEAD = {
     "en": "This section will appear in English after translation.",
     "be": "Гэты раздзел з’явіцца па-беларуску пасля перакладу.",
@@ -352,6 +576,12 @@ def _ui(key: str) -> str:
     return pack.get(key) or _CHROME["ru"].get(key) or key
 
 
+def _ui_href(filename: str, prefix: str) -> str:
+    if _LOCALE.get() != "ru" and filename in _LOCALE_CHROME_PAGES:
+        return filename
+    return f"{prefix}{filename}"
+
+
 def _admin_unit_ids() -> set[str]:
     return {str(unit["id"]) for unit in load_migrated_copy().get("admin_units", [])}
 
@@ -486,18 +716,11 @@ def render_site_files(model: SiteModel) -> dict[str, str]:
         current="home",
         extra_body_class="is-lattice-demo",
     )
-    files["cookies.html"] = _page(
-        model,
-        "Политика cookie",
-        _with_page_hero("Политика cookie", _cookies_body()),
-        current="contacts",
-    )
-    files["personal-data.html"] = _page(
-        model,
-        "Персональные данные",
-        _with_page_hero("Персональные данные", _personal_data_body()),
-        current="contacts",
-    )
+    files["cookies.html"] = _legal_page(model, "cookies")
+    files["personal-data.html"] = _legal_page(model, "personal")
+    for code in ("en", "be", "zh"):
+        files[f"{code}/cookies.html"] = _legal_page(model, "cookies", code)
+        files[f"{code}/personal-data.html"] = _legal_page(model, "personal", code)
     for item in copy.get("conferences", []):
         files[f"conferences/{item['slug']}/index.html"] = _page(
             model,
@@ -675,31 +898,33 @@ def _locale_nav(current: str, depth: int) -> str:
 def _bvi_panel() -> str:
     return (
         '<div class="bvi-panel" id="bvi-panel" hidden>'
-        '<p class="bvi-heading">Версия для слабовидящих</p>'
-        '<div class="bvi-row"><span>Шрифт</span>'
+        f'<p class="bvi-heading">{escape(_ui("bvi"))}</p>'
+        f'<div class="bvi-row"><span>{escape(_ui("bvi_font"))}</span>'
         '<button type="button" data-bvi-size="normal">A</button>'
         '<button type="button" data-bvi-size="large">A+</button>'
         '<button type="button" data-bvi-size="xlarge">A++</button></div>'
-        '<div class="bvi-row"><span>Цвета</span>'
-        '<button type="button" data-bvi-scheme="bw">А</button>'
-        '<button type="button" data-bvi-scheme="wb" class="bvi-invert">А</button>'
-        '<button type="button" data-bvi-scheme="blue" class="bvi-blue">А</button></div>'
+        f'<div class="bvi-row"><span>{escape(_ui("bvi_colors"))}</span>'
+        '<button type="button" data-bvi-scheme="bw">A</button>'
+        '<button type="button" data-bvi-scheme="wb" class="bvi-invert">A</button>'
+        '<button type="button" data-bvi-scheme="blue" class="bvi-blue">A</button></div>'
         '<div class="bvi-row">'
-        '<button type="button" data-bvi-images>Изображения</button>'
-        '<button type="button" data-bvi-spacing>Интервал</button>'
-        '<button type="button" data-bvi-off>Обычная версия</button>'
+        f'<button type="button" data-bvi-images>{escape(_ui("bvi_images"))}</button>'
+        f'<button type="button" data-bvi-spacing>{escape(_ui("bvi_spacing"))}</button>'
+        f'<button type="button" data-bvi-off>{escape(_ui("bvi_off"))}</button>'
         "</div></div>"
     )
 
 
 def _cookie_banner(prefix: str) -> str:
+    cookie_href = _ui_href("cookies.html", prefix)
+    personal_href = _ui_href("personal-data.html", prefix)
     return (
         '<div class="cookie-banner" id="cookie-banner" hidden role="dialog" '
-        'aria-labelledby="cookie-title">'
+        'aria-modal="true" aria-labelledby="cookie-title">'
         f'<p id="cookie-title">{escape(_ui("cookie_title"))}</p>'
         f"<p>{escape(_ui('cookie_body'))}"
-        f'<a href="{prefix}cookies.html">{escape(_ui("cookie_policy"))}</a> · '
-        f'<a href="{prefix}personal-data.html">{escape(_ui("cookie_personal"))}</a>.</p>'
+        f'<a href="{cookie_href}">{escape(_ui("cookie_policy"))}</a> · '
+        f'<a href="{personal_href}">{escape(_ui("cookie_personal"))}</a>.</p>'
         '<div class="cookie-actions">'
         f'<button type="button" data-cookie="accept">{escape(_ui("cookie_accept"))}</button>'
         f'<button type="button" data-cookie="reject">{escape(_ui("cookie_reject"))}</button>'
@@ -787,42 +1012,42 @@ def _footer(model: SiteModel, depth: int = 0) -> str:
         )
     pics = "".join(pics)
     site_links = (
-        f'<li><a href="{prefix}news.html">Новости</a></li>'
-        f'<li><a href="{prefix}media_about.html">СМИ о нас</a></li>'
-        f'<li><a href="{prefix}education.html">Научно-ориентированное образование</a></li>'
-        f'<li><a href="{prefix}union.html">Профсоюз</a></li>'
-        f'<li><a href="{prefix}publications.html">Публикации</a></li>'
-        f'<li><a href="{prefix}feedback.html">Обратная связь</a></li>'
-        f'<li><a href="{prefix}search.html">Поиск</a></li>'
-        f'<li><a href="{prefix}sitemap.html">Карта сайта</a></li>'
-        f'<li><a href="{prefix}cookies.html">Политика cookie</a></li>'
-        f'<li><a href="{prefix}personal-data.html">Персональные данные</a></li>'
-        f'<li><a href="{prefix}lattice-demo.html">Демо сетки атомов</a></li>'
+        f'<li><a href="{_ui_href("news.html", prefix)}">{escape(_ui("nav_news"))}</a></li>'
+        f'<li><a href="{prefix}media_about.html">{escape(_ui("footer_media"))}</a></li>'
+        f'<li><a href="{prefix}education.html">{escape(_ui("footer_education"))}</a></li>'
+        f'<li><a href="{prefix}union.html">{escape(_ui("footer_union"))}</a></li>'
+        f'<li><a href="{prefix}publications.html">{escape(_ui("footer_publications"))}</a></li>'
+        f'<li><a href="{prefix}feedback.html">{escape(_ui("footer_feedback"))}</a></li>'
+        f'<li><a href="{prefix}search.html">{escape(_ui("search"))}</a></li>'
+        f'<li><a href="{prefix}sitemap.html">{escape(_ui("sitemap"))}</a></li>'
+        f'<li><a href="{_ui_href("cookies.html", prefix)}">{escape(_ui("cookies_page_title"))}</a></li>'
+        f'<li><a href="{_ui_href("personal-data.html", prefix)}">{escape(_ui("personal_page_title"))}</a></li>'
+        f'<li><a href="{prefix}lattice-demo.html">{escape(_ui("footer_lattice"))}</a></li>'
     )
     return (
         '<footer class="ichnm-footer">'
         '<div class="wrap footer-grid">'
-        '<div><p class="footer-heading">Институт</p>'
+        f'<div><p class="footer-heading">{escape(_ui("footer_institute"))}</p>'
         f'<p class="ichnm-identity"><strong>{_t(model.legal_name)}</strong></p>'
         f"<p>{_t(address)}</p>"
-        f'<p><a href="{escape(model.nas_portal_href)}">Национальная академия наук Беларуси</a></p>'
+        f'<p><a href="{escape(model.nas_portal_href)}">{escape(_ui("kicker"))}</a></p>'
         "</div>"
-        '<div><p class="footer-heading">На сайте</p>'
+        f'<div><p class="footer-heading">{escape(_ui("footer_on_site"))}</p>'
         f'<ul class="ichnm-footer-legal">{site_links}</ul></div>'
-        '<div><p class="footer-heading">Соцсети НАН</p>'
+        f'<div><p class="footer-heading">{escape(_ui("footer_nas_socials"))}</p>'
         f'<ul class="ichnm-footer-social">{social}</ul>'
-        "<p>Веб-почта института — адрес появится после PHP-тарифа.</p>"
+        f"<p>{escape(_ui('footer_webmail'))}</p>"
         "</div>"
         '<div class="footer-place">'
-        '<p class="footer-heading">Как нас найти</p>'
-        f'<a class="footer-map" href="{prefix}contacts.html">'
+        f'<p class="footer-heading">{escape(_ui("footer_find_us"))}</p>'
+        f'<a class="footer-map" href="{_ui_href("contacts.html", prefix)}">'
         f'<img src="{prefix}media/maps/institute.svg" width="280" height="200" '
-        'alt="Институт на карте Минска, ул. Ф. Скорины, 36">'
+        f'alt="{escape(_ui("footer_map_alt"))}">'
         f"<span>{_t('ул. Ф. Скорины, 36, Минск')}</span></a>"
         "</div></div>"
-        '<div class="footer-pictograms" aria-label="Ресурсы портала НАН Беларуси">'
+        f'<div class="footer-pictograms" aria-label="{escape(_ui("footer_pictograms"))}">'
         '<div class="wrap">'
-        "<p class=\"footer-heading\">Ресурсы Академии и государственные порталы</p>"
+        f'<p class="footer-heading">{escape(_ui("footer_pictograms"))}</p>'
         f'<ul class="picto-strip">{pics}</ul>'
         "</div></div></footer>"
     )
@@ -830,16 +1055,17 @@ def _footer(model: SiteModel, depth: int = 0) -> str:
 
 def _search_overlay(prefix: str) -> str:
     return (
-        '<div class="site-search" id="site-search" hidden>'
+        '<div class="site-search" id="site-search" hidden role="dialog" '
+        'aria-modal="true" aria-label="' + escape(_ui("search")) + '">'
         '<div class="site-search-panel">'
         f'<form class="site-search-form" action="{prefix}search.html" method="get" role="search">'
-        '<label class="visually-hidden" for="q-live">Поиск по сайту</label>'
-        '<input id="q-live" name="q" type="search" placeholder="Персоналии, подразделения, приборы, разработки" '
+        f'<label class="visually-hidden" for="q-live">{escape(_ui("search_label"))}</label>'
+        f'<input id="q-live" name="q" type="search" placeholder="{escape(_ui("search_placeholder"))}" '
         'autocomplete="off">'
-        '<button type="submit">Найти</button>'
-        '<button type="button" data-search-close>Закрыть</button>'
+        f'<button type="submit">{escape(_ui("search_submit"))}</button>'
+        f'<button type="button" data-search-close>{escape(_ui("search_close"))}</button>'
         "</form>"
-        '<p class="search-hint">Как на портале НАН: живой список и отдельная страница результатов.</p>'
+        f'<p class="search-hint">{escape(_ui("search_hint"))}</p>'
         '<div id="search-live" class="search-live" role="status"></div>'
         "</div></div>"
     )
@@ -912,8 +1138,8 @@ def _shell(
         home = f"{prefix}index.html"
     else:
         home = "index.html" if depth >= 1 else f"{current_code}/index.html"
-    css = f"{prefix}site.css?v=mobile-hdr3"
-    js = f"{prefix}site.js?v=mobile-hdr3"
+    css = f"{prefix}site.css?v=hig-polish1"
+    js = f"{prefix}site.js?v=hig-polish1"
     mark = f"{prefix}media/ichnm-mark.svg?v=bew"
     nas = f"{prefix}media/nas-emblem.webp"
     body_class = " ".join(
@@ -955,7 +1181,7 @@ def _shell(
 <html lang="{html_lang}">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{escape(title)} — {escape(_ui("title_suffix"))}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1026,6 +1252,25 @@ def _page(
         is_home=is_home,
         depth=depth,
         extra_body_class=extra_body_class,
+    )
+
+
+def _legal_page(model: SiteModel, kind: str, code: str = "ru") -> str:
+    depth = 0 if code == "ru" else 1
+    _LOCALE.set(code)
+    _ASSET_PREFIX.set("../" * depth)
+    title_key = "cookies_page_title" if kind == "cookies" else "personal_page_title"
+    title = _ui(title_key)
+    inner = _cookies_body() if kind == "cookies" else _personal_data_body()
+    extra = "is-locale-stub" if code != "ru" else ""
+    return _shell(
+        model,
+        title,
+        _with_page_hero(title, inner),
+        current="contacts",
+        depth=depth,
+        current_code=code,
+        extra_body_class=extra,
     )
 
 
@@ -1291,31 +1536,36 @@ def _conference_body(model: SiteModel, item: dict, depth: int = 2) -> str:
 
 
 def _cookies_body() -> str:
+    prefix = _ASSET_PREFIX.get()
+    banner = (
+        _fish_banner()
+        if _LOCALE.get() == "ru"
+        else f'<p class="fish-banner" role="note">{escape(_ui("legal_mock"))}</p>'
+    )
     return (
-        f"{_fish_banner()}"
-        "<p>Институт использует файлы cookie, чтобы сайт работал и чтобы запомнить "
-        "ваш выбор оформления. Это тот же класс юридических элементов, что на "
-        '<a href="https://bsu.by/">bsu.by</a> (баннер, политика, настройка категорий).</p>'
-        "<h2>Необходимые</h2>"
-        "<p>Язык интерфейса, дневная/ночная тема, панель для слабовидящих, решение по cookie. "
-        "Без них страница каждый раз сбрасывается к виду по умолчанию.</p>"
-        "<h2>Аналитические</h2>"
-        "<p>В макете выключены. Если институт позже подключит счётчик, категория появится "
-        "в настройках баннера. Сейчас отказ и согласие только сохраняют ваш выбор.</p>"
-        '<p><a href="personal-data.html">Обработка персональных данных</a> · '
-        '<a href="e-appeals.html">Электронные обращения</a></p>'
+        f"{banner}"
+        f"<p>{escape(_ui('cookies_p1'))}</p>"
+        f"<h2>{escape(_ui('cookies_h_needed'))}</h2>"
+        f"<p>{escape(_ui('cookies_p_needed'))}</p>"
+        f"<h2>{escape(_ui('cookies_h_analytics'))}</h2>"
+        f"<p>{escape(_ui('cookies_p_analytics'))}</p>"
+        f'<p><a href="{_ui_href("personal-data.html", prefix)}">{escape(_ui("cookies_personal_link"))}</a> · '
+        f'<a href="{prefix}e-appeals.html">{escape(_ui("cookies_appeals_link"))}</a></p>'
     )
 
 
 def _personal_data_body() -> str:
-    return (
-        f"<p>Оператор: {_t('Государственное научное учреждение «Институт химии новых материалов Национальной академии наук Беларуси», ул. Ф. Скорины, 36, Минск.')}</p>"
-        "<p>Обращения по персональным данным — через "
-        '<a href="e-appeals.html">электронные обращения</a> или '
-        '<a href="feedback.html">форму обратной связи</a>. Полный текст политики '
-        "появится после передачи юридического файла Институтом. Этот текст — каркас страницы, не официальная политика.</p>"
+    prefix = _ASSET_PREFIX.get()
+    banner = (
         '<p class="fish-banner">Макет. Не используйте формулировку как утверждённый документ.</p>'
-        '<p><a href="cookies.html">Политика cookie</a></p>'
+        if _LOCALE.get() == "ru"
+        else f'<p class="fish-banner" role="note">{escape(_ui("legal_mock"))}</p>'
+    )
+    return (
+        f"<p>{_t(_ui('personal_operator'))}</p>"
+        f"<p>{escape(_ui('personal_p2'))}</p>"
+        f"{banner}"
+        f'<p><a href="{_ui_href("cookies.html", prefix)}">{escape(_ui("cookies_page_title"))}</a></p>'
     )
 
 
