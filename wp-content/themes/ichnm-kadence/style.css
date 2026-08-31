@@ -1,0 +1,69 @@
+/*
+Theme Name: ИХНМ Kadence
+Theme URI: https://ichnm.by/
+Description: Дочерняя тема Kadence для официального сайта ИХНМ НАН Беларуси.
+Author: ИХНМ
+Template: kadence
+Version: 0.1.0
+Text Domain: ichnm-kadence
+*/
+
+/* Tokens taken from the live iboch.by Kadence palette. */
+:root {
+  --ichnm-navy: #0f2a43;
+  --ichnm-link: #2b6cb0;
+  --ichnm-accent: #28a7ea;
+  --global-palette1: #3182ce;
+  --global-palette2: #2b6cb0;
+  --global-palette3: #1a202c;
+  --global-palette6: #28a7ea;
+  --global-palette9: #ffffff;
+}
+
+.ichnm-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.nas-emblem {
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border-radius: 4px;
+  padding: 0.15rem 0.3rem;
+}
+
+.nas-emblem img {
+  display: block;
+  height: 2.5rem;
+  width: auto;
+}
+
+.ichnm-identity a {
+  color: inherit;
+}
+
+.ichnm-mark {
+  display: block;
+  width: 3.15rem;
+  height: auto;
+}
+
+.ichnm-lang-switch a.is-current {
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--ichnm-accent);
+}
+
+.ichnm-footer-legal,
+.ichnm-footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

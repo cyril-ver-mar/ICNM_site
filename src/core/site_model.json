@@ -1,0 +1,140 @@
+{
+  "identity": {
+    "legal_name": "Государственное научное учреждение «Институт химии новых материалов Национальной академии наук Беларуси»",
+    "short_name": "ИХНМ НАН Беларуси",
+    "nas_portal_href": "https://nasb.gov.by/rus/index.php"
+  },
+  "languages": [
+    {"code": "ru", "prefix": "/", "status": "filled"},
+    {"code": "en", "prefix": "/en/", "status": "stub"},
+    {"code": "be", "prefix": "/be/", "status": "stub"},
+    {"code": "zh", "prefix": "/zh/", "status": "stub"}
+  ],
+  "homepage": {
+    "blocks": [
+      "official_intro",
+      "news",
+      "structure_entry",
+      "developments_entry",
+      "next_event"
+    ],
+    "forbidden": ["3d_printing_promo", "achievements_list"]
+  },
+  "footer": {
+    "legal_links": [
+      {"title": "Президент Республики Беларусь", "href": "https://president.gov.by/"},
+      {"title": "Совет Министров Республики Беларусь", "href": "https://www.government.by/"},
+      {"title": "Национальный правовой Интернет-портал", "href": "https://www.pravo.by/"},
+      {"title": "Газета «Навука»", "href": "https://gazeta-navuka.by/"},
+      {"title": "Профсоюз работников НАН Беларуси", "href": "https://profnan.by/"},
+      {"title": "Национальная академия наук Беларуси", "href": "https://nasb.gov.by/rus/index.php"}
+    ],
+    "nas_social": [
+      {"network": "facebook", "label": "Facebook", "href": "https://www.facebook.com/nanbelarus"},
+      {"network": "vk", "label": "ВКонтакте", "href": "https://vk.com/nanbelarus"},
+      {"network": "telegram", "label": "Telegram", "href": "https://t.me/nanbelarus"},
+      {"network": "instagram", "label": "Instagram", "href": "https://instagram.com/nanbelarus/"},
+      {"network": "youtube", "label": "YouTube", "href": "https://www.youtube.com/channel/UCCLnA99JIPe-vTCYFhUgjmw"}
+    ],
+    "icnm_social": [],
+    "pictograms": [
+      {"title": "Президент Республики Беларусь", "href": "https://president.gov.by/", "mark": "ПР", "icon": "media/footer/president.gif"},
+      {"title": "Совет Министров", "href": "https://www.government.by/", "mark": "СМ", "icon": "media/footer/government.gif"},
+      {"title": "Национальный правовой Интернет-портал", "href": "https://www.pravo.by/", "mark": "ПБ", "icon": "media/footer/pravo.gif"},
+      {"title": "Газета «Навука»", "href": "https://gazeta-navuka.by/", "mark": "НВ", "icon": "media/footer/nauka.png"},
+      {"title": "Профсоюз работников НАН Беларуси", "href": "https://profnan.by/", "mark": "ПС", "icon": "media/footer/profsouz.jpg"},
+      {"title": "Национальная академия наук Беларуси", "href": "https://nasb.gov.by/rus/index.php", "mark": "НАН", "icon": "media/footer/nas-logo.png"},
+      {"title": "БРСМ", "href": "https://www.brsm.by/", "mark": "БР", "icon": "media/footer/brsm.png"},
+      {"title": "Журнал «Наука и инновации»", "href": "https://innosfera.by/", "mark": "ИС", "icon": "media/footer/publications.jpg"},
+      {"title": "Академия управления при Президенте", "href": "https://www.pac.by/", "mark": "АУ", "icon": "media/footer/app.gif"},
+      {"title": "РЦТТ", "href": "https://ictt.by/rus/", "mark": "РЦ", "icon": "media/footer/rctt.png"},
+      {"title": "Правовой форум Беларуси", "href": "https://forumpravo.by/", "mark": "ПФ", "icon": "media/footer/letapis.jpg"},
+      {"title": "АСИО НАН Беларуси", "href": "https://asio.basnet.by/", "mark": "АС", "icon": "media/footer/asio.png"},
+      {"title": "БелИСА", "href": "https://www.belisa.org.by/izdaniya/magazin/zhurnal-novosti-nauki-i-tekhnologiy/", "mark": "БИ", "icon": "media/footer/belisa.png"},
+      {"title": "Портал рейтинговой оценки", "href": "https://качество-услуг.бел/", "mark": "КУ", "icon": "media/footer/quality.png"},
+      {"title": "ФСЗН: накопительная пенсия", "href": "https://www.ssf.gov.by/ru/dobrovolnoe-strahovanie-dopolnitelnoj-nakopitelnoj-pensii-ru", "mark": "ФС", "icon": "media/footer/strahovanie.png"}
+    ]
+  },
+  "staff": {
+    "presentation": "department_tab",
+    "metric_fields": [
+      "orcid",
+      "google_scholar",
+      "scopus_author",
+      "elibrary",
+      "researchgate"
+    ]
+  },
+  "post_types": ["news", "event", "media_about", "publication", "department"],
+  "roles": {
+    "editor_may_publish": ["news", "event", "media_about"],
+    "editor_locked": ["header", "footer"]
+  },
+  "pages": [
+    {"id": "about", "kind": "vitrine", "status": "placeholder"},
+    {"id": "structure", "kind": "vitrine", "status": "placeholder"},
+    {"id": "developments", "kind": "vitrine", "status": "placeholder"},
+    {"id": "aist", "kind": "vitrine", "status": "stub"}
+  ],
+  "menu": [
+    {
+      "id": "about",
+      "title": "Об институте",
+      "kind": "vitrine",
+      "children": [
+        {"id": "about-overview", "title": "Сведения", "kind": "vitrine"},
+        {"id": "leadership", "title": "Руководство", "kind": "vitrine"},
+        {"id": "scientific-council", "title": "Учёный совет", "kind": "vitrine"},
+        {
+          "id": "documents",
+          "title": "Документы",
+          "kind": "vitrine",
+          "children": [
+            {"id": "charter", "title": "Устав", "kind": "vitrine"},
+            {"id": "anti-corruption", "title": "Антикоррупция", "kind": "vitrine"},
+            {"id": "e-appeals", "title": "Электронные обращения", "kind": "vitrine"},
+            {"id": "requisites", "title": "Реквизиты", "kind": "vitrine"}
+          ]
+        }
+      ]
+    },
+    {"id": "structure", "title": "Структура", "kind": "vitrine", "children": [
+      {"id": "hr", "title": "Отдел кадров", "kind": "vitrine"},
+      {"id": "labor-protection", "title": "Охрана труда", "kind": "vitrine"},
+      {"id": "engineering", "title": "Главный инженер", "kind": "vitrine"},
+      {"id": "accounting", "title": "Бухгалтерия", "kind": "vitrine"}
+    ]},
+    {"id": "science", "title": "Научная деятельность", "kind": "vitrine"},
+    {"id": "developments", "title": "Разработки", "kind": "vitrine"},
+    {"id": "facilities", "title": "Материальная база", "kind": "vitrine"},
+    {"id": "cooperation", "title": "Сотрудничество", "kind": "vitrine"},
+    {"id": "news", "title": "Новости", "kind": "feed"},
+    {
+      "id": "events",
+      "title": "Мероприятия",
+      "kind": "feed",
+      "children": [
+        {"id": "aist", "title": "AIST", "kind": "vitrine"}
+      ]
+    },
+    {"id": "vacancies", "title": "Вакансии", "kind": "vitrine"},
+    {"id": "contacts", "title": "Контакты", "kind": "vitrine"},
+    {"id": "publications", "title": "Публикации", "kind": "feed"},
+    {
+      "id": "education",
+      "title": "Образование",
+      "kind": "vitrine",
+      "children": [
+        {"id": "aspirantura", "title": "Аспирантура", "kind": "vitrine"},
+        {"id": "doctorate", "title": "Докторантура", "kind": "vitrine"},
+        {"id": "defense-council", "title": "Совет по защитам", "kind": "vitrine"},
+        {"id": "internships", "title": "Стажировки", "kind": "vitrine"},
+        {"id": "courses", "title": "Курсы", "kind": "vitrine"}
+      ]
+    },
+    {"id": "union", "title": "Профсоюз", "kind": "vitrine"},
+    {"id": "young-scientists", "title": "Совет молодых учёных", "kind": "vitrine"},
+    {"id": "media_about", "title": "СМИ о нас", "kind": "feed"},
+    {"id": "feedback", "title": "Обратная связь", "kind": "vitrine"}
+  ]
+}

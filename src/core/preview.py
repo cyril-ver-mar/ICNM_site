@@ -1,0 +1,1710 @@
+from __future__ import annotations
+
+import json
+import re
+from datetime import date
+from html import escape
+from pathlib import Path
+
+from src.core.copy import load_migrated_copy, page_copy
+from src.core.site_model import MenuItem, SiteModel
+
+_HERE = Path(__file__).resolve().parent
+
+_VISIBLE_MENU = frozenset(
+    {
+        "about",
+        "structure",
+        "science",
+        "developments",
+        "news",
+        "events",
+        "contacts",
+    }
+)
+
+_METRIC_LABELS = {
+    "orcid": "ORCID",
+    "google_scholar": "Google Scholar",
+    "scopus_author": "Scopus Author",
+    "elibrary": "eLIBRARY / РИНЦ",
+    "researchgate": "ResearchGate",
+}
+
+_HOME_LABELS = {
+    "official_intro": "Об институте",
+    "news": "Новости",
+    "structure_entry": "Структура",
+    "developments_entry": "Разработки",
+    "next_event": "Ближайшее мероприятие",
+}
+
+_WIDE_PAGES = frozenset(
+    {
+        "leadership",
+        "media_about",
+        "about",
+        "news",
+        "events",
+        "contacts",
+        "facilities",
+        "developments",
+        "education",
+        "documents",
+        "science",
+        "cooperation",
+        "structure",
+        "publications",
+        "union",
+        "young-scientists",
+        "vacancies",
+        "scientific-council",
+        "cookies",
+        "personal-data",
+        "aist",
+        "events",
+        "hr",
+        "labor-protection",
+        "engineering",
+        "accounting",
+    }
+)
+
+_HUB_BLURB = {
+    "about-overview": "Задачи и направления исследований",
+    "leadership": "Директор, заместители, почётный директор",
+    "scientific-council": "Заседания и состав совета",
+    "documents": "Устав, антикоррупция, обращения, реквизиты",
+    "charter": "Текст устава — после передачи PDF",
+    "anti-corruption": "Положение и план — после передачи PDF",
+    "e-appeals": "Куда писать и какие сроки",
+    "requisites": "Юридический адрес и банк",
+    "aist": "Конференция по сырью и топливу",
+    "hr": "Состав и контакты отдела кадров",
+    "labor-protection": "Специалист по охране труда",
+    "engineering": "Главный инженер Института",
+    "accounting": "Главный бухгалтер",
+    "aspirantura": "Открыта в 1999 году",
+    "doctorate": "Правила приёма уточнит учёный секретарь",
+    "defense-council": "Специальности и состав — после сверки",
+    "internships": "Стажировки для студентов и молодых исследователей",
+    "courses": "Повышение квалификации",
+}
+
+_LIST_AS_CARDS = frozenset({"about"})
+
+_FISH_FILE_PAGES = {
+    "charter": ["Устав ГНУ «ИХНМ НАН Беларуси».pdf"],
+    "anti-corruption": ["Положение о противодействии коррупции.pdf", "План мероприятий.pdf"],
+    "scientific-council": ["Состав учёного совета.pdf", "Регламент.pdf"],
+    "defense-council": ["Состав совета по защитам.pdf", "Специальности.pdf"],
+    "internships": ["Положение о стажировках.pdf"],
+    "courses": ["Программы курсов.pdf"],
+    "doctorate": ["Правила приёма в докторантуру.pdf"],
+    "requisites": ["Банковские реквизиты.pdf"],
+    "union": ["Положение первичной организации.pdf"],
+    "aspirantura": ["Правила приёма в аспирантуру.pdf", "Перечень специальностей.pdf"],
+}
+
+_FISH_STAFF = (
+    ("Заведующий лабораторией", "Фамилия Имя Отчество", "к.х.н., доцент"),
+    ("Ведущий научный сотрудник", "Фамилия Имя Отчество", "к.х.н."),
+    ("Научный сотрудник", "Фамилия Имя Отчество", "к.х.н."),
+    ("Младший научный сотрудник", "Фамилия Имя Отчество", ""),
+    ("Аспирант", "Фамилия Имя Отчество", ""),
+)
+
+_SMU_PEOPLE = (
+    {
+        "id": "chair",
+        "name": "Фамилия Имя Отчество",
+        "role": "Председатель совета молодых учёных",
+        "initials": "П",
+    },
+    {
+        "id": "deputy",
+        "name": "Фамилия Имя Отчество",
+        "role": "Заместитель председателя",
+        "initials": "З",
+    },
+    {
+        "id": "secretary",
+        "name": "Фамилия Имя Отчество",
+        "role": "Секретарь",
+        "initials": "С",
+    },
+)
+
+_NBSP = "\u00a0"
+
+_TYPO_PHRASES = (
+    "Институт химии новых материалов",
+    "Национальной академии наук Беларуси",
+    "НАН Беларуси",
+    "ИХНМ НАН",
+    "доктор технических наук",
+    "доктор химических наук",
+    "кандидат химических наук",
+    "кандидат технических наук",
+    "член-корреспондент НАН",
+    "Ф. Скорины",
+)
+
+
+def _typo(text: str) -> str:
+    """Keep titles, street abbreviations, and numbers with their nouns."""
+    if not text:
+        return ""
+    s = text
+    for phrase in _TYPO_PHRASES:
+        s = s.replace(phrase, phrase.replace(" ", _NBSP))
+    s = s.replace("ул. ", "ул." + _NBSP)
+    s = s.replace("г. ", "г." + _NBSP)
+    s = s.replace("д. ", "д." + _NBSP)
+    s = s.replace("тел./факс ", "тел./факс" + _NBSP)
+    s = s.replace("тел. ", "тел." + _NBSP)
+    s = s.replace("Тел. ", "Тел." + _NBSP)
+    s = s.replace("Скорины, 36", "Скорины," + _NBSP + "36")
+    s = re.sub(r"\+(\d{3})\s+", r"+\1" + _NBSP, s)
+    s = re.sub(r"\((\d{2})\)\s+", r"(\1)" + _NBSP, s)
+    s = re.sub(r"([А-ЯЁ]\.)\s+(?=[А-ЯЁа-яё])", r"\1" + _NBSP, s)
+    return s
+
+
+def _t(text: str) -> str:
+    return escape(_typo(text))
+
+
+def _admin_unit_ids() -> set[str]:
+    return {str(unit["id"]) for unit in load_migrated_copy().get("admin_units", [])}
+
+
+def render_site_files(model: SiteModel) -> dict[str, str]:
+    """Public HTML files keyed by relative path. Same IA as the WordPress adapter."""
+    files: dict[str, str] = {}
+    files["site.css"] = (_HERE / "preview.css").read_text(encoding="utf-8")
+    files["site.js"] = (_HERE / "preview.js").read_text(encoding="utf-8")
+    files["index.html"] = _page(model, "Главная", _home_body(model), current="home", is_home=True)
+    files["en/index.html"] = _stub_page(model, "en")
+    files["be/index.html"] = _stub_page(model, "be")
+    files["zh/index.html"] = _stub_page(model, "zh")
+    for item in _walk(model.menu_roots()):
+        files[f"{item.id}.html"] = _page(
+            model,
+            item.title,
+            _vitrine_body(model, item),
+            current=item.id,
+        )
+    for lab in load_migrated_copy().get("labs", []):
+        slug = lab.get("slug") or lab["id"]
+        files[f"{lab['id']}.html"] = _page(
+            model,
+            lab["title"],
+            _lab_body(model, lab, depth=0),
+            current="structure",
+        )
+        files[f"labs/{slug}/index.html"] = _page(
+            model,
+            lab["title"],
+            _lab_body(model, lab, depth=2),
+            current="structure",
+            depth=2,
+            extra_body_class="is-lab-site",
+        )
+    for person in load_migrated_copy().get("leadership_people", []):
+        files[f"leadership-{person['id']}.html"] = _page(
+            model,
+            person["name"],
+            _leader_body(model, person),
+            current="leadership",
+        )
+    copy = load_migrated_copy()
+    for item in copy.get("news", []):
+        slug = item.get("slug")
+        if not slug:
+            continue
+        files[f"news/{slug}/index.html"] = _page(
+            model,
+            item["title"],
+            _news_article_body(model, item, depth=2),
+            current="news",
+            depth=2,
+        )
+    for kind, parent, current in (
+        ("science_topics", "science", "science"),
+        ("developments_items", "developments", "developments"),
+        ("facilities_items", "facilities", "facilities"),
+    ):
+        for item in copy.get(kind, []):
+            files[f"{parent}/{item['slug']}/index.html"] = _page(
+                model,
+                item["title"],
+                _catalog_detail_body(model, parent, item, depth=2),
+                current=current,
+                depth=2,
+            )
+    for person in copy.get("council_people", []):
+        files[f"council-{person['id']}.html"] = _page(
+            model,
+            person["name"],
+            _named_person_body(
+                model,
+                person,
+                page_id="council-" + person["id"],
+                back_href="scientific-council.html",
+                back_label="Ко всему учёному совету",
+                note="Биография и публикации члена совета появятся после передачи состава.",
+            ),
+            current="scientific-council",
+        )
+    for unit in copy.get("admin_units", []):
+        for person in unit.get("people", []):
+            pid = person.get("id")
+            if not pid:
+                continue
+            files[f"office-{pid}.html"] = _page(
+                model,
+                person["name"],
+                _named_person_body(
+                    model,
+                    person,
+                    page_id="office-" + pid,
+                    back_href=f"{unit['id']}.html",
+                    back_label=f"К подразделению: {unit['title']}",
+                    note="Сведения появятся после передачи состава.",
+                ),
+                current=unit["id"],
+            )
+    for person in _SMU_PEOPLE:
+        files[f"smu-{person['id']}.html"] = _page(
+            model,
+            person["name"],
+            _named_person_body(
+                model,
+                person,
+                page_id="smu-" + person["id"],
+                back_href="young-scientists.html",
+                back_label="К совету молодых учёных",
+                note="Контакт и биография появятся после передачи состава.",
+            ),
+            current="young-scientists",
+        )
+    files["lattice-demo.html"] = _page(
+        model,
+        "Демо сетки атомов",
+        _lattice_demo_body(),
+        current="home",
+        extra_body_class="is-lattice-demo",
+    )
+    files["cookies.html"] = _page(
+        model,
+        "Политика cookie",
+        _with_page_hero("Политика cookie", _cookies_body()),
+        current="contacts",
+    )
+    files["personal-data.html"] = _page(
+        model,
+        "Персональные данные",
+        _with_page_hero("Персональные данные", _personal_data_body()),
+        current="contacts",
+    )
+    for item in copy.get("conferences", []):
+        files[f"conferences/{item['slug']}/index.html"] = _page(
+            model,
+            item["title"],
+            _conference_body(model, item, depth=2),
+            current="events",
+            depth=2,
+        )
+    return files
+
+
+def _walk(items: tuple[MenuItem, ...]) -> list[MenuItem]:
+    out: list[MenuItem] = []
+    for item in items:
+        out.append(item)
+        out.extend(_walk(item.children))
+    return out
+
+
+def _href(page_id: str, depth: int = 0) -> str:
+    prefix = "../" * depth
+    if page_id == "home":
+        return f"{prefix}index.html"
+    return f"{prefix}{page_id}.html"
+
+
+def _item_href(item: MenuItem, depth: int = 0) -> str:
+    prefix = "../" * depth
+    if item.href:
+        return f"{prefix}{item.href}"
+    return _href(item.id, depth)
+
+
+def _structure_menu_children(item: MenuItem) -> tuple[MenuItem, ...]:
+    labs: list[MenuItem] = []
+    for lab in load_migrated_copy().get("labs", []):
+        slug = lab.get("slug") or lab["id"]
+        labs.append(
+            MenuItem(
+                id=str(lab["id"]),
+                title=str(lab["title"]),
+                kind="lab",
+                href=f"labs/{slug}/index.html",
+            )
+        )
+    return tuple(labs + list(item.children))
+
+
+def _nav(model: SiteModel, current: str, depth: int = 0) -> str:
+    admin_ids = _admin_unit_ids()
+
+    def branch(
+        items: tuple[MenuItem, ...] | list[MenuItem],
+        *,
+        admin_sep: bool = False,
+    ) -> str:
+        parts = ["<ul>"]
+        marked_admin = False
+        for item in items:
+            classes: list[str] = []
+            if item.id == current:
+                classes.append("is-current")
+            if item.children:
+                classes.append("has-children")
+            if admin_sep and item.id in admin_ids and not marked_admin:
+                classes.append("nav-admin-start")
+                marked_admin = True
+            cls = f' class="{" ".join(classes)}"' if classes else ""
+            parts.append(
+                f"<li{cls}><a href=\"{_item_href(item, depth)}\">{_t(item.title)}</a>"
+            )
+            if item.children:
+                kids = item.children
+                sep = False
+                if item.id == "structure":
+                    kids = _structure_menu_children(item)
+                    sep = True
+                parts.append(
+                    f'<button type="button" class="submenu-toggle" aria-expanded="false" '
+                    f'aria-label="Подменю: {escape(item.title)}"></button>'
+                )
+                parts.append(branch(kids, admin_sep=sep))
+            parts.append("</li>")
+        parts.append("</ul>")
+        return "".join(parts)
+
+    roots = model.menu_roots()
+    visible = tuple(item for item in roots if item.id in _VISIBLE_MENU)
+    more = [item for item in roots if item.id not in _VISIBLE_MENU]
+    more_open = any(item.id == current for item in more)
+    more_cls = ' class="has-children is-current"' if more_open else ' class="has-children"'
+    more_block = ""
+    if more:
+        more_block = (
+            f"<li{more_cls}><span class=\"nav-more-label\">Ещё</span>"
+            '<button type="button" class="submenu-toggle" aria-expanded="false" '
+            'aria-label="Подменю: Ещё"></button>'
+            f"{branch(more)}</li>"
+        )
+    primary = branch(visible)
+    # Insert "Ещё" into the top-level <ul> before closing.
+    if more_block:
+        primary = primary[:-5] + more_block + "</ul>"
+    return f'<nav id="primary-nav" class="ichnm-menu" aria-label="Разделы">{primary}</nav>'
+
+
+def _bvi_panel() -> str:
+    return (
+        '<div class="bvi-panel" id="bvi-panel" hidden>'
+        '<p class="bvi-heading">Версия для слабовидящих</p>'
+        '<div class="bvi-row"><span>Шрифт</span>'
+        '<button type="button" data-bvi-size="normal">A</button>'
+        '<button type="button" data-bvi-size="large">A+</button>'
+        '<button type="button" data-bvi-size="xlarge">A++</button></div>'
+        '<div class="bvi-row"><span>Цвета</span>'
+        '<button type="button" data-bvi-scheme="bw">А</button>'
+        '<button type="button" data-bvi-scheme="wb" class="bvi-invert">А</button>'
+        '<button type="button" data-bvi-scheme="blue" class="bvi-blue">А</button></div>'
+        '<div class="bvi-row">'
+        '<button type="button" data-bvi-images>Изображения</button>'
+        '<button type="button" data-bvi-spacing>Интервал</button>'
+        '<button type="button" data-bvi-off>Обычная версия</button>'
+        "</div></div>"
+    )
+
+
+def _cookie_banner(prefix: str) -> str:
+    return (
+        '<div class="cookie-banner" id="cookie-banner" hidden role="dialog" '
+        'aria-labelledby="cookie-title">'
+        '<p id="cookie-title">Файлы cookie</p>'
+        "<p>Сайт запоминает язык, тему и версию для слабовидящих. Это необходимые cookie. "
+        "Аналитические cookie в макете выключены. Подробнее — "
+        f'<a href="{prefix}cookies.html">политика cookie</a> и '
+        f'<a href="{prefix}personal-data.html">персональные данные</a>.</p>'
+        '<div class="cookie-actions">'
+        '<button type="button" data-cookie="accept">Принять</button>'
+        '<button type="button" data-cookie="reject">Отклонить необязательные</button>'
+        '<button type="button" data-cookie="settings">Настроить</button>'
+        "</div>"
+        '<form class="cookie-settings" id="cookie-settings" hidden>'
+        '<label><input type="checkbox" name="necessary" checked disabled> Необходимые (всегда)</label>'
+        '<label><input type="checkbox" name="analytics"> Аналитические</label>'
+        '<button type="submit">Сохранить</button>'
+        "</form></div>"
+    )
+
+
+def _social_icon(network: str) -> str:
+    paths = {
+        "facebook": "M10 3.2h1.8V.9H10c-2 0-3.3 1.2-3.3 3.4v1.5H5v2.4h1.7V16h2.5V8.2h2.1l.4-2.4H9.2V4.6c0-.7.3-1.4 1.4-1.4z",
+        "vk": (
+            "M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 "
+            "8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 "
+            "15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1.01"
+            "-1.49-1.147-1.744-1.147-.356 0-.458.102-.458.593v1.575c0 .424-.135.688"
+            "-1.261.688-1.862 0-3.926-1.126-5.379-3.224C4.24 10.883 3.5 8.68 3.5 "
+            "8.36c0-.323.102-.594.593-.594h1.744c.44 0 .61.253.78.843.863 2.49 "
+            "2.303 4.677 2.896 4.677.226 0 .338-.105.338-.688V9.721c-.068-1.186"
+            "-.695-1.287-.695-1.71 0-.204.17-.407.44-.407h2.744c.44 0 .525.22.525.688"
+            "v3.686c0 .355.16.479.254.479.226 0 .407-.124.814-.53 1.254-1.406 "
+            "2.151-3.574 2.151-3.574.119-.254.322-.593.763-.593h1.744c.525 0 "
+            ".643.27.525.643-.22 1.017-2.354 4.031-2.354 4.031-.186.305-.256.44 "
+            "0 .78.186.254.796.779 1.203 1.253.745.847 1.32 1.558 1.473 2.05.17.49"
+            "-.085.743-.576.743z"
+        ),
+        "telegram": "M15.7 2.3 1.8 7.6c-.9.4-.9 1 .2 1.3l3.5 1.1 1.3 4.1c.2.5.3.7.7.7.4 0 .6-.2.8-.5l2-2.1 4.1 3c.8.4 1.3.2 1.5-.7l2.7-12.7c.3-1.1-.4-1.6-1.2-1.3zM6.7 9.9l7.3-4.6-5.7 5.5-.2 2.5-1.4-3.4z",
+        "instagram": "M8 4.4A3.6 3.6 0 1 0 8 11.6 3.6 3.6 0 0 0 8 4.4zm0 5.9A2.3 2.3 0 1 1 8 5.7a2.3 2.3 0 0 1 0 4.6zM12.4 4.2a.84.84 0 1 1-1.68 0 .84.84 0 0 1 1.68 0zM14.7 4.3a4.1 4.1 0 0 0-1.1-2.9 4.1 4.1 0 0 0-2.9-1.1H5.3A4.1 4.1 0 0 0 2.4 1.4 4.1 4.1 0 0 0 1.3 4.3v5.4a4.1 4.1 0 0 0 1.1 2.9 4.1 4.1 0 0 0 2.9 1.1h5.4a4.1 4.1 0 0 0 2.9-1.1 4.1 4.1 0 0 0 1.1-2.9V4.3zm-1.3 5.4a2.8 2.8 0 0 1-.8 2 2.8 2.8 0 0 1-2 .8H5.3a2.8 2.8 0 0 1-2-.8 2.8 2.8 0 0 1-.8-2V4.3a2.8 2.8 0 0 1 .8-2 2.8 2.8 0 0 1 2-.8h5.4a2.8 2.8 0 0 1 2 .8 2.8 2.8 0 0 1 .8 2z",
+        "youtube": "M15.6 4.4s-.1-1.2-.5-1.7c-.5-.5-1.1-.5-1.3-.6C11.9 2 8 2 8 2h0s-3.9 0-5.8.1c-.3 0-.8.1-1.3.6-.4.5-.5 1.7-.5 1.7S0 5.8 0 7.2v1.6c0 1.4.2 2.8.2 2.8s.1 1.2.5 1.7c.5.5 1.2.5 1.5.6 1.1.1 5.8.1 5.8.1s3.9 0 5.8-.1c.3 0 .8-.1 1.3-.6.4-.5.5-1.7.5-1.7s.2-1.4.2-2.8V7.2c0-1.4-.2-2.8-.2-2.8zM6.4 10.6V5.4L12 8z",
+    }
+    d = paths.get(network)
+    if not d:
+        return ""
+    box = "0 0 24 24" if network == "vk" else "0 0 16 16"
+    return (
+        f'<svg class="social-icon" viewBox="{box}" width="16" height="16" aria-hidden="true">'
+        f'<path fill="currentColor" d="{d}"/></svg>'
+    )
+
+
+def _langs(model: SiteModel, current_code: str = "ru", depth: int = 0) -> str:
+    bits = ['<nav class="ichnm-lang-switch" aria-label="Язык">']
+    prefix = "../" * depth
+    for lang in model.languages:
+        code = lang.code.upper()
+        if lang.code == "ru":
+            href = f"{prefix}index.html"
+        else:
+            href = (
+                "index.html"
+                if lang.code == current_code and depth == 1
+                else f"{prefix}{lang.code}/index.html"
+            )
+        cls = "is-current" if lang.code == current_code else ""
+        bits.append(f'<a class="{cls}" href="{href}">{escape(code)}</a>')
+    bits.append("</nav>")
+    return "".join(bits)
+
+
+def _footer(model: SiteModel, depth: int = 0) -> str:
+    prefix = "../" * depth
+    contacts = page_copy("contacts")
+    address = " ".join(contacts.get("paragraphs", [])[1:2]) or "г. Минск, ул. Ф. Скорины, 36"
+    social = "".join(
+        f'<li><a href="{escape(profile.href)}">{_social_icon(profile.network)}'
+        f"<span>{escape(profile.label or profile.network)}</span></a></li>"
+        for profile in model.nas_social_profiles
+    )
+    pics = []
+    for link in model.footer_pictograms:
+        if link.icon:
+            mark = (
+                f'<img class="picto-img" src="{prefix}{escape(link.icon)}" alt="" width="140" height="66">'
+            )
+        else:
+            mark = f'<span class="picto-mark">{escape(link.mark or link.title[:2])}</span>'
+        pics.append(
+            f'<li><a href="{escape(link.href)}" rel="noopener noreferrer">'
+            f"{mark}<span class=\"picto-title\">{escape(link.title)}</span></a></li>"
+        )
+    pics = "".join(pics)
+    site_links = (
+        f'<li><a href="{prefix}news.html">Новости</a></li>'
+        f'<li><a href="{prefix}media_about.html">СМИ о нас</a></li>'
+        f'<li><a href="{prefix}education.html">Образование</a></li>'
+        f'<li><a href="{prefix}union.html">Профсоюз</a></li>'
+        f'<li><a href="{prefix}publications.html">Публикации</a></li>'
+        f'<li><a href="{prefix}feedback.html">Обратная связь</a></li>'
+        f'<li><a href="{prefix}cookies.html">Политика cookie</a></li>'
+        f'<li><a href="{prefix}personal-data.html">Персональные данные</a></li>'
+        f'<li><a href="{prefix}lattice-demo.html">Демо сетки атомов</a></li>'
+    )
+    return (
+        '<footer class="ichnm-footer">'
+        '<div class="wrap footer-grid">'
+        '<div><p class="footer-heading">Институт</p>'
+        f'<p class="ichnm-identity"><strong>{_t(model.legal_name)}</strong></p>'
+        f"<p>{_t(address)}</p>"
+        f'<p><a href="{escape(model.nas_portal_href)}">Национальная академия наук Беларуси</a></p>'
+        "</div>"
+        '<div><p class="footer-heading">На сайте</p>'
+        f'<ul class="ichnm-footer-legal">{site_links}</ul></div>'
+        '<div><p class="footer-heading">Соцсети НАН</p>'
+        f'<ul class="ichnm-footer-social">{social}</ul>'
+        "<p>Веб-почта института — адрес появится после PHP-тарифа.</p>"
+        "</div>"
+        '<div class="footer-place">'
+        '<p class="footer-heading">Как нас найти</p>'
+        f'<a class="footer-map" href="{prefix}contacts.html">'
+        f'<img src="{prefix}media/maps/institute.svg" width="280" height="200" '
+        'alt="Институт на карте Минска, ул. Ф. Скорины, 36">'
+        f"<span>{_t('ул. Ф. Скорины, 36, Минск')}</span></a>"
+        "</div></div>"
+        '<div class="footer-pictograms" aria-label="Ресурсы портала НАН Беларуси">'
+        '<div class="wrap">'
+        "<p class=\"footer-heading\">Ресурсы Академии и государственные порталы</p>"
+        f'<ul class="picto-strip">{pics}</ul>'
+        "</div></div></footer>"
+    )
+
+
+def _shell(
+    model: SiteModel,
+    title: str,
+    body: str,
+    current: str,
+    depth: int = 0,
+    current_code: str = "ru",
+    is_home: bool = False,
+    extra_body_class: str = "",
+) -> str:
+    prefix = "../" * depth
+    home = f"{prefix}index.html"
+    css = f"{prefix}site.css"
+    js = f"{prefix}site.js"
+    mark = f"{prefix}media/ichnm-mark.svg"
+    nas = f"{prefix}media/nas-emblem.webp"
+    body_class = " ".join(
+        part for part in ("is-home" if is_home else "is-inner", extra_body_class) if part
+    )
+    nav = _nav(model, current, depth=depth) if current_code == "ru" else ""
+    nas_block = (
+        f'<a class="nas-emblem" href="{escape(model.nas_portal_href)}" '
+        'title="Национальная академия наук Беларуси">'
+        f'<img src="{nas}" width="220" height="120" alt="Эмблема Национальной академии наук Беларуси">'
+        "</a>"
+    )
+    boot = (
+        "<script>"
+        "(function(){"
+        "try{"
+        'if(document.cookie.indexOf("ichnm-cookies=")!==-1||localStorage.getItem("ichnm-cookies"))'
+        '{document.documentElement.classList.add("cookies-ok")}'
+        "}catch(e){}"
+        "try{"
+        'var t=localStorage.getItem("ichnm-theme");'
+        "var h=new Date().getHours();"
+        'var night=t==="night"||(t!=="day"&&(h>=21||h<7));'
+        'if(night)document.documentElement.classList.add("theme-night")'
+        "}catch(e){}"
+        "})();"
+        "</script>"
+    )
+    return f"""<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{escape(title)} — ИХНМ НАН Беларуси</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{css}">
+  <link rel="icon" href="{mark}" type="image/svg+xml">
+  {boot}
+</head>
+<body class="{body_class}">
+  <a class="skip-link" href="#content">К содержанию</a>
+  <header class="site-header">
+    <div class="masthead">
+      <div class="wrap masthead-inner">
+        <div class="brand-row">
+          {nas_block}
+          <a class="brand" href="{home}">
+            <img class="brand-mark" src="{mark}" width="230" height="193" alt="Эмблема ИХНМ">
+            <span class="brand-lockup">
+              <span class="brand-kicker">Национальная академия наук Беларуси</span>
+              <span class="brand-title">Институт химии новых материалов</span>
+            </span>
+          </a>
+        </div>
+        {nav}
+        <div class="header-tools">
+          <button type="button" class="tool-btn" data-theme-toggle aria-pressed="false">Ночная тема</button>
+          <button type="button" class="tool-btn" data-bvi aria-pressed="false" aria-controls="bvi-panel">Версия для слабовидящих</button>
+          <a class="tool-btn" href="{prefix}feedback.html">Написать нам</a>
+          {_langs(model, current_code=current_code, depth=depth)}
+          {('<button type="button" class="menu-toggle" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Меню</button>' if nav else "")}
+        </div>
+      </div>
+    </div>
+    {_bvi_panel()}
+  </header>
+  <main id="content">{body}</main>
+  {_footer(model, depth=depth)}
+  {_cookie_banner(prefix)}
+  <script src="{js}" defer></script>
+</body>
+</html>
+"""
+
+
+def _page(
+    model: SiteModel,
+    title: str,
+    body: str,
+    current: str,
+    is_home: bool = False,
+    depth: int = 0,
+    extra_body_class: str = "",
+) -> str:
+    return _shell(
+        model,
+        title,
+        body,
+        current,
+        is_home=is_home,
+        depth=depth,
+        extra_body_class=extra_body_class,
+    )
+
+
+def _stub_page(model: SiteModel, code: str) -> str:
+    inner = (
+        f"<p>Языковой префикс <code>/{code}/</code> заложен с первого дня. "
+        f"Публичное наполнение — после перевода. "
+        f'<a href="../index.html">Русская версия</a>.</p>'
+    )
+    body = _with_page_hero("Версия готовится", inner)
+    return _shell(
+        model,
+        "Версия готовится",
+        body,
+        current="home",
+        depth=1,
+        current_code=code,
+    )
+
+
+def _with_page_hero(title: str, inner: str, trail: str = "", wide: bool = False) -> str:
+    extra = " is-wide" if wide else ""
+    return (
+        f'<header class="page-hero"><div class="wrap">{trail}'
+        f"<h1>{escape(title)}</h1></div></header>"
+        f'<div class="page-body{extra}">{inner}</div>'
+    )
+
+
+def _find_parent(model: SiteModel, page_id: str) -> MenuItem | None:
+    def walk(items: tuple[MenuItem, ...], parent: MenuItem | None) -> MenuItem | None:
+        for item in items:
+            if item.id == page_id:
+                return parent
+            found = walk(item.children, item)
+            if found is not None:
+                return found
+        return None
+
+    return walk(model.menu_roots(), None)
+
+
+def _trail(model: SiteModel, page_id: str, title: str, depth: int = 0) -> str:
+    prefix = "../" * depth
+    bits = [f'<a href="{prefix}index.html">Главная</a>']
+    if page_id.startswith("lab-") or page_id.startswith("labs/"):
+        bits.append(f'<a href="{prefix}structure.html">Структура</a>')
+    elif page_id.startswith("leadership-"):
+        bits.append(f'<a href="{prefix}leadership.html">Руководство</a>')
+    elif page_id.startswith("council-"):
+        bits.append(f'<a href="{prefix}scientific-council.html">Учёный совет</a>')
+    elif page_id.startswith("office-"):
+        bits.append(f'<a href="{prefix}structure.html">Структура</a>')
+    elif page_id.startswith("smu-"):
+        bits.append(f'<a href="{prefix}young-scientists.html">Совет молодых учёных</a>')
+    elif page_id.startswith("news/"):
+        bits.append(f'<a href="{prefix}news.html">Новости</a>')
+    elif page_id.startswith("science/"):
+        bits.append(f'<a href="{prefix}science.html">Научная деятельность</a>')
+    elif page_id.startswith("developments/"):
+        bits.append(f'<a href="{prefix}developments.html">Разработки</a>')
+    elif page_id.startswith("conferences/"):
+        bits.append(f'<a href="{prefix}events.html">Мероприятия</a>')
+    else:
+        parent = _find_parent(model, page_id)
+        if parent:
+            bits.append(f'<a href="{prefix}{parent.id}.html">{escape(parent.title)}</a>')
+    bits.append(f'<span aria-current="page">{escape(title)}</span>')
+    sep = '<span class="crumbs-sep"> / </span>'
+    return f'<nav class="crumbs" aria-label="Навигация">{sep.join(bits)}</nav>'
+
+
+def _hub_cards(children: tuple[MenuItem, ...]) -> str:
+    if not children:
+        return ""
+    cards = []
+    for child in children:
+        blurb = _HUB_BLURB.get(child.id, "")
+        extra = f"<p>{_t(blurb)}</p>" if blurb else ""
+        cards.append(
+            f'<li><a href="{child.id}.html">{_t(child.title)}{extra}</a></li>'
+        )
+    return f'<ul class="dir-grid">{"".join(cards)}</ul>'
+
+
+def _empty_state(title: str, text: str) -> str:
+    return (
+        f'<div class="empty-state"><h2>{escape(title)}</h2>'
+        f"<p>{escape(text)}</p></div>"
+    )
+
+
+def _card_list(rows: list[str], heading: str) -> str:
+    if not rows:
+        return ""
+    items = "".join(
+        f'<article class="info-card"><p>{_t(row)}</p></article>' for row in rows
+    )
+    return f"<h2>{escape(heading)}</h2><div class=\"info-grid\">{items}</div>"
+
+
+def _contact_cards(rows: list[str]) -> str:
+    cards = []
+    for row in rows:
+        if ":" not in row:
+            cards.append(f'<article class="info-card"><p>{_t(row)}</p></article>')
+            continue
+        label, rest = row.split(":", 1)
+        cards.append(
+            f'<article class="info-card"><p class="leader-role">{_t(label.strip())}</p>'
+            f"<p>{_t(rest.strip())}</p></article>"
+        )
+    return f'<div class="info-grid">{"".join(cards)}</div>'
+
+
+def _news_feed_inner() -> str:
+    copy = page_copy("news")
+    parts = [f"<p>{escape(para)}</p>" for para in copy.get("paragraphs", [])]
+    cards = "".join(
+        f'<a class="news-card" href="news/{escape(item["slug"])}/index.html">'
+        f"<time>{escape(item.get('date_label') or item.get('date', ''))}</time>"
+        f"<h3>{escape(item['title'])}</h3>"
+        "</a>"
+        for item in load_migrated_copy().get("news", [])
+        if item.get("slug")
+    )
+    parts.append(f'<div class="news-grid">{cards}</div>')
+    parts.append('<p><a class="band-link" href="media_about.html">СМИ о нас</a></p>')
+    return "".join(parts)
+
+
+def _home_mix_cards() -> str:
+    rows: list[dict] = []
+    for item in load_migrated_copy().get("news", []):
+        if not item.get("slug"):
+            continue
+        rows.append(
+            {
+                "date": item.get("date", ""),
+                "label": item.get("date_label") or item.get("date", ""),
+                "title": item["title"],
+                "href": f"news/{item['slug']}/index.html",
+                "kicker": "Новость",
+            }
+        )
+    for item in load_migrated_copy().get("media_items", []):
+        rows.append(
+            {
+                "date": item.get("date", ""),
+                "label": item.get("date_label", ""),
+                "title": item["title"],
+                "href": item.get("href") or "media_about.html",
+                "kicker": item.get("outlet") or "СМИ",
+            }
+        )
+    rows.sort(key=lambda row: row["date"], reverse=True)
+    return "".join(
+        f'<a class="news-card" href="{escape(row["href"])}">'
+        f'<p class="news-kicker">{escape(row["kicker"])}</p>'
+        f"<time>{escape(row['label'])}</time>"
+        f"<h3>{escape(row['title'])}</h3></a>"
+        for row in rows[:6]
+    )
+
+
+def _events_inner() -> str:
+    copy = page_copy("events")
+    event = load_migrated_copy().get("next_event") or {}
+    parts = [f"<p>{escape(para)}</p>" for para in copy.get("paragraphs", [])]
+    parts.append(
+        '<div class="event-banner">'
+        "<h2>Ближайшее мероприятие</h2>"
+        f"<p><strong>{escape(event.get('title', ''))}</strong></p>"
+        f"<p>{escape(event.get('when', ''))}</p>"
+        '<p><a href="aist.html">Раздел AIST</a> · '
+        f'<a href="{escape(event.get("href", "aist.html"))}">Регистрация текущего цикла</a></p>'
+        "</div>"
+    )
+    parts.append(_conference_archive())
+    return "".join(parts)
+
+
+def _conference_archive() -> str:
+    rows = load_migrated_copy().get("conferences") or []
+    aist = [row for row in rows if row.get("kind") == "aist"]
+    other = [row for row in rows if row.get("kind") != "aist"]
+    def cards(items: list[dict]) -> str:
+        bits = []
+        for item in items:
+            bits.append(
+                '<article class="conf-card">'
+                f'<p class="leader-role">{escape(item.get("series", ""))}</p>'
+                f'<h3><a href="conferences/{escape(item["slug"])}/index.html">{escape(item["title"])}</a></h3>'
+                f'<p>{escape(item.get("when", ""))}</p></article>'
+            )
+        return f'<div class="conf-grid">{"".join(bits)}</div>'
+    chunks = ["<h2>Архив AIST</h2>", cards(aist)]
+    if other:
+        chunks.append("<h2>Другие конференции Института</h2>")
+        chunks.append(
+            "<p>Слоты для мероприятий вне AIST. Новую страницу можно добавить в этот архив, "
+            "не вынося конференцию на отдельный домен.</p>"
+        )
+        chunks.append(cards(other))
+    return "".join(chunks)
+
+
+def _conference_body(model: SiteModel, item: dict, depth: int = 2) -> str:
+    prefix = "../" * depth
+    series = escape(item.get("series", ""))
+    inner = (
+        f"{_fish_banner()}"
+        f'<p class="leader-role">{series}</p>'
+        f"<p>{escape(item.get('when', ''))}</p>"
+        "<p>Программа, сборник и ключевые даты этой конференции появятся после передачи "
+        "материалов. Страница живёт в архиве ichnm.by, не на отдельном домене.</p>"
+        f'<p><a href="{prefix}events.html">К архиву мероприятий</a> · '
+        f'<a href="{prefix}aist.html">Раздел AIST</a></p>'
+    )
+    return _with_page_hero(
+        item["title"],
+        inner,
+        trail=_trail(model, f"conferences/{item['slug']}", item["title"], depth=depth),
+        wide=True,
+    )
+
+
+def _cookies_body() -> str:
+    return (
+        f"{_fish_banner()}"
+        "<p>Институт использует файлы cookie, чтобы сайт работал и чтобы запомнить "
+        "ваш выбор оформления. Это тот же класс юридических элементов, что на "
+        '<a href="https://bsu.by/">bsu.by</a> (баннер, политика, настройка категорий).</p>'
+        "<h2>Необходимые</h2>"
+        "<p>Язык интерфейса, дневная/ночная тема, панель для слабовидящих, решение по cookie. "
+        "Без них страница каждый раз сбрасывается к виду по умолчанию.</p>"
+        "<h2>Аналитические</h2>"
+        "<p>В макете выключены. Если институт позже подключит счётчик, категория появится "
+        "в настройках баннера. Сейчас отказ и согласие только сохраняют ваш выбор.</p>"
+        '<p><a href="personal-data.html">Обработка персональных данных</a> · '
+        '<a href="e-appeals.html">Электронные обращения</a></p>'
+    )
+
+
+def _personal_data_body() -> str:
+    return (
+        f"<p>Оператор: {_t('Государственное научное учреждение «Институт химии новых материалов Национальной академии наук Беларуси», ул. Ф. Скорины, 36, Минск.')}</p>"
+        "<p>Обращения по персональным данным — через "
+        '<a href="e-appeals.html">электронные обращения</a> или '
+        '<a href="feedback.html">форму обратной связи</a>. Полный текст политики '
+        "появится после передачи юридического файла Институтом. Этот текст — каркас страницы, не официальная политика.</p>"
+        '<p class="fish-banner">Макет. Не используйте формулировку как утверждённый документ.</p>'
+        '<p><a href="cookies.html">Политика cookie</a></p>'
+    )
+
+
+def _lattice_demo_body() -> str:
+    def row(name: str, label: str, min_v: str, max_v: str, step: str, hint: str) -> str:
+        return (
+            "<label>"
+            f"<span>{escape(label)}</span>"
+            f'<input type="range" name="{name}" min="{min_v}" max="{max_v}" step="{step}">'
+            "<output></output>"
+            f"<small>{escape(hint)}</small>"
+            "</label>"
+        )
+
+    controls = (
+        "<p class=\"lattice-group\">Сетка и атомы</p>"
+        + '<label class="lattice-check"><input type="checkbox" name="showHex" value="1"> '
+        "<span>Показывать шестигранную сетку</span></label>"
+        + row("hexSize", "Ребро шестигранника", "18", "72", "1", "Размер ячейки сетки, px")
+        + row("hexLine", "Контраст сетки", "0", "0.6", "0.01", "0 — сетка не видна")
+        + row("idleRadius", "Атом в покое", "0", "16", "0.5", "0 — покоящиеся атомы скрыты")
+        + row("peakRadius", "Атом на пике волны", "4", "36", "0.5", "Максимальный радиус")
+        + row("paletteStep", "Шаг цвета новой волны", "0.02", "0.25", "0.01",
+              "Насколько сдвигается общий цвет, когда появляется новое кольцо")
+        + "<p class=\"lattice-group\">Случайные волны</p>"
+        + "<p><small>Курсор сетку не трогает. Цвет всех волн общий: после зелёного — белый, "
+        "затем оранжевый, дальше по кругу без жёлтого.</small></p>"
+        + row("waveWidth", "Толщина фронта", "16", "180", "1", "Ширина кольца")
+        + row("waveSpeed", "Скорость", "80", "700", "10", "Пикселей в секунду")
+        + row("waveLife", "Время жизни", "1", "6", "0.1", "Секунды")
+        + row("waveDecay", "Затухание к краю", "0", "1", "0.02", "0 — не слабеет, 1 — гаснет у края")
+        + row("randomAmp", "Сила волны", "0.1", "1.5", "0.05", "Амплитуда случайных колец")
+        + row("randomEvery", "Интервал волн, мс", "0", "8000", "100", "0 — не запускать")
+    )
+    inner = (
+        '<section class="lattice-stage">'
+        '<canvas class="hero-lattice" width="1290" height="800" aria-hidden="true"></canvas>'
+        '<form class="lattice-panel" id="lattice-form">'
+        "<h1>Сетка атомов</h1>"
+        "<p>Только случайные кольца. Курсор сетку не трогает. "
+        "Цвет общий для всех волн и идёт по кругу, минуя жёлтый через белый.</p>"
+        f"{controls}"
+        '<div class="lattice-actions">'
+        '<button type="button" data-lattice-action="save">Сохранить в браузере</button>'
+        '<button type="button" data-lattice-action="copy">Скопировать JSON</button>'
+        '<button type="button" data-lattice-action="download">Скачать JSON</button>'
+        '<button type="button" data-lattice-action="reset">Сброс</button>'
+        "</div>"
+        '<p id="lattice-status" role="status"></p>'
+        "<p>Главная читает сохранённый профиль из этого браузера. "
+        "Чтобы зафиксировать вид в коде — пришлите JSON в чат.</p>"
+        '<pre id="lattice-json"></pre>'
+        '<p><a href="index.html">На главную</a></p>'
+        "</form></section>"
+    )
+    return inner
+
+
+def _home_body(model: SiteModel) -> str:
+    copy = load_migrated_copy()
+    intro = _t(copy.get("home_intro", model.legal_name))
+    news_cards = _home_mix_cards()
+    event = copy.get("next_event") or {}
+    labs = copy.get("labs", [])
+    lab_cards = "".join(
+        f'<li><a href="labs/{escape(lab.get("slug") or lab["id"])}/index.html">'
+        f'{escape(lab["title"])}</a></li>'
+        for lab in labs
+    )
+    founded = int(copy.get("founded_year", 1998))
+    years = date.today().year - founded
+    return (
+        '<section class="hero ichnm-home-block" data-ichnm-block="official_intro">'
+        '<canvas class="hero-lattice" width="1290" height="720" aria-hidden="true"></canvas>'
+        '<div class="wrap hero-layout"><div class="hero-copy">'
+        '<p class="hero-kicker">Национальная академия наук Беларуси</p>'
+        "<h1>Институт химии новых материалов</h1>"
+        f'<p class="hero-lead">{intro}</p>'
+        '<div class="hero-entries">'
+        '<a class="hero-pill hero-pill-primary" href="about.html">Сведения</a>'
+        '<a class="hero-pill ichnm-home-block" data-ichnm-block="structure_entry" href="structure.html">Структура</a>'
+        '<a class="hero-pill ichnm-home-block" data-ichnm-block="developments_entry" href="developments.html">Разработки</a>'
+        '<a class="hero-pill" href="feedback.html">Написать нам</a>'
+        f"</div></div></div></section>"
+        '<section class="stats-band" aria-label="Цифры об институте">'
+        '<div class="wrap stats-grid">'
+        f'<article class="stat" data-count-to="{years}" data-suffix="+" tabindex="0" '
+        f'aria-label="{years} лет опыта работы, {founded}—{date.today().year}">'
+        f'<p class="stat-value" aria-hidden="true"><span class="stat-num">{years}</span>'
+        '<span class="stat-suffix">+</span></p>'
+        "<h2>Опыт работы</h2>"
+        f'<p class="stat-note">{founded} — {date.today().year}</p></article>'
+        f'<article class="stat" data-count-to="{len(labs)}" tabindex="0" '
+        f'aria-label="{len(labs)} лабораторий">'
+        f'<p class="stat-value" aria-hidden="true"><span class="stat-num">{len(labs)}</span></p>'
+        "<h2>Лабораторий</h2>"
+        '<p class="stat-note"><a href="structure.html">Подразделения</a></p></article>'
+        "</div></section>"
+        '<section class="home-band">'
+        '<div class="wrap"><h2>Основные направления</h2>'
+        '<ul class="dir-grid">'
+        '<li><a href="science.html">Тонкоплёночные и наноструктурированные материалы'
+        "<p>Органические плёнки и наноструктуры с заданными свойствами.</p></a></li>"
+        '<li><a href="developments.html">Композиты лесо- и нефтехимии'
+        "<p>Материалы на основе продуктов лесо- и нефтехимии и технологии их получения.</p></a></li>"
+        '<li><a href="science.html">Синтез новых органических соединений'
+        "<p>Потенциальные физиологически активные вещества.</p></a></li>"
+        "</ul></div></section>"
+        '<section class="home-band band-muted ichnm-home-block" data-ichnm-block="news">'
+        '<div class="wrap"><h2>Актуальные новости и мероприятия</h2>'
+        f'<div class="news-grid">{news_cards}</div>'
+        '<p><a class="band-link" href="news.html">Все новости</a>'
+        ' · <a class="band-link" href="media_about.html">СМИ о нас</a>'
+        ' · <a class="band-link" href="feedback.html">Написать нам</a></p>'
+        "</div></section>"
+        '<section class="home-band">'
+        '<div class="wrap"><h2>Структура</h2>'
+        f'<ul class="lab-grid">{lab_cards}</ul>'
+        '<p><a class="band-link" href="structure.html">Все подразделения</a></p>'
+        "</div></section>"
+        '<section class="home-band ichnm-home-block" data-ichnm-block="next_event">'
+        '<div class="wrap"><div class="event-banner">'
+        f"<h2>{escape(_HOME_LABELS['next_event'])}</h2>"
+        f"<p><strong>{escape(event.get('title', ''))}</strong></p>"
+        f"<p>{escape(event.get('when', ''))}</p>"
+        f'<p><a href="aist.html">Раздел AIST</a> · '
+        f'<a href="{escape(event.get("href", "aist.html"))}">Регистрация</a></p>'
+        "</div></div></section>"
+    )
+
+
+def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
+    if item.id == "aist":
+        event = load_migrated_copy().get("next_event") or {}
+        return (
+            '<div class="conf-hero">'
+            f'<p class="leader-role">Серия AIST · раздел на ichnm.by</p>'
+            f"<h2>{escape(event.get('title', 'AIST'))}</h2>"
+            f"<p>{escape(event.get('when', ''))}</p>"
+            "<p>Программа, ключевые даты и сборник появятся в этом разделе. "
+            "Регистрация текущего цикла пока на "
+            '<a href="http://aist.ichnm.by/">aist.ichnm.by</a> — отдельный домен в v1 не поднимаем.</p>'
+            f'<p><a class="hero-pill hero-pill-primary" href="{escape(event.get("href", "http://aist.ichnm.by/"))}">Регистрация</a> '
+            '<a class="hero-pill" href="events.html">Весь архив мероприятий</a></p>'
+            "</div>"
+            + _conference_archive()
+        )
+    if item.id == "feedback":
+        return (
+            "<p>Форма откроет письмо на приёмную. Электронные обращения по закону — "
+            '<a href="e-appeals.html">отдельная страница</a>.</p>'
+            '<form class="form" action="mailto:ichnm@ichnm.by" method="post" enctype="text/plain">'
+            '<label for="name">Имя</label><input id="name" name="name" required>'
+            '<label for="email">Электронная почта</label>'
+            '<input id="email" name="email" type="email" required>'
+            '<label for="message">Сообщение</label>'
+            '<textarea id="message" name="message" rows="6" required></textarea>'
+            '<button type="submit">Отправить</button></form>'
+        )
+    if item.id == "science":
+        paras = "".join(f"<p>{escape(p)}</p>" for p in page_copy("science").get("paragraphs", []))
+        return paras + _catalog_grid("science_topics", "science")
+    if item.id == "developments":
+        paras = "".join(
+            f"<p>{escape(p)}</p>" for p in page_copy("developments").get("paragraphs", [])
+        )
+        return paras + _catalog_grid("developments_items", "developments")
+    if item.id == "facilities":
+        paras = "".join(
+            f"<p>{escape(p)}</p>" for p in page_copy("facilities").get("paragraphs", [])
+        )
+        return paras + _catalog_grid("facilities_items", "facilities")
+    if item.id == "cooperation":
+        copied = page_copy("cooperation")
+        paras = "".join(f"<p>{escape(p)}</p>" for p in copied.get("paragraphs", []))
+        cards = _card_list(copied.get("list") or [], "Центры и договоры")
+        partners = load_migrated_copy().get("partners") or []
+        partner_cards = "".join(
+            '<article class="info-card">'
+            f'<p class="leader-role">{escape(row.get("place", ""))}</p>'
+            f"<h3>{escape(row['title'])}</h3>"
+            f"<p>{escape(row.get('note', ''))}</p></article>"
+            for row in partners
+        )
+        partner_block = (
+            "<h2>Партнёры на карте</h2>"
+            "<p>Те же договоры и центры, что в списке выше, отмечены на карте. "
+            "Это дубль сведений, не отдельная вкладка.</p>"
+            f'<div class="info-grid">{partner_cards}</div>'
+            if partners
+            else ""
+        )
+        return paras + cards + partner_block + _world_map()
+    if item.id == "scientific-council":
+        return _council_listing()
+    if item.id in _admin_unit_ids():
+        return _admin_unit_inner(item.id)
+    if item.id == "media_about":
+        return _media_about_inner()
+    if item.id == "leadership":
+        return _leadership_inner(item)
+    if item.id == "news":
+        return _news_feed_inner()
+    if item.id == "events":
+        return _events_inner()
+    if item.id == "announcement":
+        paras = page_copy("announcement").get("paragraphs", [])
+        intro = "".join(f"<p>{escape(p)}</p>" for p in paras)
+        return intro + _empty_state(
+            "Объявлений пока нет",
+            "Служебные сообщения появятся здесь, отдельно от новостей и мероприятий.",
+        )
+    if item.id == "vacancies":
+        paras = "".join(f"<p>{escape(p)}</p>" for p in page_copy("vacancies").get("paragraphs", []))
+        return paras + _empty_state(
+            "Открытых вакансий нет",
+            "Когда появится ставка, её опубликуют в этом разделе. Вопросы в отдел кадров: +375 (17) 243-67-56.",
+        )
+    if item.id == "publications":
+        paras = "".join(
+            f"<p>{escape(p)}</p>" for p in page_copy("publications").get("paragraphs", [])
+        )
+        return paras + _publications_inner()
+    copied = page_copy(item.id)
+    chunks: list[str] = []
+    for para in copied.get("paragraphs", []):
+        chunks.append(f"<p>{_t(para)}</p>")
+    heading = {
+        "about": "Награды и достижения",
+        "developments": "Разработки",
+        "facilities": "Приборы и установки",
+        "cooperation": "Центры и договоры",
+        "science": "Направления",
+    }.get(item.id, "")
+    if copied.get("list") and item.id in _LIST_AS_CARDS:
+        chunks.append(_card_list(copied["list"], heading or "Перечень"))
+    elif copied.get("list") and item.id == "contacts":
+        chunks.append(_contact_cards(copied["list"]))
+        chunks.append(
+            '<p><a href="requisites.html">Реквизиты</a> · '
+            '<a href="feedback.html">Форма обратной связи</a> · '
+            '<a href="e-appeals.html">Электронные обращения</a></p>'
+        )
+        chunks.append(
+            '<div class="map-slot" role="img" aria-label="Место для карты">'
+            "<p>Карта проезда появится после согласования. "
+            f"Адрес: {_t('ул. Ф. Скорины, 36, Минск')}.</p>"
+            "</div>"
+        )
+    elif copied.get("list") and item.id not in {"structure"}:
+        items = "".join(f"<li>{escape(row)}</li>" for row in copied["list"])
+        chunks.append(f'<ul class="plain-list">{items}</ul>')
+    if item.id == "structure":
+        labs = load_migrated_copy().get("labs", [])
+        if labs:
+            chunks.append("<h2>Лаборатории</h2>")
+            lab_links = "".join(
+                f'<li><a href="labs/{escape(lab.get("slug") or lab["id"])}/index.html">'
+                f'{_t(lab["title"])}</a></li>'
+                for lab in labs
+            )
+            chunks.append(f'<ul class="lab-grid">{lab_links}</ul>')
+        chunks.append("<h2>Административные подразделения</h2>")
+    if item.id == "union":
+        chunks.append(
+            '<p><a href="https://profnan.by/">Профсоюз работников НАН Беларуси</a> '
+            "(общеакадемический сайт, не замена этой страницы).</p>"
+        )
+    if item.id == "young-scientists":
+        chunks.append('<div class="people-list">')
+        for person in _SMU_PEOPLE:
+            chunks.append(
+                _person_card(
+                    name=person["name"],
+                    role=person["role"],
+                    initials=person["initials"],
+                    href=f"smu-{person['id']}.html",
+                    lines=["Контакт появится после передачи состава."],
+                )
+            )
+        chunks.append("</div>")
+    if item.id in _FISH_FILE_PAGES:
+        chunks.insert(0, _fish_banner())
+        chunks.append(_file_slots(_FISH_FILE_PAGES[item.id]))
+    if item.children:
+        chunks.append(_hub_cards(item.children))
+    if not chunks:
+        chunks.append(
+            '<p class="placeholder">Плейсхолдер. Текст будет перенесён с ichnm.by '
+            "или придёт в пакете к переключению.</p>"
+        )
+    return "".join(chunks)
+
+
+def _vitrine_body(model: SiteModel, item: MenuItem) -> str:
+    extra = " is-wide" if item.id in _WIDE_PAGES else ""
+    trail = _trail(model, item.id, item.title)
+    return (
+        f'<header class="page-hero"><div class="wrap">{trail}'
+        f"<h1>{_t(item.title)}</h1></div></header>"
+        f'<div class="page-body{extra}">{_vitrine_inner(model, item)}</div>'
+    )
+
+
+def _photo_slot(label: str, initials: str = "", compact: bool = False) -> str:
+    mark = f"<span>{escape(initials)}</span>" if initials else ""
+    note = "" if compact else "<p>Фото появится после передачи файла</p>"
+    return (
+        f'<div class="photo-slot" role="img" aria-label="Место для фото: {escape(label)}">'
+        f"{mark}{note}</div>"
+    )
+
+
+def _person_card(
+    *,
+    name: str,
+    role: str,
+    initials: str = "",
+    href: str = "",
+    lines: tuple[str, ...] | list[str] | None = None,
+    cta: str = "Карточка сотрудника",
+) -> str:
+    photo = _photo_slot(name, initials, compact=True)
+    if href:
+        photo = f'<a class="leader-photo" href="{escape(href)}">{photo}</a>'
+        title = f'<h2><a href="{escape(href)}">{_t(name)}</a></h2>'
+        more = f'<p><a href="{escape(href)}">{escape(cta)}</a></p>'
+    else:
+        photo = f'<div class="leader-photo">{photo}</div>'
+        title = f"<h2>{_t(name)}</h2>"
+        more = ""
+    extra = "".join(f"<p>{_t(line)}</p>" for line in (lines or []) if line)
+    return (
+        f'<article class="leader-card">{photo}<div>'
+        f'<p class="leader-role">{_t(role)}</p>'
+        f"{title}{extra}{more}</div></article>"
+    )
+
+
+def _cover_card(href: str, title: str, lead: str) -> str:
+    return (
+        f'<a class="cover-card" href="{escape(href)}">'
+        f"{_photo_slot(title)}"
+        f"<h3>{escape(title)}</h3>"
+        f"<p>{escape(lead)}</p></a>"
+    )
+
+
+def _news_article_body(model: SiteModel, item: dict, depth: int = 2) -> str:
+    prefix = "../" * depth
+    paras = "".join(f"<p>{escape(p)}</p>" for p in item.get("paragraphs", []))
+    inner = (
+        f"{_photo_slot(item['title'])}"
+        f"<p class=\"leader-role\">{escape(item.get('date_label') or item.get('date', ''))}</p>"
+        f"{paras}"
+        f'<p><a href="{prefix}news.html">Ко всем новостям</a></p>'
+    )
+    return _with_page_hero(
+        item["title"],
+        inner,
+        trail=_trail(model, f"news/{item.get('slug', '')}", item["title"], depth=depth),
+        wide=True,
+    )
+
+
+def _catalog_detail_body(model: SiteModel, parent: str, item: dict, depth: int = 2) -> str:
+    prefix = "../" * depth
+    parent_file = f"{parent}.html"
+    parent_title = {
+        "science": "Научная деятельность",
+        "developments": "Разработки",
+        "facilities": "Материальная база",
+    }[parent]
+    spec = item.get("spec") or item.get("product") or ""
+    contacts = item.get("contacts") or "ichnm@ichnm.by"
+    inner = (
+        f"{_fish_banner()}"
+        f"{_photo_slot(item['title'])}"
+        f"<p>{escape(item.get('lead', ''))}</p>"
+        "<h2>Описание и контакты</h2>"
+        f"<p>{escape(contacts)}</p>"
+        f"<h2>{'Спецификация' if parent == 'facilities' else 'Продукт / результат'}</h2>"
+        f"<p>{escape(spec)}</p>"
+        f'<p><a href="{prefix}{parent_file}">{escape(parent_title)}</a></p>'
+    )
+    return _with_page_hero(
+        item["title"],
+        inner,
+        trail=_trail(model, f"{parent}/{item['slug']}", item["title"], depth=depth),
+        wide=True,
+    )
+
+
+def _named_person_body(
+    model: SiteModel,
+    person: dict,
+    *,
+    page_id: str,
+    back_href: str,
+    back_label: str,
+    note: str,
+) -> str:
+    contacts = []
+    if person.get("phone"):
+        contacts.append(f"<p>{_t('Тел. ' + person['phone'])}</p>")
+    if person.get("email"):
+        contacts.append(
+            f'<p><a href="mailto:{escape(person["email"])}">{escape(person["email"])}</a></p>'
+        )
+    photo = (
+        '<div class="leader-photo leader-photo-lg" role="img" '
+        f'aria-label="Место для официального фото: {escape(person["name"])}">'
+        f'<span>{escape(person.get("initials", ""))}</span>'
+        "<p>Официальное фото появится после передачи файла Институтом</p>"
+        "</div>"
+    )
+    inner = (
+        f"{_fish_banner()}"
+        '<div class="leader-profile">'
+        f"{photo}<div class=\"leader-profile-copy\">"
+        f'<p class="leader-role">{_t(person.get("role", ""))}</p>'
+        f"<p>{_t(person.get('degree', ''))}</p>"
+        f"{''.join(contacts)}"
+        f"<p>{escape(note)}</p>"
+        f'<p><a href="{escape(back_href)}">{escape(back_label)}</a></p>'
+        "</div></div>"
+    )
+    return _with_page_hero(
+        person["name"],
+        inner,
+        trail=_trail(model, page_id, person["name"]),
+        wide=True,
+    )
+
+
+def _catalog_grid(kind: str, parent: str) -> str:
+    items = load_migrated_copy().get(kind, [])
+    cards = "".join(
+        _cover_card(f"{parent}/{item['slug']}/index.html", item["title"], item.get("lead", ""))
+        for item in items
+    )
+    return f'<div class="cover-grid">{cards}</div>'
+
+
+def _world_map() -> str:
+    pins = []
+    for partner in load_migrated_copy().get("partners", []):
+        pins.append(
+            f'<div class="map-hotspot" style="left:{float(partner["x"])}%;top:{float(partner["y"])}%">'
+            f'<button type="button" class="map-pin" aria-describedby="pop-{escape(partner["slug"])}">'
+            f'<span class="visually-hidden">{escape(partner["title"])}</span></button>'
+            f'<div class="map-pop" id="pop-{escape(partner["slug"])}">'
+            f'{_photo_slot(partner["title"])}'
+            f'<p class="leader-role">{escape(partner.get("place", ""))}</p>'
+            f"<h3>{escape(partner['title'])}</h3>"
+            f"<p>{escape(partner.get('note', ''))}</p>"
+            "</div></div>"
+        )
+    return (
+        '<figure class="world-map" aria-label="Карта сотрудничества">'
+        f'<img class="world-base" src="media/maps/world.jpg" width="1280" height="640" '
+        'alt="Карта мира">'
+        f"{''.join(pins)}</figure>"
+    )
+
+
+def _council_listing() -> str:
+    copy = page_copy("scientific-council")
+    parts = [_fish_banner()]
+    parts.extend(f"<p>{escape(para)}</p>" for para in copy.get("paragraphs", []))
+    cards = []
+    for person in load_migrated_copy().get("council_people", []):
+        href = f"council-{person['id']}.html"
+        cards.append(
+            _person_card(
+                name=person["name"],
+                role=person.get("role", ""),
+                initials=person.get("initials", ""),
+                href=href,
+                lines=[person.get("degree", "")],
+                cta="Контакты и сведения",
+            )
+        )
+    parts.append(f'<div class="people-list">{"".join(cards)}</div>')
+    return "".join(parts)
+
+
+def _admin_unit_inner(unit_id: str) -> str:
+    units = load_migrated_copy().get("admin_units", [])
+    unit = next((row for row in units if row["id"] == unit_id), None)
+    if not unit:
+        return "<p>Подразделение появится после передачи состава.</p>"
+    people = []
+    for person in unit.get("people", []):
+        people.append(
+            _person_card(
+                name=person["name"],
+                role=person.get("role", ""),
+                initials=person.get("initials", ""),
+                href=f"office-{person.get('id') or unit_id}.html",
+                lines=[
+                    f"Тел. {person.get('phone', '')}" if person.get("phone") else "",
+                    person.get("email") or "",
+                ],
+            )
+        )
+    return (
+        f"{_fish_banner()}"
+        f'<p class="unit-back"><a href="structure.html">Ко всем подразделениям</a></p>'
+        f"<p>{_t('Тел. подразделения: ' + str(unit.get('phone', '')))}</p>"
+        f'<div class="people-list">{"".join(people)}</div>'
+    )
+
+
+def _fish_banner() -> str:
+    return (
+        '<p class="fish-banner" role="note">Макет. Рыбный текст и пустые слоты показывают структуру. '
+        "Замените данными и файлами Института — это не официальные сведения.</p>"
+    )
+
+
+def _file_slots(labels: list[str]) -> str:
+    items = "".join(
+        f'<li class="file-slot"><span>{escape(label)}</span>'
+        "<small>Файл не загружен</small></li>"
+        for label in labels
+    )
+    return f'<ul class="file-shelf" aria-label="Слоты для документов">{items}</ul>'
+
+
+def _publications_inner() -> str:
+    data = load_migrated_copy().get("publication_years") or {}
+    series = data.get("series") or []
+    max_count = max((int(row.get("count", 0)) for row in series), default=1) or 1
+    counts = [int(row.get("count", 0)) for row in series]
+    sma: list[float] = []
+    for index, value in enumerate(counts):
+        window = counts[max(0, index - 2) : index + 1]
+        sma.append(sum(window) / len(window))
+    sma_max = max(sma + [float(max_count)]) or 1
+    points = []
+    for index, value in enumerate(sma):
+        x = 6 + (88 * index / max(len(sma) - 1, 1))
+        y = 36 - (28 * value / sma_max)
+        points.append(f"{x:.1f},{y:.1f}")
+    sma_path = " ".join(points)
+    bars = []
+    for offset, row in enumerate(series):
+        year = int(row.get("year", 0))
+        count = int(row.get("count", 0))
+        px = max(8, round(168 * count / max_count))
+        delay = round(0.05 * offset, 2)
+        bars.append(
+            f'<li><button type="button" class="chart-bar" data-year="{year}" '
+            f'data-count="{count}" aria-label="{year}: {count} статей">'
+            f'<span class="chart-col" style="height:{px}px;animation-delay:{delay}s"></span>'
+            f'<span class="chart-year">{year}</span></button></li>'
+        )
+    payload = json.dumps(data, ensure_ascii=False)
+    note = escape(str(data.get("note", "")))
+    catalog = "".join(
+        "<li>Фамилия И. О., Фамилия И. О. Название статьи-рыбы // "
+        f"Журнал-макет. {year}. Т. 1, № 1. С. 1–8.</li>"
+        for year in (2024, 2023, 2022)
+    )
+    return (
+        f'<script type="application/json" id="pub-year-data">{payload}</script>'
+        f'<p class="fish-banner" role="note">{note}</p>'
+        '<figure class="pub-chart">'
+        "<figcaption>Статьи по годам</figcaption>"
+        '<p class="chart-readout" aria-live="polite">Наведите на столбец, чтобы увидеть число</p>'
+        f'<ul class="chart-bars">{"".join(bars)}</ul>'
+        '<svg class="chart-sma" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">'
+        f'<polyline class="chart-sma-line" points="{sma_path}" fill="none" '
+        'stroke="#28a7ea" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>'
+        "</svg>"
+        "</figure>"
+        "<h2>Каталог</h2>"
+        f"{_fish_banner()}"
+        f'<ul class="plain-list">{catalog}</ul>'
+    )
+
+
+def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
+    prefix = "../" * depth
+    kicker = escape(str(lab.get("kicker") or "Подразделение Института"))
+    metrics = "".join(
+        f'<li data-metric="{escape(field)}">'
+        f'<a href="#">{escape(_METRIC_LABELS.get(field, field))}</a> — ссылка появится после передачи профиля'
+        "</li>"
+        for field in model.staff_metric_fields
+    )
+    people = []
+    for role, name, degree in _FISH_STAFF:
+        people.append(
+            _person_card(
+                name=name,
+                role=role,
+                initials="ФИО",
+                lines=([degree] if degree else []) + ["ORCID · Scopus · eLIBRARY / РИНЦ"],
+            )
+        )
+    pubs = "".join(
+        "<li>Фамилия И. О. Название статьи-рыбы по теме лаборатории // "
+        f"Журнал-макет. {year}. Т. 1. С. 10–18.</li>"
+        for year in (2024, 2023, 2021)
+    )
+    inner = (
+        f"{_fish_banner()}"
+        f'<p class="unit-back"><a href="{prefix}structure.html">Ко всем подразделениям</a></p>'
+        '<nav class="lab-local" aria-label="Разделы лаборатории">'
+        '<a href="#about">О лаборатории</a>'
+        '<a href="#equipment">Оборудование</a>'
+        '<a href="#services">Услуги и разработки</a>'
+        '<a href="#staff">Команда</a>'
+        '<a href="#pubs">Публикации</a>'
+        '<a href="#contacts">Контакты</a>'
+        "</nav>"
+        '<section id="about" class="lab-split">'
+        f'{_photo_slot(lab["title"], kicker[:2] if kicker else "ЛБ")}'
+        "<div>"
+        "<h2>О лаборатории</h2>"
+        "<p>Подразделение Института химии новых материалов НАН Беларуси. "
+        "Пакет страницы собран как у лабораторных сайтов (локальное меню, команда, "
+        "приборы, контакты), но живёт на ichnm.by — не отдельный домен в v1.</p>"
+        "<p>Рыба: лаборатория ведёт работы по направлению, указанному в названии. "
+        "Тексты задач, приборов и договоров появятся из пакета подразделения.</p>"
+        "</div></section>"
+        '<section id="equipment">'
+        "<h2>Оборудование</h2>"
+        "<p>Современное оснащение появится списком из пакета лаборатории. "
+        "Пока слоты показывают структуру блока, как на лабораторных сайтах института.</p>"
+        '<ul class="lab-equip">'
+        "<li>Прибор 1 — назначение (макет)</li>"
+        "<li>Прибор 2 — назначение (макет)</li>"
+        "<li>Прибор 3 — назначение (макет)</li>"
+        "</ul></section>"
+        '<section id="services">'
+        "<h2>Услуги и разработки</h2>"
+        '<ul class="dir-grid">'
+        "<li><a href=\"#\">Испытания и измерения<p>Методики появятся после передачи.</p></a></li>"
+        "<li><a href=\"#\">Материалы и полупродукты<p>Карточки продукции — макет.</p></a></li>"
+        "</ul></section>"
+        '<section id="staff">'
+        "<h2>Наша команда</h2>"
+        '<div class="staff-tab">'
+        "<p>Состав ниже — макет. Отдельных персональных страниц нет.</p>"
+        f'<div class="people-list">{"".join(people)}</div>'
+        "<h3>Научные метрики</h3>"
+        f'<ul class="plain-list">{metrics}</ul>'
+        "</div></section>"
+        '<section id="pubs">'
+        "<h2>Избранные публикации</h2>"
+        f'<ul class="plain-list">{pubs}</ul>'
+        "</section>"
+        '<section id="contacts" class="lab-contacts">'
+        "<h2>Контакты</h2>"
+        f"<p>Адрес: {_t('220084, г. Минск, ул. Ф. Скорины, 36')}</p>"
+        "<p>Тел.: +375 (17) 000-00-00 (макет)</p>"
+        "<p>E-mail: lab@ichnm.by (макет)</p>"
+        "</section>"
+    )
+    extra = (
+        f'<p class="lab-kicker">{kicker}</p>'
+        if kicker
+        else ""
+    )
+    trail = _trail(model, lab["id"], lab["title"], depth=depth)
+    return (
+        f'<header class="page-hero"><div class="wrap">{trail}'
+        f"{extra}<h1>{escape(lab['title'])}</h1></div></header>"
+        f'<div class="page-body is-wide is-lab">{inner}</div>'
+    )
+
+
+def _media_card(item: dict) -> str:
+    issue = escape(item.get("date_label", ""))
+    outlet = escape(item.get("outlet", ""))
+    title = escape(item.get("title", ""))
+    href = escape(item.get("href", "#"))
+    summary = escape(item.get("summary", ""))
+    return (
+        "<article class=\"media-card\">"
+        f"<p class=\"media-meta\"><span>{outlet}</span><time datetime=\"{escape(item.get('date', ''))}\">{issue}</time></p>"
+        f"<h3><a href=\"{href}\" rel=\"noopener noreferrer\">{title}</a></h3>"
+        f"<p>{summary}</p>"
+        f"<p class=\"media-source\"><a href=\"{href}\" rel=\"noopener noreferrer\">Читать оригинал</a></p>"
+        "</article>"
+    )
+
+
+def _media_about_inner() -> str:
+    copy = page_copy("media_about")
+    items = load_migrated_copy().get("media_items", [])
+    parts = [f"<p>{escape(para)}</p>" for para in copy.get("paragraphs", [])]
+    press = [row for row in items if row.get("kind") == "press"]
+    navuka = [row for row in items if row.get("kind") == "navuka"]
+    press.sort(key=lambda row: row.get("date", ""), reverse=True)
+    navuka.sort(key=lambda row: row.get("date", ""), reverse=True)
+    if press:
+        cards = "".join(_media_card(row) for row in press)
+        parts.append("<h2>Внешние СМИ</h2>")
+        parts.append(f'<div class="media-grid">{cards}</div>')
+    if navuka:
+        cards = "".join(_media_card(row) for row in navuka)
+        parts.append("<h2>Газета «Навука»</h2>")
+        parts.append(
+            "<p>Онлайн-версии материалов академической газеты. Полные PDF-выпуски — "
+            '<a href="https://gazeta-navuka.by/">в архиве gazeta-navuka.by</a>.</p>'
+        )
+        parts.append(f'<div class="media-grid">{cards}</div>')
+    return "".join(parts)
+
+
+def _leadership_inner(item: MenuItem) -> str:
+    copy = page_copy(item.id)
+    people = load_migrated_copy().get("leadership_people", [])
+    parts = [f"<p>{_t(para)}</p>" for para in copy.get("paragraphs", [])]
+    cards: list[str] = []
+    for person in people:
+        href = f"leadership-{person['id']}.html"
+        cards.append(
+            _person_card(
+                name=person["name"],
+                role=person.get("role", ""),
+                initials=person.get("initials", ""),
+                href=href,
+                lines=[person.get("degree", "")],
+                cta="Биография и публикации",
+            )
+        )
+    if cards:
+        parts.append(f'<div class="people-list">{"".join(cards)}</div>')
+    return "".join(parts)
+
+
+def _leader_body(model: SiteModel, person: dict) -> str:
+    bio = "".join(f"<p>{escape(para)}</p>" for para in person.get("bio", []))
+    interests = "".join(f"<li>{escape(row)}</li>" for row in person.get("interests", []))
+    pubs = "".join(f"<li>{escape(row)}</li>" for row in person.get("publications", []))
+    phone = person.get("phone") or ""
+    email = person.get("email") or ""
+    contacts = []
+    if phone:
+        contacts.append(f"<p>{_t('Тел. ' + phone)}</p>")
+    if email:
+        contacts.append(
+            f'<p><a href="mailto:{escape(email)}">{escape(email)}</a></p>'
+        )
+    photo = (
+        '<div class="leader-photo leader-photo-lg" role="img" '
+        f'aria-label="Место для официального фото: {escape(person["name"])}">'
+        f'<span>{escape(person.get("initials", ""))}</span>'
+        "<p>Официальное фото появится после передачи файла Институтом</p>"
+        "</div>"
+    )
+    inner = (
+        '<div class="leader-profile">'
+        f"{photo}<div class=\"leader-profile-copy\">"
+        f'<p class="leader-role">{_t(person.get("role", ""))}</p>'
+        f"<p>{_t(person.get('degree', ''))}</p>"
+        f"{''.join(contacts)}"
+        "<h2>Биография</h2>"
+        f"{bio or '<p>Биография будет опубликована по тексту Института.</p>'}"
+        "<h2>Научные интересы</h2>"
+        f"{f'<ul class=\"plain-list\">{interests}</ul>' if interests else '<p>Раздел будет заполнен по материалам Института.</p>'}"
+        "<h2>Избранные публикации</h2>"
+        f"{f'<ul class=\"plain-list\">{pubs}</ul>' if pubs else '<p>Список появится после передачи каталога.</p>'}"
+        f"<p class=\"leader-source\">{escape(person.get('sources_note', ''))}</p>"
+        '<p><a href="leadership.html">Ко всему руководству</a></p>'
+        "</div></div>"
+    )
+    return (
+        f'<header class="page-hero"><div class="wrap">'
+        f'{_trail(model, "leadership-" + person["id"], person["name"])}'
+        f"<h1>{escape(person['name'])}</h1></div></header>"
+        f'<div class="page-body is-wide">{inner}</div>'
+    )

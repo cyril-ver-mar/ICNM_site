@@ -1,0 +1,58 @@
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: wordpress
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-pwordpress"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wordpress:
+    image: wordpress:6.8-php8.3-apache
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DEBUG: "1"
+    volumes:
+      - wp_data:/var/www/html
+      - ./wp-content/plugins/ichnm-site:/var/www/html/wp-content/plugins/ichnm-site
+      - ./src/core/site_model.json:/var/www/html/wp-content/plugins/ichnm-site/site-model.json:ro
+      - ./wp-content/themes/ichnm-kadence:/var/www/html/wp-content/themes/ichnm-kadence
+    depends_on:
+      db:
+        condition: service_healthy
+
+  wpcli:
+    image: wordpress:cli-php8.3
+    user: "33:33"
+    depends_on:
+      wordpress:
+        condition: service_started
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp_data:/var/www/html
+      - ./wp-content/plugins/ichnm-site:/var/www/html/wp-content/plugins/ichnm-site
+      - ./src/core/site_model.json:/var/www/html/wp-content/plugins/ichnm-site/site-model.json:ro
+      - ./wp-content/themes/ichnm-kadence:/var/www/html/wp-content/themes/ichnm-kadence
+    entrypoint: ["wp", "--path=/var/www/html"]
+
+volumes:
+  db_data:
+  wp_data:
