@@ -24,6 +24,10 @@
 
   function applyBvi(state) {
     root.classList.toggle("is-bvi", Boolean(state.on));
+    if (state.on) {
+      root.classList.add("is-entered");
+      root.classList.remove("js-motion");
+    }
     root.setAttribute("data-bvi-size", state.size || "normal");
     root.setAttribute("data-bvi-scheme", state.scheme || "bw");
     root.classList.toggle("is-bvi-noimg", Boolean(state.on && !state.images));
@@ -730,4 +734,172 @@
     });
   }
   bootLattices();
+
+  function indexPrefix() {
+    const url = document.body && document.body.getAttribute("data-search-index");
+    if (!url) return "";
+    const slash = url.lastIndexOf("/");
+    return slash >= 0 ? url.slice(0, slash + 1) : "";
+  }
+
+  function esc(value) {
+    return String(value).replace(/[&<>"']/g, function (ch) {
+      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch];
+    });
+  }
+
+  function matchSearch(query, items) {
+    const needle = query.trim().toLowerCase();
+    if (needle.length < 2) return [];
+    return items.filter(function (row) {
+      return String(row.text || row.title || "")
+        .toLowerCase()
+        .indexOf(needle) !== -1;
+    });
+  }
+
+  function renderSearchGroups(rows, prefix) {
+    if (!rows.length) {
+      return '<p class="search-hint">Ничего не найдено. Попробуйте фамилию, лабораторию, прибор или разработку.</p>';
+    }
+    const labels = {
+      person: "Персоналии",
+      unit: "Подразделения",
+      facility: "Приборы",
+      development: "Разработки",
+    };
+    const order = ["person", "unit", "facility", "development"];
+    const buckets = { person: [], unit: [], facility: [], development: [] };
+    rows.forEach(function (row) {
+      if (buckets[row.kind]) buckets[row.kind].push(row);
+    });
+    return order
+      .filter(function (kind) {
+        return buckets[kind].length;
+      })
+      .map(function (kind) {
+        const links = buckets[kind]
+          .map(function (row) {
+            const href = prefix + row.href;
+            const lead = row.lead ? "<small>" + esc(row.lead) + "</small>" : "";
+            return "<a href=\"" + esc(href) + "\">" + esc(row.title) + lead + "</a>";
+          })
+          .join("");
+        return (
+          '<section class="search-group"><h2>' +
+          labels[kind] +
+          "</h2>" +
+          links +
+          "</section>"
+        );
+      })
+      .join("");
+  }
+
+  let searchIndex = null;
+
+  function loadSearchIndex(done) {
+    if (searchIndex) {
+      done(searchIndex);
+      return;
+    }
+    const url = document.body && document.body.getAttribute("data-search-index");
+    if (!url || !window.fetch) {
+      done([]);
+      return;
+    }
+    fetch(url)
+      .then(function (res) {
+        return res.json();
+      })
+      .then(function (data) {
+        searchIndex = Array.isArray(data) ? data : [];
+        done(searchIndex);
+      })
+      .catch(function () {
+        done([]);
+      });
+  }
+
+  function bindSearch() {
+    const overlay = document.getElementById("site-search");
+    const liveHost = document.getElementById("search-live");
+    const liveInput = document.getElementById("q-live");
+    const pageHost = document.getElementById("search-results");
+    const pageInput = document.getElementById("q-page");
+    const openBtns = document.querySelectorAll("[data-search-open]");
+    const prefix = indexPrefix();
+
+    function setOpen(open) {
+      if (!overlay) return;
+      overlay.hidden = !open;
+      root.classList.toggle("is-search-open", open);
+      openBtns.forEach(function (btn) {
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+      if (open && liveInput) liveInput.focus();
+    }
+
+    openBtns.forEach(function (btn) {
+      btn.setAttribute("aria-expanded", "false");
+      btn.addEventListener("click", function () {
+        setOpen(true);
+      });
+    });
+    document.querySelectorAll("[data-search-close]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        setOpen(false);
+      });
+    });
+    if (overlay) {
+      overlay.addEventListener("click", function (event) {
+        if (event.target === overlay) setOpen(false);
+      });
+    }
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") setOpen(false);
+    });
+
+    function paint(host, query) {
+      if (!host) return;
+      const q = query.trim();
+      if (q.length < 2) {
+        host.innerHTML =
+          '<p class="search-hint">Введите не меньше двух букв: персоналии, подразделения, разработки.</p>';
+        return;
+      }
+      loadSearchIndex(function (items) {
+        host.innerHTML = renderSearchGroups(matchSearch(q, items), prefix);
+      });
+    }
+
+    if (liveInput) {
+      liveInput.addEventListener("input", function () {
+        paint(liveHost, liveInput.value);
+      });
+    }
+    if (pageHost) {
+      const initial = new URLSearchParams(window.location.search).get("q") || "";
+      if (pageInput && initial) pageInput.value = initial;
+      if (initial) paint(pageHost, initial);
+      if (pageInput) {
+        pageInput.addEventListener("input", function () {
+          paint(pageHost, pageInput.value);
+        });
+      }
+    }
+  }
+  bindSearch();
+
+  function enterPage() {
+    if (reduceMotion || root.classList.contains("is-bvi")) {
+      root.classList.add("is-entered");
+      root.classList.remove("js-motion");
+      return;
+    }
+    requestAnimationFrame(function () {
+      root.classList.add("is-entered");
+    });
+  }
+  enterPage();
 })();

@@ -39,7 +39,7 @@ function ichnm_render_identity(): void
     echo '<a class="nas-emblem" href="' . esc_url($nas) . '">';
     echo '<img src="' . esc_url(get_stylesheet_directory_uri() . '/assets/nas-emblem.webp') . '" width="220" height="120" alt="Эмблема Национальной академии наук Беларуси">';
     echo '</a> ';
-    echo '<img class="ichnm-mark" src="' . esc_url(get_stylesheet_directory_uri() . '/assets/ichnm-mark.svg') . '" width="230" height="193" alt="Эмблема ИХНМ"> ';
+    echo '<img class="ichnm-mark" src="' . esc_url(get_stylesheet_directory_uri() . '/assets/ichnm-mark.svg') . '" width="397" height="392" alt="Эмблема ИХНМ"> ';
     echo '<strong>' . esc_html($name) . '</strong> · ';
     echo '<a href="' . esc_url($nas) . '">Национальная академия наук Беларуси</a>';
     echo '</div>';

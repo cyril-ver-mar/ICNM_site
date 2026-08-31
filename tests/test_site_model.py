@@ -24,32 +24,34 @@ def test_languages_have_four_prefixes_and_only_russian_is_filled(model):
 
 
 def test_top_menu_covers_locked_information_architecture(model):
-    titles = model.top_menu_titles()
-    required = [
+    roots = model.top_menu_titles()
+    assert roots == [
         "Об институте",
         "Структура",
         "Научная деятельность",
-        "Разработки",
-        "Материальная база",
-        "Сотрудничество",
         "Новости",
         "Мероприятия",
-        "Вакансии",
         "Контакты",
-        "Публикации",
-        "Образование",
-        "Профсоюз",
-        "Совет молодых учёных",
-        "СМИ о нас",
-        "Обратная связь",
     ]
-    for title in required:
-        assert title in titles, title
+    science = model.menu_item("science")
+    assert [child.id for child in science.children] == [
+        "developments",
+        "cooperation",
+        "publications",
+        "education",
+    ]
+    assert model.menu_item("education").title == "Научно-ориентированное образование"
+    structure_ids = [child.id for child in model.menu_item("structure").children]
+    assert structure_ids[-2:] == ["union", "young-scientists"]
+    assert model.menu_item("news").children == ()
+    about_ids = [child.id for child in model.menu_item("about").children]
+    assert about_ids[-2:] == ["facilities", "vacancies"]
+    assert [child.id for child in model.menu_item("contacts").children] == ["feedback"]
 
 
 def test_about_and_education_children(model):
     about = model.menu_item("about")
-    assert {"Сведения", "Руководство", "Учёный совет", "Документы"} <= set(
+    assert {"Сведения", "Руководство", "Учёный совет", "Документы", "Материальная база", "Вакансии"} <= set(
         child.title for child in about.children
     )
     education = model.menu_item("education")
@@ -122,6 +124,7 @@ def test_editor_publishes_feeds_not_vitrine(model):
         "news",
         "event",
         "media_about",
+        "publication",
     }
     for slug in ("header", "footer", "about", "structure", "developments"):
         assert not model.editor_may_edit(slug)
@@ -134,9 +137,9 @@ def test_aist_is_stub_vitrine_not_a_feed(model):
     assert "aist" not in model.editor_may_publish
 
 
-def test_no_personal_mini_sites(model):
-    assert "person" not in model.post_type_ids()
-    assert model.staff_presentation == "department_tab"
+def test_personal_pages_with_multiple_affiliations(model):
+    assert "person" in model.post_type_ids()
+    assert model.staff_presentation == "person_page"
 
 
 def test_identity_block(model):
