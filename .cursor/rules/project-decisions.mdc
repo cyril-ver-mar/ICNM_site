@@ -18,12 +18,12 @@ Read `docs/DECISIONS.md` and `docs/CONTEXT.md` before changing scope, IA, or sta
 - Documents: charter, anti-corruption, electronic appeals. Requisites sit under Contacts.
 - Leadership: director, deputies, honorary director, учёный секретарь, reception. Cooperation: world map with partner pins. Contacts/footer: Minsk outline in the same theme colours, pin at Skaryna 36.
 - Footer: stable NAS pack (president, government, pravo.by, Navuka, profnan.by, NAS portal) + NAS socials + ICNM socials when URLs exist. No empty icons. No seasonal Academy banners.
-- AIST is a section on this site; launch may be basic info + stub.
+- AIST is a section on this site; files from aist.ichnm.by live there; registration stays on aist.ichnm.by; not a mini-site or form.
 - Cutover: test URL first; old site stays until sign-off. ICNM mark is `ICHNM_Bew.ai` → `ichnm-mark.svg`. NAS emblem may still crop until its vector arrives.
 - The builder is the institute developer and configurator (hosting, admin, migration). Colleagues still supply source files; there is no second counterpart.
 - Visually-impaired mode in v1 (plugin, IBOCH-class).
 - Announcements were dropped (2026-08-31).
 - Search (people / units / facilities / developments) and sitemap are header/footer utilities, not extra top-menu roots. Page-open veil animation is NAS-class; off in BVI and reduced-motion.
-- Honest `preview/` keeps empty slots. `preview-filled/` is a separate letter-coded dummy (А–Д by lab) with fish images — not official copy.
+- Honest `preview/` keeps empty slots except where real institute files exist (AIST PDFs, news photos from ichnm.by). `preview-filled/` is a separate letter-coded dummy (А–Д by lab) with fish images — not official copy.
 
 If a request contradicts `docs/DECISIONS.md`, stop and ask. Product forks from grilling are closed; remaining gaps are files and hosting access.

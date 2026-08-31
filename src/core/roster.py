@@ -84,10 +84,18 @@ def all_people() -> dict[str, dict[str, Any]]:
             [{"unit_id": "scientific-council", "role": person.get("role") or ""}],
         )
         found[pid] = row
+    names = {
+        str(row.get("name") or "").strip(): pid
+        for pid, row in found.items()
+        if str(row.get("name") or "").strip()
+    }
     for unit in _copy().get("admin_units") or []:
         for person in unit.get("people") or []:
             pid = str(person.get("id") or "")
             if not pid or pid in found:
+                continue
+            name = str(person.get("name") or "").strip()
+            if name and name in names:
                 continue
             row = dict(person)
             row.setdefault(
@@ -95,6 +103,8 @@ def all_people() -> dict[str, dict[str, Any]]:
                 [{"unit_id": unit["id"], "role": person.get("role") or ""}],
             )
             found[pid] = row
+            if name:
+                names[name] = pid
     for person in SMU_PEOPLE:
         pid = str(person["id"])
         if pid not in found:

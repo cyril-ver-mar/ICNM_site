@@ -16,10 +16,13 @@ from src.core.site_model import load_site_model
 
 _BRAND_DIR = ROOT / "assets" / "brand"
 _BRAND_FILES = ("ichnm-mark.svg", "ichnm-mark.png", "nas-emblem.webp")
+_MEDIA_SUFFIXES = {".svg", ".png", ".gif", ".jpg", ".jpeg", ".webp", ".pdf", ".doc", ".docx"}
 _EXTRA_DIRS = (
     ("footer", ROOT / "assets" / "footer"),
     ("maps", ROOT / "assets" / "maps"),
     ("about", ROOT / "assets" / "about"),
+    ("aist", ROOT / "assets" / "aist"),
+    ("news", ROOT / "assets" / "news"),
 )
 
 
@@ -41,10 +44,13 @@ def _write_tree(out: Path, files: dict[str, str]) -> int:
         dest.mkdir(parents=True, exist_ok=True)
         if not src_dir.is_dir():
             continue
-        for src in src_dir.iterdir():
-            if src.is_file() and src.suffix.lower() in {".svg", ".png", ".gif", ".jpg", ".jpeg", ".webp"}:
-                (dest / src.name).write_bytes(src.read_bytes())
-                copied += 1
+        for src in src_dir.rglob("*"):
+            if not src.is_file() or src.suffix.lower() not in _MEDIA_SUFFIXES:
+                continue
+            target = dest / src.relative_to(src_dir)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(src.read_bytes())
+            copied += 1
     print(f"Wrote {len(files)} files to {out} (+{copied} brand assets)")
     return copied
 

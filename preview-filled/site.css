@@ -27,6 +27,8 @@ html.theme-night {
   --muted: #122234;
   --band: #0e1c2c;
   --ink: #dce6ef;
+  --palette1: #5aa4e0;
+  --palette2: #8ec4f0;
   --palette3: #e8eef4;
   --palette4: #c5d4e0;
   --palette5: #9bb0c2;
@@ -788,6 +790,22 @@ html.is-bvi .hero-figure { display: none; }
 
 a.news-card:hover {
   transform: translateY(-2px);
+}
+
+.news-gallery {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.news-gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.news-source {
+  font-size: 0.92rem;
 }
 
 .news-card time {
@@ -2303,6 +2321,7 @@ html.theme-night .staff-tab,
 html.theme-night .file-slot,
 html.theme-night .event-banner,
 html.theme-night .conf-card,
+html.theme-night .conf-hero,
 html.theme-night .cookie-banner,
 html.theme-night .lab-equip li,
 html.theme-night .empty-state,
@@ -2445,6 +2464,47 @@ html.cookies-ok .cookie-banner {
 }
 
 .conf-hero { margin-bottom: 1.5rem; }
+
+.conf-hero .hero-pill {
+  background: var(--navy);
+  color: #fff;
+  box-shadow: none;
+}
+
+.conf-hero .hero-pill-primary {
+  background: var(--accent);
+}
+
+html.theme-night .conf-hero .hero-pill {
+  background: #e8eef4;
+  color: #0c1824;
+  box-shadow: none;
+}
+
+html.theme-night .conf-hero .hero-pill-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+html.theme-night .conf-hero a:not(.hero-pill) {
+  color: #7fd4f7;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+}
+
+html.theme-night .conf-hero h2,
+html.theme-night .conf-card h3,
+html.theme-night .conf-card p {
+  color: var(--ink);
+}
+
+html.theme-night .conf-card h3 a {
+  color: var(--palette2);
+}
+
+html.theme-night .conf-card h3 a:hover {
+  color: var(--accent);
+}
 
 .conf-card h3 { margin: 0.2rem 0 0.35rem; font-size: 1.02rem; }
 

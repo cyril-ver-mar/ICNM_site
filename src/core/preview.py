@@ -1192,8 +1192,8 @@ def _shell(
     page = _page_prefix()
     asset = _asset_prefix()
     home = f"{page}index.html"
-    css = f"{asset}site.css?v=locale-tree1"
-    js = f"{asset}site.js?v=locale-tree1"
+    css = f"{asset}site.css?v=aist-news1"
+    js = f"{asset}site.js?v=aist-news1"
     mark = f"{asset}media/ichnm-mark.svg?v=bew"
     nas = f"{asset}media/nas-emblem.webp"
     body_class = " ".join(
@@ -1471,7 +1471,7 @@ def _news_feed_inner() -> str:
     parts.append(f'<h2 id="institute-news">{escape(_st("institute_news"))}</h2>')
     cards = "".join(
         f'<a class="news-card" href="news/{escape(item["slug"])}/index.html">'
-        f"{_photo_slot(item['title'], kind='cover') if is_filled_copy() else ''}"
+        f"{_news_card_photo(item)}"
         f"<time>{escape(item.get('date_label') or item.get('date', ''))}</time>"
         f"<h3>{escape(item['title'])}</h3>"
         "</a>"
@@ -1496,6 +1496,7 @@ def _home_mix_cards() -> str:
                 "title": item["title"],
                 "href": f"news/{item['slug']}/index.html",
                 "kicker": _st("news_kicker"),
+                "cover": _news_image_src(item),
             }
         )
     for item in load_migrated_copy().get("media_items", []):
@@ -1511,7 +1512,7 @@ def _home_mix_cards() -> str:
     rows.sort(key=lambda row: row["date"], reverse=True)
     return "".join(
         f'<a class="news-card" href="{escape(row["href"])}">'
-        f"{_photo_slot(row['title'], kind='cover') if is_filled_copy() else ''}"
+        f"{_news_thumb(row['title'], row.get('cover'))}"
         f'<p class="news-kicker">{escape(row["kicker"])}</p>'
         f"<time>{escape(row['label'])}</time>"
         f"<h3>{escape(row['title'])}</h3></a>"
@@ -1561,16 +1562,81 @@ def _conference_archive() -> str:
     return "".join(chunks)
 
 
+def _real_file_shelf(files: list[dict]) -> str:
+    if not files:
+        return ""
+    prefix = _asset_prefix()
+    items: list[str] = []
+    for row in files:
+        name = str(row.get("file") or "")
+        if not name:
+            continue
+        label = str(row.get("label") or name)
+        href = f"{prefix}media/aist/{name}"
+        kind = Path(name).suffix.lstrip(".").upper() or "FILE"
+        items.append(
+            f'<li class="file-slot">'
+            f'<a href="{escape(href)}">{escape(label)}</a>'
+            f"<small>{escape(kind)}</small></li>"
+        )
+    if not items:
+        return ""
+    return f'<ul class="file-shelf" aria-label="{escape(_st("aist_materials"))}">{"".join(items)}</ul>'
+
+
+def _aist_org_block() -> str:
+    hub = load_migrated_copy().get("aist_hub") or {}
+    if not hub:
+        return ""
+    sid = str(hub.get("secretary_id") or "")
+    name = ""
+    if sid:
+        person = roster.all_people().get(sid) or {}
+        name = str(person.get("name") or "")
+    href = roster.person_href(sid, _NEST.get()) if sid else ""
+    who = (
+        f'<a href="{escape(href)}">{escape(name)}</a>'
+        if href and name
+        else escape(name or sid)
+    )
+    lines = [
+        f"<h2>{escape(_st('aist_org'))}</h2>",
+        f"<p>{escape(_st('aist_secretary'))}{who}</p>",
+    ]
+    if hub.get("phone"):
+        lines.append(f"<p>{escape(_st('tel'))}{escape(str(hub['phone']))}</p>")
+    if hub.get("email"):
+        email = escape(str(hub["email"]))
+        lines.append(f'<p>E-mail: <a href="mailto:{email}">{email}</a></p>')
+    press = hub.get("press") or []
+    if press:
+        lines.append(f"<h2>{escape(_st('aist_press'))}</h2>")
+        lines.append("<ul>")
+        for row in press:
+            title = escape(str(row.get("title") or row.get("href") or ""))
+            link = escape(str(row.get("href") or "#"))
+            lines.append(f'<li><a href="{link}" rel="noopener noreferrer">{title}</a></li>')
+        lines.append("</ul>")
+    return "".join(lines)
+
+
 def _conference_body(model: SiteModel, item: dict, depth: int = 2) -> str:
     prefix = "../" * depth
     _begin_page(depth)
     series = escape(item.get("series", ""))
+    paras = item.get("paragraphs") or []
+    files = item.get("files") or []
+    body = "".join(f"<p>{escape(p)}</p>" for p in paras)
+    if not body:
+        body = f"<p>{escape(_st('conference_placeholder'))}</p>"
+    banner = "" if files or paras else _fish_banner()
     inner = (
-        f"{_fish_banner()}"
+        f"{banner}"
         f"{_photo_slot(item['title'], kind='cover')}"
         f'<p class="leader-role">{series}</p>'
         f"<p>{escape(item.get('when', ''))}</p>"
-        f"<p>{escape(_st('conference_placeholder'))}</p>"
+        f"{body}"
+        f"{_real_file_shelf(files)}"
         f'<p><a href="{prefix}events.html">{escape(_st("back_to_events"))}</a> · '
         f'<a href="{prefix}aist.html">{escape(_st("aist_section"))}</a></p>'
     )
@@ -1754,16 +1820,30 @@ def _home_body(model: SiteModel) -> str:
 def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
     if item.id == "aist":
         event = load_migrated_copy().get("next_event") or {}
+        hub = load_migrated_copy().get("aist_hub") or {}
+        current = next(
+            (
+                row
+                for row in load_migrated_copy().get("conferences") or []
+                if row.get("slug") == "aist-2025"
+            ),
+            {},
+        )
+        leads = hub.get("lead") or [
+            _st("aist_body") + "aist.ichnm.by" + _st("aist_no_domain")
+        ]
+        lead_html = "".join(f"<p>{escape(p)}</p>" for p in leads)
         return (
             '<div class="conf-hero">'
             f'<p class="leader-role">{escape(_st("aist_series"))}</p>'
             f"<h2>{escape(event.get('title', 'AIST'))}</h2>"
             f"<p>{escape(event.get('when', ''))}</p>"
-            f"<p>{escape(_st('aist_body'))}"
-            '<a href="http://aist.ichnm.by/">aist.ichnm.by</a>' + escape(_st("aist_no_domain")) + "</p>"
+            f"{lead_html}"
+            f"{_real_file_shelf(current.get('files') or [])}"
             f'<p><a class="hero-pill hero-pill-primary" href="{escape(event.get("href", "http://aist.ichnm.by/"))}">{escape(_st("register"))}</a> '
             f'<a class="hero-pill" href="events.html">{escape(_st("all_events"))}</a></p>'
             "</div>"
+            + _aist_org_block()
             + _conference_archive()
         )
     if item.id == "feedback":
@@ -2020,14 +2100,56 @@ def _cover_card(href: str, title: str, lead: str, meta: str = "", letter: str = 
     )
 
 
+def _news_image_src(item: dict) -> str:
+    images = item.get("images") or []
+    slug = item.get("slug") or ""
+    if not images or not slug:
+        return ""
+    return f"{_asset_prefix()}media/news/{slug}/{images[0]}"
+
+
+def _news_thumb(title: str, src: str | None) -> str:
+    if src:
+        return (
+            f'<div class="photo-slot is-filled" role="img" aria-label="{escape(title)}">'
+            f'<img src="{escape(src)}" alt="" width="640" height="400"></div>'
+        )
+    return _photo_slot(title, kind="cover") if is_filled_copy() else ""
+
+
+def _news_card_photo(item: dict) -> str:
+    return _news_thumb(item.get("title") or "", _news_image_src(item))
+
+
+def _news_gallery(item: dict) -> str:
+    images = item.get("images") or []
+    slug = item.get("slug") or ""
+    if not images or not slug:
+        return _photo_slot(item["title"], kind="cover")
+    prefix = _asset_prefix()
+    figs = []
+    for name in images:
+        src = f"{prefix}media/news/{slug}/{name}"
+        figs.append(
+            f'<figure class="news-photo"><img src="{escape(src)}" alt="" width="700" height="525"></figure>'
+        )
+    return f'<div class="news-gallery">{"".join(figs)}</div>'
+
+
 def _news_article_body(model: SiteModel, item: dict, depth: int = 2) -> str:
     prefix = "../" * depth
     _begin_page(depth)
     paras = "".join(f"<p>{escape(p)}</p>" for p in item.get("paragraphs", []))
+    source = ""
+    if item.get("source_href"):
+        source = (
+            f'<p class="news-source"><a href="{escape(item["source_href"])}" '
+            f'rel="noopener noreferrer">{escape(_st("news_source"))}</a></p>'
+        )
     inner = (
-        f"{_photo_slot(item['title'], kind='cover')}"
+        f"{_news_gallery(item)}"
         f"<p class=\"leader-role\">{escape(item.get('date_label') or item.get('date', ''))}</p>"
-        f"{paras}"
+        f"{paras}{source}"
         f'<p><a href="{prefix}news.html">{escape(_st("back_to_news"))}</a></p>'
     )
     return _with_page_hero(
@@ -2413,10 +2535,14 @@ def _admin_unit_inner(unit_id: str) -> str:
     if not unit:
         return f"<p>{escape(_st('unit_pending'))}</p>"
     seen: set[str] = set()
+    seen_names: set[str] = set()
     people = []
     for person in roster.people_for_unit(unit_id):
         pid = str(person["id"])
         seen.add(pid)
+        name = str(person.get("name") or "").strip()
+        if name:
+            seen_names.add(name)
         people.append(
             _person_card(
                 name=person["name"],
@@ -2431,7 +2557,8 @@ def _admin_unit_inner(unit_id: str) -> str:
         )
     for person in unit.get("people", []):
         pid = str(person.get("id") or "")
-        if pid and pid in seen:
+        name = str(person.get("name") or "").strip()
+        if (pid and pid in seen) or (name and name in seen_names):
             continue
         people.append(
             _person_card(

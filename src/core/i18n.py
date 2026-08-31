@@ -296,10 +296,15 @@ STRINGS: dict[str, dict[str, str]] = {
         ),
         "aist_series": "Серия AIST · раздел на ichnm.by",
         "aist_body": (
-            "Программа, ключевые даты и сборник появятся в этом разделе. "
-            "Регистрация текущего цикла пока на "
+            "Материалы текущего цикла — программа, тезисы и резолюция — на этой странице. "
+            "Регистрация и исторический сайт серии пока на "
         ),
         "aist_no_domain": " — отдельный домен в v1 не поднимаем.",
+        "aist_materials": "Материалы конференции",
+        "aist_org": "Оргкомитет",
+        "aist_secretary": "Секретарь конференции: ",
+        "aist_press": "СМИ о конференции",
+        "news_source": "Текст и фото с текущего ichnm.by",
         "all_events": "Весь архив мероприятий",
         "feedback_lead": (
             "Форма откроет письмо на приёмную. Электронные обращения по закону — "
@@ -563,10 +568,15 @@ STRINGS: dict[str, dict[str, str]] = {
         ),
         "aist_series": "AIST series · a section on ichnm.by",
         "aist_body": (
-            "The programme, key dates and proceedings will appear in this section. "
-            "Registration for the current cycle is still at "
+            "The current cycle’s programme, abstracts and resolution are on this page. "
+            "Registration and the historic series site remain at "
         ),
         "aist_no_domain": " — v1 does not raise a separate domain.",
+        "aist_materials": "Conference files",
+        "aist_org": "Organising committee",
+        "aist_secretary": "Conference secretary: ",
+        "aist_press": "Press about the conference",
+        "news_source": "Text and photos from the current ichnm.by",
         "all_events": "Full event archive",
         "feedback_lead": (
             "The form opens a message to the reception desk. Statutory electronic appeals are on "
@@ -824,10 +834,15 @@ STRINGS: dict[str, dict[str, str]] = {
         ),
         "aist_series": "Серыя AIST · раздзел на ichnm.by",
         "aist_body": (
-            "Праграма, ключавыя даты і зборнік з’явяцца ў гэтым раздзеле. "
-            "Рэгістрацыя бягучага цыкла пакуль на "
+            "Матэрыялы бягучага цыкла — праграма, тэзісы і рэзалюцыя — на гэтай старонцы. "
+            "Рэгістрацыя і гістарычны сайт серыі пакуль на "
         ),
         "aist_no_domain": " — асобны дамен у v1 не падымаем.",
+        "aist_materials": "Матэрыялы канферэнцыі",
+        "aist_org": "Аргкамітэт",
+        "aist_secretary": "Сакратар канферэнцыі: ",
+        "aist_press": "СМІ пра канферэнцыю",
+        "news_source": "Тэкст і фота з бягучага ichnm.by",
         "all_events": "Увесь архіў мерапрыемстваў",
         "feedback_lead": (
             "Форма адкрые ліст на прыёмную. Электронныя звароты па законе — "
@@ -1087,9 +1102,14 @@ STRINGS: dict[str, dict[str, str]] = {
         ),
         "aist_series": "AIST 系列 · ichnm.by 栏目",
         "aist_body": (
-            "日程、关键日期和论文集将在本栏目发布。本届注册仍在 "
+            "本届日程、摘要和决议在本页。注册和系列历史站点仍在 "
         ),
         "aist_no_domain": " — 第一版不另设独立域名。",
+        "aist_materials": "会议材料",
+        "aist_org": "组委会",
+        "aist_secretary": "会议秘书：",
+        "aist_press": "会议媒体报道",
+        "news_source": "来自现行 ichnm.by 的正文与照片",
         "all_events": "全部活动档案",
         "feedback_lead": (
             "表单将向接待室发信。法定电子诉求见"

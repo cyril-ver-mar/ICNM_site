@@ -81,7 +81,22 @@ def test_language_structure_mirrors_russian_ia():
     aist = files["aist.html"]
     assert "aist.ichnm.by" in aist
     assert "conf-card" in aist
+    assert "conf-hero" in aist
     assert "conferences/aist-2025/index.html" in aist
+    assert "conferences/aist-2009/index.html" in aist
+    assert "media/aist/PROGRAMMA_AIST_2025.pdf" in aist
+    assert "sidorenko@ichnm.by" in aist
+    kids = files["news/children-day-2025/index.html"]
+    assert "первичной профсоюзной организации" in kids
+    assert "media/news/children-day-2025/image001.jpg" in kids
+    assert "появятся после передачи" not in kids
+    assert "Королёва Елена Вадимовна" in files["news/sinyutich-defense-2025/index.html"]
+    assert "Бею Максиму Петровичу" in files["news/scientific-council-docent-2024/index.html"]
+    assert "media/aist/Sbornic_2023.pdf" in files["conferences/aist-2023/index.html"]
+    css = files["site.css"]
+    assert "html.theme-night .conf-hero," in css
+    assert "html.theme-night .conf-hero .hero-pill" in css
+    assert "--palette2: #8ec4f0" in css
     assert "Главная" in files["about.html"]
     assert "is-locale-stub" not in files["en/index.html"]
 
@@ -208,6 +223,18 @@ def test_nas_emblem_lattice_lab_packs_and_publication_chart():
     assert "accounting.html" in files
     assert "Тихонов" in files["engineering.html"]
     assert "Бабко" in files["accounting.html"]
+    assert files["engineering.html"].count('class="leader-card"') == 1
+    assert files["accounting.html"].count('class="leader-card"') == 1
+    assert "people/tikhonov/index.html" in files["engineering.html"]
+    assert "people/babko/index.html" in files["accounting.html"]
+    assert "people/chief-engineer" not in files["engineering.html"]
+    assert "people/chief-accountant" not in files["accounting.html"]
+    assert "Тихонов" not in files["leadership.html"]
+    assert "Бабко" not in files["leadership.html"]
+    assert "people/tikhonov/index.html" in files
+    assert "people/babko/index.html" in files
+    assert "people/chief-engineer/index.html" not in files
+    assert "people/chief-accountant/index.html" not in files
     assert "Ко всем подразделениям" in files["hr.html"]
     assert "office-hr-head.html" in files
     assert "smu-chair.html" in files
