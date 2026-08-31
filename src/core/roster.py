@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from src.core import i18n
 from src.core.copy import load_migrated_copy
 
 _COMMUNITY_UNITS = frozenset({"union", "young-scientists"})
@@ -148,7 +149,10 @@ def unit_link(unit_id: str, depth: int = 0) -> tuple[str, str]:
     lab = lab_by_id(unit_id)
     if lab:
         slug = lab.get("slug") or lab["id"]
-        return f"{prefix}labs/{slug}/index.html", str(lab["title"])
+        return (
+            f"{prefix}labs/{slug}/index.html",
+            i18n.lab_title(str(lab["id"]), str(lab["title"])),
+        )
     titles = {
         "leadership": "Руководство",
         "scientific-council": "Учёный совет",
@@ -171,7 +175,7 @@ def unit_link(unit_id: str, depth: int = 0) -> tuple[str, str]:
         "young-scientists": "young-scientists.html",
         "structure": "structure.html",
     }
-    title = titles.get(unit_id, unit_id)
+    title = i18n.menu_title(unit_id, titles.get(unit_id, unit_id))
     href = prefix + files.get(unit_id, f"{unit_id}.html")
     return href, title
 

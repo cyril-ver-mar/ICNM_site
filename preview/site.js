@@ -814,15 +814,35 @@
     });
   }
 
+  function searchI18n() {
+    const raw = document.body && document.body.getAttribute("data-search-i18n");
+    if (!raw) {
+      return {
+        hint: "Введите не меньше двух букв: персоналии, подразделения, разработки.",
+        empty: "Ничего не найдено. Попробуйте фамилию, лабораторию, прибор или разработку.",
+        person: "Персоналии",
+        unit: "Подразделения",
+        facility: "Приборы",
+        development: "Разработки",
+      };
+    }
+    try {
+      return JSON.parse(raw);
+    } catch (e) {
+      return searchI18n.fallback || {};
+    }
+  }
+
   function renderSearchGroups(rows, prefix) {
+    const ui = searchI18n();
     if (!rows.length) {
-      return '<p class="search-hint">Ничего не найдено. Попробуйте фамилию, лабораторию, прибор или разработку.</p>';
+      return '<p class="search-hint">' + esc(ui.empty || "") + "</p>";
     }
     const labels = {
-      person: "Персоналии",
-      unit: "Подразделения",
-      facility: "Приборы",
-      development: "Разработки",
+      person: ui.person,
+      unit: ui.unit,
+      facility: ui.facility,
+      development: ui.development,
     };
     const order = ["person", "unit", "facility", "development"];
     const buckets = { person: [], unit: [], facility: [], development: [] };
@@ -933,7 +953,7 @@
       const q = query.trim();
       if (q.length < 2) {
         host.innerHTML =
-          '<p class="search-hint">Введите не меньше двух букв: персоналии, подразделения, разработки.</p>';
+          '<p class="search-hint">' + esc(searchI18n().hint || "") + "</p>";
         return;
       }
       loadSearchIndex(function (items) {

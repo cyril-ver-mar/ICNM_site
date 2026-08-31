@@ -6,9 +6,9 @@
   },
   "languages": [
     {"code": "ru", "prefix": "/", "status": "filled"},
-    {"code": "en", "prefix": "/en/", "status": "stub"},
-    {"code": "be", "prefix": "/be/", "status": "stub"},
-    {"code": "zh", "prefix": "/zh/", "status": "stub"}
+    {"code": "en", "prefix": "/en/", "status": "structure"},
+    {"code": "be", "prefix": "/be/", "status": "structure"},
+    {"code": "zh", "prefix": "/zh/", "status": "structure"}
   ],
   "homepage": {
     "blocks": [

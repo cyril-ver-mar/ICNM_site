@@ -1,0 +1,408 @@
+[
+  {
+    "kind": "person",
+    "title": "Михайловский Юрий Кимович",
+    "href": "people/mikhailovsky/index.html",
+    "lead": "Учёный секретарь",
+    "text": "Михайловский Юрий Кимович Учёный секретарь Кандидат химических наук Leadership Учёный секретарь Scientific council Учёный секретарь совета"
+  },
+  {
+    "kind": "person",
+    "title": "Луковская Ольга Вальдемаровна",
+    "href": "people/lukovskaya/index.html",
+    "lead": "Помощник руководителя, приёмная",
+    "text": "Луковская Ольга Вальдемаровна Помощник руководителя, приёмная  Leadership Помощник руководителя, приёмная"
+  },
+  {
+    "kind": "person",
+    "title": "Куликовская Виктория Игоревна",
+    "href": "people/kulikouskaya/index.html",
+    "lead": "Заведующий лабораторией",
+    "text": "Куликовская Виктория Игоревна Заведующий лабораторией Кандидат химических наук, доцент Laboratory of Micro- and Nanostructured Systems Заведующий лабораторией"
+  },
+  {
+    "kind": "person",
+    "title": "Гилевская Ксения Сергеевна",
+    "href": "people/hileuskaya/index.html",
+    "lead": "Ведущий научный сотрудник",
+    "text": "Гилевская Ксения Сергеевна Ведущий научный сотрудник Кандидат химических наук, доцент Laboratory of Micro- and Nanostructured Systems Ведущий научный сотрудник"
+  },
+  {
+    "kind": "person",
+    "title": "Иванова Наталья Александровна",
+    "href": "people/ivanova/index.html",
+    "lead": "Заведующий лабораторией",
+    "text": "Иванова Наталья Александровна Заведующий лабораторией Кандидат химических наук Laboratory of Optical Multifunctional Films Заведующий лабораторией"
+  },
+  {
+    "kind": "person",
+    "title": "Муравский Александр Анатольевич",
+    "href": "people/muravsky/index.html",
+    "lead": "Заведующий лабораторией",
+    "text": "Муравский Александр Анатольевич Заведующий лабораторией Кандидат технических наук Laboratory of Materials and Technologies for LC Devices Заведующий лабораторией"
+  },
+  {
+    "kind": "person",
+    "title": "Сидоренко Александр Юрьевич",
+    "href": "people/sidorenko/index.html",
+    "lead": "Заведующий лабораторией",
+    "text": "Сидоренко Александр Юрьевич Заведующий лабораторией Кандидат химических наук Industry Laboratory of Heat-Resistant Polymer Composites Заведующий лабораторией"
+  },
+  {
+    "kind": "person",
+    "title": "Карпинчик Елена Владимировна",
+    "href": "people/karpinchik/index.html",
+    "lead": "Заведующий лабораторией",
+    "text": "Карпинчик Елена Владимировна Заведующий лабораторией Кандидат химических наук Laboratory of Forest Chemical Products and Technologies Заведующий лабораторией"
+  },
+  {
+    "kind": "person",
+    "title": "Тихонов Александр Викторович",
+    "href": "people/tikhonov/index.html",
+    "lead": "Главный инженер",
+    "text": "Тихонов Александр Викторович Главный инженер  Chief engineer Главный инженер"
+  },
+  {
+    "kind": "person",
+    "title": "Бабко Полина Анатольевна",
+    "href": "people/babko/index.html",
+    "lead": "Главный бухгалтер",
+    "text": "Бабко Полина Анатольевна Главный бухгалтер  Accounting Главный бухгалтер"
+  },
+  {
+    "kind": "person",
+    "title": "Фамилия Имя Отчество",
+    "href": "people/nano-ns/index.html",
+    "lead": "Научный сотрудник",
+    "text": "Фамилия Имя Отчество Научный сотрудник к.х.н. Laboratory of Micro- and Nanostructured Systems Научный сотрудник"
+  },
+  {
+    "kind": "person",
+    "title": "Фамилия Имя Отчество",
+    "href": "people/films-ns/index.html",
+    "lead": "Научный сотрудник",
+    "text": "Фамилия Имя Отчество Научный сотрудник к.х.н. Laboratory of Optical Multifunctional Films Научный сотрудник"
+  },
+  {
+    "kind": "person",
+    "title": "Фамилия Имя Отчество",
+    "href": "people/lcd-ns/index.html",
+    "lead": "Научный сотрудник",
+    "text": "Фамилия Имя Отчество Научный сотрудник к.х.н. Laboratory of Materials and Technologies for LC Devices Научный сотрудник"
+  },
+  {
+    "kind": "person",
+    "title": "Фамилия Имя Отчество",
+    "href": "people/comp-ns/index.html",
+    "lead": "Научный сотрудник",
+    "text": "Фамилия Имя Отчество Научный сотрудник к.х.н. Industry Laboratory of Heat-Resistant Polymer Composites Научный сотрудник"
+  },
+  {
+    "kind": "person",
+    "title": "Фамилия Имя Отчество",
+    "href": "people/wood-ns/index.html",
+    "lead": "Научный сотрудник",
+    "text": "Фамилия Имя Отчество Научный сотрудник к.х.н. Laboratory of Forest Chemical Products and Technologies Научный сотрудник"
+  },
+  {
+    "kind": "person",
+    "title": "Рогачёв Александр Александрович",
+    "href": "people/rogachev/index.html",
+    "lead": "Директор",
+    "text": "Рогачёв Александр Александрович Директор Член-корреспондент НАН Беларуси, доктор технических наук, профессор Leadership Директор Laboratory of Micro- and Nanostructured Systems Научный сотрудник (плазмохимия покрытий)"
+  },
+  {
+    "kind": "person",
+    "title": "Игнатович Жанна Владимировна",
+    "href": "people/ignatovich/index.html",
+    "lead": "Заместитель директора по научной работе",
+    "text": "Игнатович Жанна Владимировна Заместитель директора по научной работе Кандидат химических наук, доцент Leadership Заместитель директора по научной работе Laboratory of Forest Chemical Products and Technologies Ведущий научный сотрудник"
+  },
+  {
+    "kind": "person",
+    "title": "Зураев Александр Викторович",
+    "href": "people/zuraev/index.html",
+    "lead": "Заместитель директора по научной и инновационной работе",
+    "text": "Зураев Александр Викторович Заместитель директора по научной и инновационной работе Кандидат химических наук, доцент Leadership Заместитель директора по научной и инновационной работе"
+  },
+  {
+    "kind": "person",
+    "title": "Агабеков Владимир Енокович",
+    "href": "people/agabekov/index.html",
+    "lead": "Почётный директор",
+    "text": "Агабеков Владимир Енокович Почётный директор Академик НАН Беларуси, доктор химических наук, профессор Leadership Почётный директор Laboratory of Optical Multifunctional Films Заведующий отделом физико-химии тонкоплёночных материалов"
+  },
+  {
+    "kind": "person",
+    "title": "Фамилия Имя Отчество",
+    "href": "people/chair/index.html",
+    "lead": "Председатель учёного совета",
+    "text": "Фамилия Имя Отчество Председатель учёного совета д.х.н., профессор Scientific council Председатель учёного совета"
+  },
+  {
+    "kind": "person",
+    "title": "Фамилия Имя Отчество",
+    "href": "people/member-1/index.html",
+    "lead": "Член совета",
+    "text": "Фамилия Имя Отчество Член совета д.х.н. Scientific council Член совета"
+  },
+  {
+    "kind": "person",
+    "title": "Фамилия Имя Отчество",
+    "href": "people/member-2/index.html",
+    "lead": "Член совета",
+    "text": "Фамилия Имя Отчество Член совета к.х.н., доцент Scientific council Член совета"
+  },
+  {
+    "kind": "person",
+    "title": "Фамилия Имя Отчество",
+    "href": "people/hr-head/index.html",
+    "lead": "Начальник отдела кадров",
+    "text": "Фамилия Имя Отчество Начальник отдела кадров  Human resources Начальник отдела кадров"
+  },
+  {
+    "kind": "person",
+    "title": "Фамилия Имя Отчество",
+    "href": "people/ot-spec/index.html",
+    "lead": "Специалист по охране труда",
+    "text": "Фамилия Имя Отчество Специалист по охране труда  Occupational safety Специалист по охране труда"
+  },
+  {
+    "kind": "person",
+    "title": "Тихонов Александр Викторович",
+    "href": "people/chief-engineer/index.html",
+    "lead": "Главный инженер",
+    "text": "Тихонов Александр Викторович Главный инженер  Chief engineer Главный инженер"
+  },
+  {
+    "kind": "person",
+    "title": "Бабко Полина Анатольевна",
+    "href": "people/chief-accountant/index.html",
+    "lead": "Главный бухгалтер",
+    "text": "Бабко Полина Анатольевна Главный бухгалтер  Accounting Главный бухгалтер"
+  },
+  {
+    "kind": "person",
+    "title": "Фамилия Имя Отчество",
+    "href": "people/smu-chair/index.html",
+    "lead": "Председатель совета молодых учёных",
+    "text": "Фамилия Имя Отчество Председатель совета молодых учёных  Council of Young Scientists Председатель совета молодых учёных"
+  },
+  {
+    "kind": "person",
+    "title": "Фамилия Имя Отчество",
+    "href": "people/smu-deputy/index.html",
+    "lead": "Заместитель председателя",
+    "text": "Фамилия Имя Отчество Заместитель председателя  Council of Young Scientists Заместитель председателя"
+  },
+  {
+    "kind": "person",
+    "title": "Фамилия Имя Отчество",
+    "href": "people/smu-secretary/index.html",
+    "lead": "Секретарь",
+    "text": "Фамилия Имя Отчество Секретарь  Council of Young Scientists Секретарь"
+  },
+  {
+    "kind": "unit",
+    "title": "Laboratory of Micro- and Nanostructured Systems",
+    "href": "labs/nano/index.html",
+    "lead": "Наноструктуры и носители",
+    "text": "Лаборатория микро- и наноструктурированных систем Laboratory of Micro- and Nanostructured Systems Наноструктуры и носители "
+  },
+  {
+    "kind": "unit",
+    "title": "Laboratory of Optical Multifunctional Films",
+    "href": "labs/films/index.html",
+    "lead": "Оптические плёнки",
+    "text": "Лаборатория оптических многофункциональных плёнок Laboratory of Optical Multifunctional Films Оптические плёнки "
+  },
+  {
+    "kind": "unit",
+    "title": "Laboratory of Materials and Technologies for LC Devices",
+    "href": "labs/lcd/index.html",
+    "lead": "Жидкие кристаллы",
+    "text": "Лаборатория материалов и технологий ЖК-устройств Laboratory of Materials and Technologies for LC Devices Жидкие кристаллы "
+  },
+  {
+    "kind": "unit",
+    "title": "Industry Laboratory of Heat-Resistant Polymer Composites",
+    "href": "labs/composites/index.html",
+    "lead": "Термостойкие композиты",
+    "text": "Отраслевая лаборатория термостойких полимерных композиционных материалов Industry Laboratory of Heat-Resistant Polymer Composites Термостойкие композиты "
+  },
+  {
+    "kind": "unit",
+    "title": "Laboratory of Forest Chemical Products and Technologies",
+    "href": "labs/woodchem/index.html",
+    "lead": "Лесохимия",
+    "text": "Лаборатория лесохимических продуктов и технологий Laboratory of Forest Chemical Products and Technologies Лесохимия "
+  },
+  {
+    "kind": "unit",
+    "title": "Human resources",
+    "href": "hr.html",
+    "lead": "Administrative unit",
+    "text": "Отдел кадров Human resources +375 (17) 243-67-56"
+  },
+  {
+    "kind": "unit",
+    "title": "Occupational safety",
+    "href": "labor-protection.html",
+    "lead": "Administrative unit",
+    "text": "Охрана труда Occupational safety +375 (17) 000-00-00"
+  },
+  {
+    "kind": "unit",
+    "title": "Chief engineer",
+    "href": "engineering.html",
+    "lead": "Administrative unit",
+    "text": "Главный инженер Chief engineer +375 (17) 215-07-15"
+  },
+  {
+    "kind": "unit",
+    "title": "Accounting",
+    "href": "accounting.html",
+    "lead": "Administrative unit",
+    "text": "Бухгалтерия Accounting +375 (17) 215-07-03"
+  },
+  {
+    "kind": "unit",
+    "title": "Trade union",
+    "href": "union.html",
+    "lead": "Primary organisation",
+    "text": "Профсоюз Trade union Primary organisation"
+  },
+  {
+    "kind": "unit",
+    "title": "Council of Young Scientists",
+    "href": "young-scientists.html",
+    "lead": "Institute CYS",
+    "text": "Совет молодых учёных Council of Young Scientists Institute CYS"
+  },
+  {
+    "kind": "unit",
+    "title": "Leadership",
+    "href": "leadership.html",
+    "lead": "Directorate",
+    "text": "Руководство Leadership Directorate"
+  },
+  {
+    "kind": "unit",
+    "title": "Scientific council",
+    "href": "scientific-council.html",
+    "lead": "Council membership",
+    "text": "Учёный совет Scientific council Council membership"
+  },
+  {
+    "kind": "development",
+    "title": "Микросферы иммуномагнитные «МСС-4.12-Avidin»",
+    "href": "developments/immuno-spheres/index.html",
+    "lead": "Лаборатория микро- и наноструктурированных систем",
+    "text": "Микросферы иммуномагнитные «МСС-4.12-Avidin» Иммуномагнитные микросферы (справка ichnm.by). Лаборатория микро- и наноструктурированных систем Лаборатория микро- и наноструктурированных систем · Куликовская Виктория Игоревна · +375 (17) 263-92-99 · kulikouskaya@ichnm.by"
+  },
+  {
+    "kind": "development",
+    "title": "Поляроидные плёнки",
+    "href": "developments/polaroid-films/index.html",
+    "lead": "Лаборатория оптических многофункциональных плёнок",
+    "text": "Поляроидные плёнки Повышенная термостойкость; оптоэлектроника и защита документов. Лаборатория оптических многофункциональных плёнок Лаборатория оптических многофункциональных плёнок · Иванова Наталья Александровна"
+  },
+  {
+    "kind": "development",
+    "title": "Ориентирующие слои для ЖК",
+    "href": "developments/lcd-orientants/index.html",
+    "lead": "Лаборатория материалов и технологий ЖК-устройств",
+    "text": "Ориентирующие слои для ЖК Слои и методики сборки (макет карточки лаборатории). Лаборатория материалов и технологий ЖК-устройств Лаборатория материалов и технологий ЖК-устройств · Муравский Александр Анатольевич"
+  },
+  {
+    "kind": "development",
+    "title": "Композиционные материалы «ПАНАНТ»",
+    "href": "developments/panant/index.html",
+    "lead": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+    "text": "Композиционные материалы «ПАНАНТ» Совместно с ИММС НАН Беларуси: карточки, детали, расходники 3D-принтеров. Отраслевая лаборатория термостойких полимерных композиционных материалов Отраслевая лаборатория термостойких полимерных композиционных материалов · Сидоренко Александр Юрьевич"
+  },
+  {
+    "kind": "development",
+    "title": "СОЖ и биоразлагаемые фунгициды",
+    "href": "developments/coolants-fungicides/index.html",
+    "lead": "Лаборатория лесохимических продуктов и технологий",
+    "text": "СОЖ и биоразлагаемые фунгициды Водоэмульсионные СОЖ на основе канифолемалеинового аддукта. Лаборатория лесохимических продуктов и технологий Лаборатория лесохимических продуктов и технологий · Карпинчик Елена Владимировна"
+  },
+  {
+    "kind": "development",
+    "title": "Оптические отбеливатели, красители и люминофоры",
+    "href": "developments/optical-brighteners/index.html",
+    "lead": "Development",
+    "text": "Оптические отбеливатели, красители и люминофоры Пигменты для защиты ценных бумаг (совместно с РУП «Криптотех»).  ichnm@ichnm.by"
+  },
+  {
+    "kind": "development",
+    "title": "Комплекс LT-201 / ЛТ-103",
+    "href": "developments/langmuir-blodgett/index.html",
+    "lead": "Development",
+    "text": "Комплекс LT-201 / ЛТ-103 Моно- и мультимолекулярные слои методом горизонтального осаждения.  ichnm@ichnm.by"
+  },
+  {
+    "kind": "facility",
+    "title": "Вакуумная установка плазмохимического синтеза покрытий",
+    "href": "facilities/vaktime-plasma-lab/index.html",
+    "lead": "Лаборатория микро- и наноструктурированных систем",
+    "text": "Вакуумная установка плазмохимического синтеза покрытий ООО «Вактайм», Сморгонь, 2022. Плазмохимическое осаждение покрытий. Плазмохимическое осаждение покрытий. Лаборатория микро- и наноструктурированных систем Лаборатория микро- и наноструктурированных систем · Рогачёв Александр Александрович · +375 (17) 317-70-07 · rogachev@ichnm.by"
+  },
+  {
+    "kind": "facility",
+    "title": "Автоматическая установка ЛТ-103",
+    "href": "facilities/lt-103/index.html",
+    "lead": "Лаборатория оптических многофункциональных плёнок",
+    "text": "Автоматическая установка ЛТ-103 Моно- и мультимолекулярные слои методом горизонтального осаждения. Плёнки Ленгмюра–Блоджетт. Лаборатория оптических многофункциональных плёнок Лаборатория оптических многофункциональных плёнок · Иванова Наталья Александровна"
+  },
+  {
+    "kind": "facility",
+    "title": "Потенциостат Р-45Х с модулем FRA-24M",
+    "href": "facilities/p45x/index.html",
+    "lead": "Лаборатория материалов и технологий ЖК-устройств",
+    "text": "Потенциостат Р-45Х с модулем FRA-24M Electrochemical instruments, 2023. Электрохимические измерения, импеданс. Лаборатория материалов и технологий ЖК-устройств Лаборатория материалов и технологий ЖК-устройств · Муравский Александр Анатольевич"
+  },
+  {
+    "kind": "facility",
+    "title": "Лабораторный экструдер LabTech Scientific LE GM 1224",
+    "href": "facilities/labtech-extruder/index.html",
+    "lead": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+    "text": "Лабораторный экструдер LabTech Scientific LE GM 1224 Микропроцессорные блоки Schneider Electric, 2023. Лабораторная экструзия полимеров. Отраслевая лаборатория термостойких полимерных композиционных материалов Отраслевая лаборатория термостойких полимерных композиционных материалов · Сидоренко Александр Юрьевич"
+  },
+  {
+    "kind": "facility",
+    "title": "Мельница трёхвалковая Guangzhou Cosmati Technology",
+    "href": "facilities/cosmati-mill/index.html",
+    "lead": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+    "text": "Мельница трёхвалковая Guangzhou Cosmati Technology КНР, 2024. Диспергирование паст. Диспергирование паст. Отраслевая лаборатория термостойких полимерных композиционных материалов Отраслевая лаборатория термостойких полимерных композиционных материалов · Сидоренко Александр Юрьевич"
+  },
+  {
+    "kind": "facility",
+    "title": "Хроматограф газовый «Хромос ГХ-1000»",
+    "href": "facilities/chromos-gx1000/index.html",
+    "lead": "Лаборатория лесохимических продуктов и технологий",
+    "text": "Хроматограф газовый «Хромос ГХ-1000» ХРОМОС Инжиниринг, 2025. Анализ органических газообразных и жидких проб. Лаборатория лесохимических продуктов и технологий Лаборатория лесохимических продуктов и технологий · Карпинчик Елена Владимировна"
+  },
+  {
+    "kind": "facility",
+    "title": "Комплект для переработки древесных отходов",
+    "href": "facilities/npo-center-wood/index.html",
+    "lead": "Лаборатория лесохимических продуктов и технологий",
+    "text": "Комплект для переработки древесных отходов ОАО «НПО Центр», 2022. Линия переработки. Лаборатория лесохимических продуктов и технологий Лаборатория лесохимических продуктов и технологий · Карпинчик Елена Владимировна"
+  },
+  {
+    "kind": "facility",
+    "title": "Экспресс-анализатор «ИнСпектр МиксСплиттер»",
+    "href": "facilities/inspec-mixsplitter/index.html",
+    "lead": "Instrument",
+    "text": "Экспресс-анализатор «ИнСпектр МиксСплиттер» ООО «Спектр-М», Россия, 2025. Идентификация порошковых смесей. Экспресс-анализ порошков. Паспорт появится из материальной базы.  "
+  },
+  {
+    "kind": "facility",
+    "title": "Калориметр бомбовый изопериболический БИК 100",
+    "href": "facilities/bik-100/index.html",
+    "lead": "Instrument",
+    "text": "Калориметр бомбовый изопериболический БИК 100 ЗАО «БМЦ», Минск, 2025. Бомбовая калориметрия. Лист спецификации — макет.  "
+  }
+]

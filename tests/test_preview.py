@@ -52,17 +52,22 @@ def test_icnm_mark_uses_bew_vector():
     assert "#1f2427" in svg
 
 
-def test_language_stubs_and_aist():
+def test_language_structure_mirrors_russian_ia():
     model = load_site_model()
     files = render_site_files(model)
     en = files["en/index.html"]
     assert 'lang="en"' in en
-    assert "English version in preparation" in en
     assert "Institute of Chemistry of New Materials" in en
-    assert files["en/about.html"].count("About") >= 1
+    assert "English version in preparation" not in en
+    assert "Research areas" in files["en/science.html"]
+    assert "Structure" in files["en/structure.html"]
+    assert "labs/nano/index.html" in files["en/structure.html"]
+    assert "Laboratory of Micro- and Nanostructured Systems" in files["en/labs/nano/index.html"]
+    assert "../site.css" in files["en/about.html"]
+    assert "../../../site.css" in files["en/labs/nano/index.html"]
+    assert "../../../labs/nano/index.html" in files["en/labs/nano/index.html"]  # RU switch
     assert "Пра інстытут" in files["be/about.html"]
-    assert "关于研究所" in files["zh/about.html"]
-    assert "Russian version" in en
+    assert "机构设置" in files["zh/structure.html"]
     assert "Font size" in en
     assert "Standard version" in en
     assert "On this site" in en
@@ -72,11 +77,14 @@ def test_language_stubs_and_aist():
     assert "标准版" in files["zh/index.html"]
     assert "Версия для слабовидящих" not in en
     assert "Политика cookie" in files["cookies.html"]
+    assert files["en/search.json"]
     aist = files["aist.html"]
     assert "aist.ichnm.by" in aist
     assert "conf-card" in aist
     assert "conferences/aist-2025/index.html" in aist
     assert "Главная" in files["about.html"]
+    assert "is-locale-stub" not in files["en/index.html"]
+
 
 
 def test_inner_pages_use_cards_and_empty_states():
@@ -88,6 +96,8 @@ def test_inner_pages_use_cards_and_empty_states():
     contacts = files["contacts.html"]
     assert "Михайловский" in contacts
     assert "map-slot" in contacts
+    assert "city-map" in contacts
+    assert "map-pin" in contacts
     assert "empty-state" in files["vacancies.html"]
     assert "1999" in files["aspirantura.html"]
     assert "cover-card" in files["developments.html"]
@@ -248,7 +258,9 @@ def test_nas_emblem_lattice_lab_packs_and_publication_chart():
     assert "announcement.html" not in files
     assert "picto-strip" in files["index.html"]
     assert "media/footer/president.gif" in files["index.html"]
-    assert "media/maps/institute.svg" in files["index.html"]
+    assert "city-map" in files["index.html"]
+    assert "data-pin-left" in files["index.html"]
+    assert "media/maps/institute.svg" not in files["index.html"]
     assert "cookie-banner" in files["index.html"]
     assert "data-theme-toggle" in files["index.html"]
     assert "bvi-panel" in files["index.html"]

@@ -11,12 +11,12 @@ Read `docs/DECISIONS.md` and `docs/CONTEXT.md` before changing scope, IA, or sta
 - Look and IA follow iboch.by; not a pixel clone. Keep ICNM sections: developments, facilities, AIST.
 - Personal pages at `people/{id}/`. A person can belong to several units; the person page lists all affiliations. Cards are the hyperlink (no extra biography caption). Labs remain packs at `labs/{slug}/` on this site, not separate domains. Structure dropdown: labs, then admin units, then union and young scientists.
 - Top menu: Об институте (сведения, руководство, **Структура** with nested labs/admin/union, folder **Научная деятельность**, учёный совет, facilities, документы without requisites, vacancies); News is one combined page (institute + СМИ); events; contacts (feedback + **реквизиты**). The science folder has no page; its first child is **Направления работы** (`science.html`). Dropdown parent *pages* are links; first submenu row repeats the section page (no «страница раздела» caption). A folder parent is a label only. Lab catalogues feed institute pages; science and facilities cards keep lab and staff attribution. Publications name the lab and DOI only.
-- v1 language: Russian only. URLs `/`, `/en/`, `/be/`, `/zh/` exist from day one; non-RU are stubs.
+- v1 language: **structure** in RU/EN/BE/ZH (`/`, `/en/`, `/be/`, `/zh/`). Institute body copy stays Russian until official translation. Language switcher maps equivalent pages.
 - WordPress + Kadence (same constructor as iboch.by). The same staff role publishes news, events, «СМИ о нас», and publications. Do not let editors break header, footer, or vitrine pages.
 - Plan a PHP tariff at Active.by or Hoster.by. Do not put WordPress on the current Java Forever stack.
 - Homepage: short official intro, mixed news + media-about-us, entries to structure/developments, next event. No 3D promo. Achievements live under About. No separate announcements feed; contact form is in the header.
 - Documents: charter, anti-corruption, electronic appeals. Requisites sit under Contacts.
-- Leadership: director, deputies, honorary director, учёный секретарь, reception. Cooperation: world map with partner pins.
+- Leadership: director, deputies, honorary director, учёный секретарь, reception. Cooperation: world map with partner pins. Contacts/footer: Minsk outline in the same theme colours, pin at Skaryna 36.
 - Footer: stable NAS pack (president, government, pravo.by, Navuka, profnan.by, NAS portal) + NAS socials + ICNM socials when URLs exist. No empty icons. No seasonal Academy banners.
 - AIST is a section on this site; launch may be basic info + stub.
 - Cutover: test URL first; old site stays until sign-off. ICNM mark is `ICHNM_Bew.ai` → `ichnm-mark.svg`. NAS emblem may still crop until its vector arrives.

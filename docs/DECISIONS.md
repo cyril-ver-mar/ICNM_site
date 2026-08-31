@@ -28,9 +28,8 @@ Locked in grilling, 2026-08-30. Detail and rationale live here. Agents: follow `
 
 ## Languages
 
-- **v1** — Public content in Russian only.
-- **v1** — URL prefixes exist from day one: `/`, `/en/`, `/be/`, `/zh/`. Header language switcher is visible. Non-Russian locales are short stubs.
-- **post-v1** — Fill English, Belarusian, and Chinese.
+- **v1 (2026-09-01)** — Site **structure** (IA, menus, chrome, page shells, laboratory names in the tree) is filled in four languages: Russian `/`, English `/en/`, Belarusian `/be/`, Chinese `/zh/`. Institute **copy** (news, biographies, scientific paragraphs, dummy filled texts) stays Russian until an official translation. The language switcher stays on the equivalent page.
+- **post-v1** — Translate remaining institute texts into English, Belarusian, and Chinese.
 
 ## Content
 
@@ -45,7 +44,7 @@ Locked in grilling, 2026-08-30. Detail and rationale live here. Agents: follow `
 - **v1 (2026-08-31)** — Scientific council uses the same card pattern as Руководство (photo slot, role, contacts). Cards open the shared personal page.
 - **v1 (2026-08-31)** — Structure includes administrative units (отдел кадров, охрана труда, главный инженер, бухгалтерия) plus профсоюз and совет молодых учёных (visual break after admin). Staff lists live on each unit/lab page and on personal pages, not on the structure hub.
 - **v1 (2026-08-31)** — Руководство is director, deputies, honorary director, учёный секретарь and сотрудник приёмной (two-column cards). Chief engineer and chief accountant sit under Структура.
-- **v1 (2026-08-31)** — Cooperation page: Natural Earth country outlines in theme colors (white land / light ocean by day) with partner pins and hover cards (photo slot + interaction note). Not a watermarked political atlas.
+- **v1 (2026-08-31)** — Cooperation page: Natural Earth country outlines in theme colors (white land / light ocean by day) with partner pins and hover cards (photo slot + interaction note). Not a watermarked political atlas. Contacts and the footer use the same language for **Minsk**: simplified city outline, Svisloch and reservoirs in the ocean colour, one pin at ул. Ф. Скорины, 36. Not an OSM/Google screenshot.
 - **v1 (2026-08-31)** — Publications year chart: bars grow on first view; a moving-average polyline sits on the histogram. Series remains mock until official yearly counts exist.
 - **v1** — Cutover content packet: the **institute developer/configurator** (this project’s builder) owns both the WordPress build and the institute-side setup (hosting, admin, roles, migration). Colleagues still supply source files (lab lists, PDFs, vectors, publication spreadsheet); there is no second named counterpart.
 

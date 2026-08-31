@@ -12,7 +12,7 @@ def model():
     return load_site_model()
 
 
-def test_languages_have_four_prefixes_and_only_russian_is_filled(model):
+def test_languages_have_four_prefixes_and_structure_locales(model):
     langs = {item.code: item for item in model.languages}
     assert set(langs) == {"ru", "en", "be", "zh"}
     assert langs["ru"].prefix == "/"
@@ -20,7 +20,7 @@ def test_languages_have_four_prefixes_and_only_russian_is_filled(model):
     assert langs["en"].prefix == "/en/"
     assert langs["be"].prefix == "/be/"
     assert langs["zh"].prefix == "/zh/"
-    assert langs["en"].status == langs["be"].status == langs["zh"].status == "stub"
+    assert langs["en"].status == langs["be"].status == langs["zh"].status == "structure"
 
 
 def test_top_menu_covers_locked_information_architecture(model):

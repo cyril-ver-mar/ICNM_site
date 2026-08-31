@@ -8,17 +8,19 @@ from hashlib import sha1
 from html import escape
 from pathlib import Path
 
+from src.core import i18n, roster
 from src.core.copy import is_filled_copy, load_migrated_copy, page_copy
 from src.core.filled import fish_svg, letter_for_lab
 from src.core.search_index import build_search_index
 from src.core.site_model import MenuItem, SiteModel
-from src.core import roster
 
 _HERE = Path(__file__).resolve().parent
 
 _ASSET_PREFIX: ContextVar[str] = ContextVar("asset_prefix", default="")
 _CURRENT_LETTER: ContextVar[str] = ContextVar("current_letter", default="И")
-_LOCALE: ContextVar[str] = ContextVar("locale", default="ru")
+_LOCALE = i18n.LOCALE
+_NEST: ContextVar[int] = ContextVar("nest", default=0)
+_REL_PATH: ContextVar[str] = ContextVar("rel_path", default="index.html")
 _FISH_FILES: dict[str, str] = {}
 
 _VISIBLE_MENU = frozenset(
@@ -81,6 +83,7 @@ _CHROME: dict[str, dict[str, str]] = {
         "day": "Дневная тема",
         "year_unknown": "Год не указан",
         "to_ru": "Русская версия",
+        "home": "Главная",
     },
     "en": {
         "skip": "Skip to content",
@@ -430,9 +433,7 @@ _CHROME_MORE: dict[str, dict[str, str]] = {
 for _code, _keys in _CHROME_MORE.items():
     _CHROME[_code].update(_keys)
 
-_LOCALE_CHROME_PAGES = frozenset(
-    {"cookies.html", "personal-data.html", "about.html", "news.html", "events.html", "contacts.html"}
-)
+_LOCALE_CHROME_PAGES = frozenset()
 
 _STUB_SECTION_LEAD = {
     "en": "This section will appear in English after translation.",
@@ -571,15 +572,39 @@ def _t(text: str) -> str:
     return escape(_typo(text))
 
 
+def _st(key: str) -> str:
+    return i18n.string(key)
+
+
+def _mt(item: MenuItem) -> str:
+    return i18n.menu_title(item.id, item.title)
+
+
+def _lt(lab: dict) -> str:
+    return i18n.lab_from_row(lab)
+
+
+def _page_prefix() -> str:
+    return "../" * _NEST.get()
+
+
+def _asset_prefix() -> str:
+    extra = 0 if _LOCALE.get() == "ru" else 1
+    return "../" * (_NEST.get() + extra)
+
+
 def _ui(key: str) -> str:
     pack = _CHROME.get(_LOCALE.get(), _CHROME["ru"])
-    return pack.get(key) or _CHROME["ru"].get(key) or key
+    if key in pack:
+        return pack[key]
+    text = i18n.string(key)
+    if text != key:
+        return text
+    return _CHROME["ru"].get(key) or key
 
 
-def _ui_href(filename: str, prefix: str) -> str:
-    if _LOCALE.get() != "ru" and filename in _LOCALE_CHROME_PAGES:
-        return filename
-    return f"{prefix}{filename}"
+def _ui_href(filename: str, prefix: str | None = None) -> str:
+    return f"{prefix if prefix is not None else _page_prefix()}{filename}"
 
 
 def _admin_unit_ids() -> set[str]:
@@ -587,7 +612,8 @@ def _admin_unit_ids() -> set[str]:
 
 
 def _begin_page(depth: int = 0, letter: str = "") -> None:
-    _ASSET_PREFIX.set("../" * depth)
+    _NEST.set(depth)
+    _ASSET_PREFIX.set(_asset_prefix())
     if letter:
         _CURRENT_LETTER.set(letter)
 
@@ -606,68 +632,96 @@ def render_site_files(model: SiteModel) -> dict[str, str]:
     files: dict[str, str] = {}
     files["site.css"] = (_HERE / "preview.css").read_text(encoding="utf-8")
     files["site.js"] = (_HERE / "preview.js").read_text(encoding="utf-8")
-    files["index.html"] = _page(model, "Главная", _home_body(model), current="home", is_home=True)
-    for code in ("en", "be", "zh"):
-        files[f"{code}/index.html"] = _stub_page(model, code, "home")
-        for section, _key in _LOCALE_SECTIONS:
-            files[f"{code}/{section}.html"] = _stub_page(model, code, section)
+    for code in ("ru", "en", "be", "zh"):
+        tree = _render_locale_tree(model, code)
+        if code == "ru":
+            files.update(tree)
+        else:
+            files.update({f"{code}/{path}": html for path, html in tree.items()})
+    files.update(_FISH_FILES)
+    return files
+
+
+def _render_locale_tree(model: SiteModel, code: str) -> dict[str, str]:
+    _LOCALE.set(code)
+    _begin_page(0)
+    files: dict[str, str] = {}
+
+    def put(
+        rel: str,
+        title: str,
+        body: str,
+        current: str,
+        *,
+        depth: int = 0,
+        is_home: bool = False,
+        extra_body_class: str = "",
+    ) -> None:
+        files[rel] = _page(
+            model,
+            title,
+            body,
+            current,
+            is_home=is_home,
+            depth=depth,
+            extra_body_class=extra_body_class,
+            current_code=code,
+            rel_path=rel,
+        )
+
+    put("index.html", _st("home"), _home_body(model), "home", is_home=True)
     for item in _walk(model.menu_roots()):
         if item.kind == "folder":
             continue
-        files[f"{item.id}.html"] = _page(
-            model,
-            item.title,
-            _vitrine_body(model, item),
-            current=item.id,
-        )
-    media_about = MenuItem(id="media_about", title="СМИ о нас", kind="feed")
-    files["media_about.html"] = _page(
-        model,
+        put(f"{item.id}.html", _mt(item), _vitrine_body(model, item), item.id)
+    media_about = MenuItem(
+        id="media_about",
+        title=i18n.menu_title("media_about", "СМИ о нас"),
+        kind="feed",
+    )
+    put(
+        "media_about.html",
         media_about.title,
         _vitrine_body(model, media_about),
-        current="news",
+        "news",
     )
     for lab in load_migrated_copy().get("labs", []):
         slug = lab.get("slug") or lab["id"]
-        files[f"{lab['id']}.html"] = _page(
-            model,
-            lab["title"],
-            _lab_body(model, lab, depth=0),
-            current=str(lab["id"]),
-        )
-        files[f"labs/{slug}/index.html"] = _page(
-            model,
-            lab["title"],
+        title = _lt(lab)
+        put(f"{lab['id']}.html", title, _lab_body(model, lab, depth=0), str(lab["id"]))
+        put(
+            f"labs/{slug}/index.html",
+            title,
             _lab_body(model, lab, depth=2),
-            current=str(lab["id"]),
+            str(lab["id"]),
             depth=2,
             extra_body_class="is-lab-site",
         )
     copy = load_migrated_copy()
     for pid, person in roster.all_people().items():
-        files[f"people/{pid}/index.html"] = _page(
-            model,
+        put(
+            f"people/{pid}/index.html",
             person["name"],
             _person_body(model, person, depth=2),
-            current=roster.person_nav_current(person),
+            roster.person_nav_current(person),
             depth=2,
         )
     for person in copy.get("leadership_people", []):
-        files[f"leadership-{person['id']}.html"] = _page(
-            model,
+        put(
+            f"leadership-{person['id']}.html",
             person["name"],
             _person_body(model, person, depth=0),
-            current=roster.person_nav_current(person),
+            roster.person_nav_current(person),
         )
     for item in copy.get("news", []):
         slug = item.get("slug")
         if not slug:
             continue
-        files[f"news/{slug}/index.html"] = _page(
-            model,
+        put(
+            f"news/{slug}/index.html",
             item["title"],
             _news_article_body(model, item, depth=2),
-            current="news",
+            "news",
             depth=2,
         )
     for parent, current, items in (
@@ -676,19 +730,20 @@ def render_site_files(model: SiteModel) -> dict[str, str]:
         ("facilities", "facilities", roster.facilities_catalog()),
     ):
         for item in items:
-            files[f"{parent}/{item['slug']}/index.html"] = _page(
-                model,
+            put(
+                f"{parent}/{item['slug']}/index.html",
                 item["title"],
                 _catalog_detail_body(model, parent, item, depth=2),
-                current=current,
+                current,
                 depth=2,
             )
     for person in copy.get("council_people", []):
-        files[f"council-{person['id']}.html"] = _page(
-            model,
+        record = roster.person(person["id"]) or person
+        put(
+            f"council-{person['id']}.html",
             person["name"],
-            _person_body(model, roster.person(person["id"]) or person, depth=0),
-            current=roster.person_nav_current(roster.person(person["id"]) or person),
+            _person_body(model, record, depth=0),
+            roster.person_nav_current(record),
         )
     for unit in copy.get("admin_units", []):
         for person in unit.get("people", []):
@@ -696,63 +751,61 @@ def render_site_files(model: SiteModel) -> dict[str, str]:
             if not pid:
                 continue
             record = roster.person(pid) or person
-            files[f"office-{pid}.html"] = _page(
-                model,
+            put(
+                f"office-{pid}.html",
                 person["name"],
                 _person_body(model, record, depth=0),
-                current=roster.person_nav_current(record),
+                roster.person_nav_current(record),
             )
     for person in roster.people_for_unit("young-scientists") or list(roster.SMU_PEOPLE):
-        files[f"{person['id']}.html"] = _page(
-            model,
+        put(
+            f"{person['id']}.html",
             person["name"],
             _person_body(model, person, depth=0),
-            current="young-scientists",
+            "young-scientists",
         )
-    files["lattice-demo.html"] = _page(
-        model,
-        "Демо сетки атомов",
+    put(
+        "lattice-demo.html",
+        _ui("footer_lattice"),
         _lattice_demo_body(),
-        current="home",
+        "home",
         extra_body_class="is-lattice-demo",
     )
-    files["cookies.html"] = _legal_page(model, "cookies")
-    files["personal-data.html"] = _legal_page(model, "personal")
-    for code in ("en", "be", "zh"):
-        files[f"{code}/cookies.html"] = _legal_page(model, "cookies", code)
-        files[f"{code}/personal-data.html"] = _legal_page(model, "personal", code)
+    files["cookies.html"] = _legal_page(model, "cookies", code)
+    files["personal-data.html"] = _legal_page(model, "personal", code)
     for item in copy.get("conferences", []):
-        files[f"conferences/{item['slug']}/index.html"] = _page(
-            model,
+        put(
+            f"conferences/{item['slug']}/index.html",
             item["title"],
             _conference_body(model, item, depth=2),
-            current="events",
+            "events",
             depth=2,
         )
-    files["search.html"] = _page(
-        model,
-        "Поиск",
+    search_title = _ui("search")
+    put(
+        "search.html",
+        search_title,
         _with_page_hero(
-            "Поиск",
+            search_title,
             _search_page_inner(),
-            trail=_trail(model, "search", "Поиск"),
+            trail=_trail(model, "search", search_title),
             wide=True,
         ),
-        current="search",
+        "search",
     )
-    files["sitemap.html"] = _page(
-        model,
-        "Карта сайта",
+    sitemap_title = _ui("sitemap")
+    put(
+        "sitemap.html",
+        sitemap_title,
         _with_page_hero(
-            "Карта сайта",
+            sitemap_title,
             _sitemap_inner(model),
-            trail=_trail(model, "sitemap", "Карта сайта"),
+            trail=_trail(model, "sitemap", sitemap_title),
             wide=True,
         ),
-        current="sitemap",
+        "sitemap",
     )
     files["search.json"] = json.dumps(build_search_index(), ensure_ascii=False, indent=2)
-    files.update(_FISH_FILES)
     return files
 
 
@@ -787,7 +840,7 @@ def _structure_menu_children(item: MenuItem) -> tuple[MenuItem, ...]:
         labs.append(
             MenuItem(
                 id=str(lab["id"]),
-                title=str(lab["title"]),
+                title=_lt(lab),
                 kind="lab",
                 href=f"labs/{slug}/index.html",
             )
@@ -839,20 +892,20 @@ def _nav(model: SiteModel, current: str, depth: int = 0) -> str:
             if kids:
                 parts.append('<div class="nav-parent">')
             if folder:
-                parts.append(f'<span class="nav-folder">{_t(item.title)}</span>')
+                parts.append(f'<span class="nav-folder">{_t(_mt(item))}</span>')
             else:
-                parts.append(f'<a href="{href}">{_t(item.title)}</a>')
+                parts.append(f'<a href="{href}">{_t(_mt(item))}</a>')
             if kids:
                 sep = item.id == "structure"
                 parts.append(
                     f'<button type="button" class="submenu-toggle" aria-expanded="false" '
-                    f'aria-label="{escape(_ui("submenu") + ": " + item.title)}"></button>'
+                    f'aria-label="{escape(_ui("submenu") + ": " + _mt(item))}"></button>'
                     "</div>"
                 )
                 nested = branch(kids, admin_sep=sep)
                 if href:
                     self_link = (
-                        f'<li class="nav-self"><a href="{href}">{_t(item.title)}</a></li>'
+                        f'<li class="nav-self"><a href="{href}">{_t(_mt(item))}</a></li>'
                     )
                     nested = nested[:4] + self_link + nested[4:]
                 parts.append(nested)
@@ -972,17 +1025,15 @@ def _social_icon(network: str) -> str:
 
 def _langs(model: SiteModel, current_code: str = "ru", depth: int = 0) -> str:
     bits = [f'<nav class="ichnm-lang-switch" aria-label="{escape(_ui("lang"))}">']
-    prefix = "../" * depth
+    extra = 0 if current_code == "ru" else 1
+    root = "../" * (depth + extra)
+    rel = _REL_PATH.get() or "index.html"
     for lang in model.languages:
         code = lang.code.upper()
         if lang.code == "ru":
-            href = f"{prefix}index.html"
+            href = f"{root}{rel}"
         else:
-            href = (
-                "index.html"
-                if lang.code == current_code and depth == 1
-                else f"{prefix}{lang.code}/index.html"
-            )
+            href = f"{root}{lang.code}/{rel}"
         cls = "is-current" if lang.code == current_code else ""
         bits.append(f'<a class="{cls}" href="{href}">{escape(code)}</a>')
     bits.append("</nav>")
@@ -990,9 +1041,10 @@ def _langs(model: SiteModel, current_code: str = "ru", depth: int = 0) -> str:
 
 
 def _footer(model: SiteModel, depth: int = 0) -> str:
-    prefix = "../" * depth
+    page = _page_prefix()
+    asset = _asset_prefix()
     contacts = page_copy("contacts")
-    address = " ".join(contacts.get("paragraphs", [])[1:2]) or "г. Минск, ул. Ф. Скорины, 36"
+    address = " ".join(contacts.get("paragraphs", [])[1:2]) or _st("street")
     social = "".join(
         f'<li><a href="{escape(profile.href)}">{_social_icon(profile.network)}'
         f"<span>{escape(profile.label or profile.network)}</span></a></li>"
@@ -1000,29 +1052,30 @@ def _footer(model: SiteModel, depth: int = 0) -> str:
     )
     pics = []
     for link in model.footer_pictograms:
+        title = i18n.pictogram_title(link.href, link.title)
         if link.icon:
             mark = (
-                f'<img class="picto-img" src="{prefix}{escape(link.icon)}" alt="" width="140" height="66">'
+                f'<img class="picto-img" src="{asset}{escape(link.icon)}" alt="" width="140" height="66">'
             )
         else:
-            mark = f'<span class="picto-mark">{escape(link.mark or link.title[:2])}</span>'
+            mark = f'<span class="picto-mark">{escape(link.mark or title[:2])}</span>'
         pics.append(
             f'<li><a href="{escape(link.href)}" rel="noopener noreferrer">'
-            f"{mark}<span class=\"picto-title\">{escape(link.title)}</span></a></li>"
+            f"{mark}<span class=\"picto-title\">{escape(title)}</span></a></li>"
         )
     pics = "".join(pics)
     site_links = (
-        f'<li><a href="{_ui_href("news.html", prefix)}">{escape(_ui("nav_news"))}</a></li>'
-        f'<li><a href="{prefix}media_about.html">{escape(_ui("footer_media"))}</a></li>'
-        f'<li><a href="{prefix}education.html">{escape(_ui("footer_education"))}</a></li>'
-        f'<li><a href="{prefix}union.html">{escape(_ui("footer_union"))}</a></li>'
-        f'<li><a href="{prefix}publications.html">{escape(_ui("footer_publications"))}</a></li>'
-        f'<li><a href="{prefix}feedback.html">{escape(_ui("footer_feedback"))}</a></li>'
-        f'<li><a href="{prefix}search.html">{escape(_ui("search"))}</a></li>'
-        f'<li><a href="{prefix}sitemap.html">{escape(_ui("sitemap"))}</a></li>'
-        f'<li><a href="{_ui_href("cookies.html", prefix)}">{escape(_ui("cookies_page_title"))}</a></li>'
-        f'<li><a href="{_ui_href("personal-data.html", prefix)}">{escape(_ui("personal_page_title"))}</a></li>'
-        f'<li><a href="{prefix}lattice-demo.html">{escape(_ui("footer_lattice"))}</a></li>'
+        f'<li><a href="{page}news.html">{escape(_ui("nav_news"))}</a></li>'
+        f'<li><a href="{page}media_about.html">{escape(_ui("footer_media"))}</a></li>'
+        f'<li><a href="{page}education.html">{escape(_ui("footer_education"))}</a></li>'
+        f'<li><a href="{page}union.html">{escape(_ui("footer_union"))}</a></li>'
+        f'<li><a href="{page}publications.html">{escape(_ui("footer_publications"))}</a></li>'
+        f'<li><a href="{page}feedback.html">{escape(_ui("footer_feedback"))}</a></li>'
+        f'<li><a href="{page}search.html">{escape(_ui("search"))}</a></li>'
+        f'<li><a href="{page}sitemap.html">{escape(_ui("sitemap"))}</a></li>'
+        f'<li><a href="{page}cookies.html">{escape(_ui("cookies_page_title"))}</a></li>'
+        f'<li><a href="{page}personal-data.html">{escape(_ui("personal_page_title"))}</a></li>'
+        f'<li><a href="{page}lattice-demo.html">{escape(_ui("footer_lattice"))}</a></li>'
     )
     return (
         '<footer class="ichnm-footer">'
@@ -1040,10 +1093,10 @@ def _footer(model: SiteModel, depth: int = 0) -> str:
         "</div>"
         '<div class="footer-place">'
         f'<p class="footer-heading">{escape(_ui("footer_find_us"))}</p>'
-        f'<a class="footer-map" href="{_ui_href("contacts.html", prefix)}">'
-        f'<img src="{prefix}media/maps/institute.svg" width="280" height="200" '
-        f'alt="{escape(_ui("footer_map_alt"))}">'
-        f"<span>{_t('ул. Ф. Скорины, 36, Минск')}</span></a>"
+        f'<a class="footer-map" href="{page}contacts.html" '
+        f'aria-label="{escape(_ui("footer_map_alt"))}">'
+        f"{_minsk_map(compact=True)}"
+        f"<span>{_t(_st('street'))}</span></a>"
         "</div></div>"
         f'<div class="footer-pictograms" aria-label="{escape(_ui("footer_pictograms"))}">'
         '<div class="wrap">'
@@ -1073,12 +1126,11 @@ def _search_overlay(prefix: str) -> str:
 
 def _search_page_inner() -> str:
     return (
-        "<p>Поиск по персоналиям, подразделениям, приборам и разработкам. "
-        "Введите запрос в поле шапки или здесь.</p>"
+        f"<p>{escape(_st('search_page_lead'))}</p>"
         '<form class="site-search-form is-page" action="search.html" method="get" role="search">'
-        '<label class="visually-hidden" for="q-page">Запрос</label>'
-        '<input id="q-page" name="q" type="search" placeholder="Например: Рогачёв, нано, поляроид">'
-        '<button type="submit">Найти</button>'
+        f'<label class="visually-hidden" for="q-page">{escape(_st("search_query"))}</label>'
+        f'<input id="q-page" name="q" type="search" placeholder="{escape(_st("search_example"))}">'
+        f'<button type="submit">{escape(_ui("search_submit"))}</button>'
         "</form>"
         '<div id="search-results" class="search-results"></div>'
     )
@@ -1089,15 +1141,16 @@ def _sitemap_inner(model: SiteModel) -> str:
         parts = ["<ul>"]
         for item in items:
             href = _item_href(item, 0)
+            title = _mt(item)
             if item.kind == "folder":
-                parts.append(f"<li><span>{_t(item.title)}</span>")
+                parts.append(f"<li><span>{_t(title)}</span>")
             else:
-                parts.append(f'<li><a href="{href}">{_t(item.title)}</a>')
+                parts.append(f'<li><a href="{href}">{_t(title)}</a>')
             if item.id == "news":
                 parts.append(
                     "<ul>"
-                    '<li><a href="news.html#institute-news">Новости Института</a></li>'
-                    '<li><a href="news.html#smi">СМИ о нас</a></li>'
+                    f'<li><a href="news.html#institute-news">{escape(_st("institute_news"))}</a></li>'
+                    f'<li><a href="news.html#smi">{escape(_ui("footer_media"))}</a></li>'
                     "</ul>"
                 )
             kids = _menu_kids(item)
@@ -1112,12 +1165,11 @@ def _sitemap_inner(model: SiteModel) -> str:
         for row in roster.leadership_people()
     )
     return (
-        "<p>Все публичные разделы, как карта сайта на nasb.gov.by. "
-        "Лаборатории стоят внутри структуры.</p>"
-        f'<nav class="sitemap" aria-label="Карта сайта">{tree(model.menu_roots())}</nav>'
-        "<h2>Персоналии руководства</h2>"
+        f"<p>{escape(_st('sitemap_lead'))}</p>"
+        f'<nav class="sitemap" aria-label="{escape(_ui("sitemap"))}">{tree(model.menu_roots())}</nav>'
+        f"<h2>{escape(_st('sitemap_people'))}</h2>"
         f'<ul class="plain-list">{people}</ul>'
-        '<p><a href="search.html">Поиск по персоналиям и разработкам</a></p>'
+        f'<p><a href="search.html">{escape(_st("sitemap_search"))}</a></p>'
     )
 
 
@@ -1130,31 +1182,42 @@ def _shell(
     current_code: str = "ru",
     is_home: bool = False,
     extra_body_class: str = "",
+    rel_path: str = "",
 ) -> str:
-    prefix = "../" * depth
-    _ASSET_PREFIX.set(prefix)
     _LOCALE.set(current_code)
-    if current_code == "ru":
-        home = f"{prefix}index.html"
-    else:
-        home = "index.html" if depth >= 1 else f"{current_code}/index.html"
-    css = f"{prefix}site.css?v=hig-polish1"
-    js = f"{prefix}site.js?v=hig-polish1"
-    mark = f"{prefix}media/ichnm-mark.svg?v=bew"
-    nas = f"{prefix}media/nas-emblem.webp"
+    _NEST.set(depth)
+    if rel_path:
+        _REL_PATH.set(rel_path)
+    _ASSET_PREFIX.set(_asset_prefix())
+    page = _page_prefix()
+    asset = _asset_prefix()
+    home = f"{page}index.html"
+    css = f"{asset}site.css?v=locale-tree1"
+    js = f"{asset}site.js?v=locale-tree1"
+    mark = f"{asset}media/ichnm-mark.svg?v=bew"
+    nas = f"{asset}media/nas-emblem.webp"
     body_class = " ".join(
         part for part in ("is-home" if is_home else "is-inner", extra_body_class) if part
     )
-    nav = (
-        _nav(model, current, depth=depth)
-        if current_code == "ru"
-        else _locale_nav(current, depth)
-    )
+    nav = _nav(model, current, depth=depth)
     nas_block = (
         f'<a class="nas-emblem" href="{escape(model.nas_portal_href)}" '
-        'title="Национальная академия наук Беларуси">'
-        f'<img src="{nas}" width="220" height="120" alt="Эмблема Национальной академии наук Беларуси">'
+        f'title="{escape(_ui("kicker"))}">'
+        f'<img src="{nas}" width="220" height="120" alt="{escape(_st("nas_emblem_alt"))}">'
         "</a>"
+    )
+    search_i18n = escape(
+        json.dumps(
+            {
+                "hint": _st("search_js_hint"),
+                "empty": _st("search_js_empty"),
+                "person": _st("search_kind_person"),
+                "unit": _st("search_kind_unit"),
+                "facility": _st("search_kind_facility"),
+                "development": _st("search_kind_development"),
+            },
+            ensure_ascii=False,
+        )
     )
     boot = (
         "<script>"
@@ -1190,7 +1253,7 @@ def _shell(
   <link rel="icon" href="{mark}" type="image/svg+xml">
   {boot}
 </head>
-<body class="{body_class}" data-search-index="{prefix}search.json">
+<body class="{body_class}" data-search-index="{page}search.json" data-search-i18n="{search_i18n}">
   <div class="page-veil" aria-hidden="true"></div>
   <a class="skip-link" href="#content">{escape(_ui("skip"))}</a>
   <header class="site-header">
@@ -1199,7 +1262,7 @@ def _shell(
         <div class="brand-row">
           {nas_block}
           <a class="brand" href="{home}">
-            <img class="brand-mark" src="{mark}" width="397" height="392" alt="Эмблема ИХНМ">
+            <img class="brand-mark" src="{mark}" width="397" height="392" alt="{escape(_st("icnm_mark_alt"))}">
             <span class="brand-lockup">
               <span class="brand-kicker">{escape(_ui("kicker"))}</span>
               <span class="brand-title">{escape(_ui("brand"))}</span>
@@ -1213,10 +1276,10 @@ def _shell(
         <div class="header-panel">
           <div class="header-utilities">
             <button type="button" class="tool-btn" data-search-open aria-controls="site-search">{escape(_ui("search"))}</button>
-            <a class="tool-btn" href="{prefix}sitemap.html">{escape(_ui("sitemap"))}</a>
+            <a class="tool-btn" href="{page}sitemap.html">{escape(_ui("sitemap"))}</a>
             <button type="button" class="tool-btn" data-theme-toggle aria-pressed="false" data-label-day="{escape(_ui('day'))}" data-label-night="{escape(_ui('night'))}">{escape(_ui("night"))}</button>
             <button type="button" class="tool-btn" data-bvi aria-pressed="false" aria-controls="bvi-panel">{escape(_ui("bvi"))}</button>
-            <a class="tool-btn" href="{prefix}feedback.html">{escape(_ui("write"))}</a>
+            <a class="tool-btn" href="{page}feedback.html">{escape(_ui("write"))}</a>
             {_langs(model, current_code=current_code, depth=depth)}
           </div>
           {nav}
@@ -1226,9 +1289,9 @@ def _shell(
     {_bvi_panel()}
   </header>
   <main id="content">{body}</main>
-  {_search_overlay(prefix)}
+  {_search_overlay(page)}
   {_footer(model, depth=depth)}
-  {_cookie_banner(prefix)}
+  {_cookie_banner(page)}
   <script src="{js}" defer></script>
 </body>
 </html>
@@ -1243,6 +1306,8 @@ def _page(
     is_home: bool = False,
     depth: int = 0,
     extra_body_class: str = "",
+    current_code: str | None = None,
+    rel_path: str = "",
 ) -> str:
     return _shell(
         model,
@@ -1252,17 +1317,19 @@ def _page(
         is_home=is_home,
         depth=depth,
         extra_body_class=extra_body_class,
+        current_code=current_code or _LOCALE.get(),
+        rel_path=rel_path,
     )
 
 
 def _legal_page(model: SiteModel, kind: str, code: str = "ru") -> str:
-    depth = 0 if code == "ru" else 1
     _LOCALE.set(code)
-    _ASSET_PREFIX.set("../" * depth)
+    depth = 0
+    _begin_page(0)
+    rel = "cookies.html" if kind == "cookies" else "personal-data.html"
     title_key = "cookies_page_title" if kind == "cookies" else "personal_page_title"
     title = _ui(title_key)
     inner = _cookies_body() if kind == "cookies" else _personal_data_body()
-    extra = "is-locale-stub" if code != "ru" else ""
     return _shell(
         model,
         title,
@@ -1270,34 +1337,8 @@ def _legal_page(model: SiteModel, kind: str, code: str = "ru") -> str:
         current="contacts",
         depth=depth,
         current_code=code,
-        extra_body_class=extra,
-    )
-
-
-def _stub_page(model: SiteModel, code: str, section: str = "home") -> str:
-    title = _CHROME[code]["stub_title"] if section == "home" else _CHROME[code][
-        dict(_LOCALE_SECTIONS)[section]
-    ]
-    ru_href = "../index.html" if section == "home" else f"../{section}.html"
-    section_note = ""
-    if section != "home":
-        section_note = f"<p>{escape(_STUB_SECTION_LEAD[code])}</p>"
-    inner = (
-        f"<p>{escape(_CHROME[code]['stub_lead'])}</p>"
-        f"{section_note}"
-        f"<p>{escape(_CHROME[code]['stub_note'])} "
-        f'<a href="{escape(ru_href)}">{escape(_CHROME[code]["to_ru"])}</a>.</p>'
-        f"<p><code>/{code}/</code></p>"
-    )
-    body = _with_page_hero(title, inner)
-    return _shell(
-        model,
-        title,
-        body,
-        current=section,
-        depth=1,
-        current_code=code,
-        extra_body_class="is-locale-stub",
+        extra_body_class="",
+        rel_path=rel,
     )
 
 
@@ -1325,54 +1366,62 @@ def _find_parent(model: SiteModel, page_id: str) -> MenuItem | None:
 
 def _trail(model: SiteModel, page_id: str, title: str, depth: int = 0) -> str:
     prefix = "../" * depth
-    bits = [f'<a href="{prefix}index.html">Главная</a>']
-    if page_id.startswith("lab-") or page_id.startswith("labs/"):
-        bits.append(f'<a href="{prefix}structure.html">Структура</a>')
-    elif page_id.startswith("people/"):
-        bits.append(f'<a href="{prefix}structure.html">Структура</a>')
-    elif page_id.startswith("leadership-"):
-        bits.append(f'<a href="{prefix}leadership.html">Руководство</a>')
-    elif page_id.startswith("council-"):
-        bits.append(f'<a href="{prefix}scientific-council.html">Учёный совет</a>')
-    elif page_id.startswith("office-"):
-        bits.append(f'<a href="{prefix}structure.html">Структура</a>')
-    elif page_id.startswith("smu-"):
-        bits.append(f'<a href="{prefix}young-scientists.html">Совет молодых учёных</a>')
-    elif page_id.startswith("news/") or page_id == "media_about":
-        bits.append(f'<a href="{prefix}news.html">Новости</a>')
-    elif page_id.startswith("science/"):
-        bits.append(f'<a href="{prefix}science.html">Направления работы</a>')
-    elif page_id.startswith("developments/"):
-        bits.append(f'<a href="{prefix}developments.html">Разработки</a>')
-    elif page_id.startswith("facilities/"):
-        bits.append(f'<a href="{prefix}facilities.html">Материальная база</a>')
-    elif page_id.startswith("conferences/"):
-        bits.append(f'<a href="{prefix}events.html">Мероприятия</a>')
+    bits = [f'<a href="{prefix}index.html">{escape(_st("home"))}</a>']
+    crumbs = {
+        "lab-": ("structure.html", i18n.menu_title("structure", "Структура")),
+        "labs/": ("structure.html", i18n.menu_title("structure", "Структура")),
+        "people/": ("structure.html", i18n.menu_title("structure", "Структура")),
+        "leadership-": ("leadership.html", i18n.menu_title("leadership", "Руководство")),
+        "council-": ("scientific-council.html", i18n.menu_title("scientific-council", "Учёный совет")),
+        "office-": ("structure.html", i18n.menu_title("structure", "Структура")),
+        "smu-": ("young-scientists.html", i18n.menu_title("young-scientists", "Совет молодых учёных")),
+        "news/": ("news.html", i18n.menu_title("news", "Новости")),
+        "science/": ("science.html", i18n.menu_title("science", "Направления работы")),
+        "developments/": ("developments.html", i18n.menu_title("developments", "Разработки")),
+        "facilities/": ("facilities.html", i18n.menu_title("facilities", "Материальная база")),
+        "conferences/": ("events.html", i18n.menu_title("events", "Мероприятия")),
+    }
+    matched = False
+    if page_id == "media_about":
+        bits.append(
+            f'<a href="{prefix}news.html">{escape(i18n.menu_title("news", "Новости"))}</a>'
+        )
+        matched = True
     else:
+        for prefix_id, (href, label) in crumbs.items():
+            if page_id.startswith(prefix_id):
+                bits.append(f'<a href="{prefix}{href}">{escape(label)}</a>')
+                matched = True
+                break
+    if not matched:
         parent = _find_parent(model, page_id)
         while parent is not None and parent.kind == "folder":
             parent = _find_parent(model, parent.id)
         if parent:
-            bits.append(f'<a href="{prefix}{parent.id}.html">{escape(parent.title)}</a>')
+            bits.append(
+                f'<a href="{prefix}{parent.id}.html">{escape(_mt(parent))}</a>'
+            )
     bits.append(f'<span aria-current="page">{escape(title)}</span>')
     sep = '<span class="crumbs-sep"> / </span>'
-    return f'<nav class="crumbs" aria-label="Навигация">{sep.join(bits)}</nav>'
+    return f'<nav class="crumbs" aria-label="{escape(_st("crumbs"))}">{sep.join(bits)}</nav>'
 
 
 def _hub_cards(
     children: tuple[MenuItem, ...],
-    heading: str = "Страницы раздела",
+    heading: str | None = None,
 ) -> str:
+    if heading is None:
+        heading = _st("section_pages")
     if not children:
         return ""
     cards = []
     for child in children:
         if child.kind == "folder":
             continue
-        blurb = _HUB_BLURB.get(child.id, "")
+        blurb = i18n.hub_blurb(child.id, _HUB_BLURB.get(child.id, ""))
         extra = f"<p>{_t(blurb)}</p>" if blurb else ""
         cards.append(
-            f'<li><a href="{child.id}.html">{_t(child.title)}{extra}</a></li>'
+            f'<li><a href="{child.id}.html">{_t(_mt(child))}{extra}</a></li>'
         )
     if not cards:
         return ""
@@ -1414,12 +1463,12 @@ def _news_feed_inner() -> str:
     copy = page_copy("news")
     parts = [f"<p>{escape(para)}</p>" for para in copy.get("paragraphs", [])]
     parts.append(
-        '<nav class="section-jump" aria-label="На этой странице">'
-        '<a href="#institute-news">Новости Института</a>'
-        '<a href="#smi">СМИ о нас</a>'
+        f'<nav class="section-jump" aria-label="{escape(_st("on_this_page"))}">'
+        f'<a href="#institute-news">{escape(_st("institute_news"))}</a>'
+        f'<a href="#smi">{escape(_ui("footer_media"))}</a>'
         "</nav>"
     )
-    parts.append('<h2 id="institute-news">Новости Института</h2>')
+    parts.append(f'<h2 id="institute-news">{escape(_st("institute_news"))}</h2>')
     cards = "".join(
         f'<a class="news-card" href="news/{escape(item["slug"])}/index.html">'
         f"{_photo_slot(item['title'], kind='cover') if is_filled_copy() else ''}"
@@ -1430,7 +1479,7 @@ def _news_feed_inner() -> str:
         if item.get("slug")
     )
     parts.append(f'<div class="news-grid">{cards}</div>')
-    parts.append('<h2 id="smi">СМИ о нас</h2>')
+    parts.append(f'<h2 id="smi">{escape(_ui("footer_media"))}</h2>')
     parts.append(_media_about_inner())
     return "".join(parts)
 
@@ -1446,7 +1495,7 @@ def _home_mix_cards() -> str:
                 "label": item.get("date_label") or item.get("date", ""),
                 "title": item["title"],
                 "href": f"news/{item['slug']}/index.html",
-                "kicker": "Новость",
+                "kicker": _st("news_kicker"),
             }
         )
     for item in load_migrated_copy().get("media_items", []):
@@ -1456,7 +1505,7 @@ def _home_mix_cards() -> str:
                 "label": item.get("date_label", ""),
                 "title": item["title"],
                 "href": item.get("href") or "media_about.html",
-                "kicker": item.get("outlet") or "СМИ",
+                "kicker": item.get("outlet") or _st("media_kicker"),
             }
         )
     rows.sort(key=lambda row: row["date"], reverse=True)
@@ -1476,11 +1525,11 @@ def _events_inner() -> str:
     parts = [f"<p>{escape(para)}</p>" for para in copy.get("paragraphs", [])]
     parts.append(
         '<div class="event-banner">'
-        "<h2>Ближайшее мероприятие</h2>"
+        f"<h2>{escape(_st('next_event'))}</h2>"
         f"<p><strong>{escape(event.get('title', ''))}</strong></p>"
         f"<p>{escape(event.get('when', ''))}</p>"
-        '<p><a href="aist.html">Раздел AIST</a> · '
-        f'<a href="{escape(event.get("href", "aist.html"))}">Регистрация текущего цикла</a></p>'
+        f'<p><a href="aist.html">{escape(_st("aist_section"))}</a> · '
+        f'<a href="{escape(event.get("href", "aist.html"))}">{escape(_st("register_cycle"))}</a></p>'
         "</div>"
     )
     parts.append(_conference_archive())
@@ -1502,12 +1551,11 @@ def _conference_archive() -> str:
                 f'<p>{escape(item.get("when", ""))}</p></article>'
             )
         return f'<div class="conf-grid">{"".join(bits)}</div>'
-    chunks = ["<h2>Архив AIST</h2>", cards(aist)]
+    chunks = [f"<h2>{escape(_st('aist_archive'))}</h2>", cards(aist)]
     if other:
-        chunks.append("<h2>Другие конференции Института</h2>")
+        chunks.append(f"<h2>{escape(_st('other_conferences'))}</h2>")
         chunks.append(
-            "<p>Слоты для мероприятий вне AIST. Новую страницу можно добавить в этот архив, "
-            "не вынося конференцию на отдельный домен.</p>"
+            f"<p>{escape(_st('other_conferences_lead'))}</p>"
         )
         chunks.append(cards(other))
     return "".join(chunks)
@@ -1522,10 +1570,9 @@ def _conference_body(model: SiteModel, item: dict, depth: int = 2) -> str:
         f"{_photo_slot(item['title'], kind='cover')}"
         f'<p class="leader-role">{series}</p>'
         f"<p>{escape(item.get('when', ''))}</p>"
-        "<p>Программа, сборник и ключевые даты этой конференции появятся после передачи "
-        "материалов. Страница живёт в архиве ichnm.by, не на отдельном домене.</p>"
-        f'<p><a href="{prefix}events.html">К архиву мероприятий</a> · '
-        f'<a href="{prefix}aist.html">Раздел AIST</a></p>'
+        f"<p>{escape(_st('conference_placeholder'))}</p>"
+        f'<p><a href="{prefix}events.html">{escape(_st("back_to_events"))}</a> · '
+        f'<a href="{prefix}aist.html">{escape(_st("aist_section"))}</a></p>'
     )
     return _with_page_hero(
         item["title"],
@@ -1536,7 +1583,7 @@ def _conference_body(model: SiteModel, item: dict, depth: int = 2) -> str:
 
 
 def _cookies_body() -> str:
-    prefix = _ASSET_PREFIX.get()
+    prefix = _page_prefix()
     banner = (
         _fish_banner()
         if _LOCALE.get() == "ru"
@@ -1555,7 +1602,7 @@ def _cookies_body() -> str:
 
 
 def _personal_data_body() -> str:
-    prefix = _ASSET_PREFIX.get()
+    prefix = _page_prefix()
     banner = (
         '<p class="fish-banner">Макет. Не используйте формулировку как утверждённый документ.</p>'
         if _LOCALE.get() == "ru"
@@ -1581,9 +1628,9 @@ def _lattice_demo_body() -> str:
         )
 
     controls = (
-        "<p class=\"lattice-group\">Сетка и атомы</p>"
+        f"<p class=\"lattice-group\">{escape(_st('lattice_group_grid'))}</p>"
         + '<label class="lattice-check"><input type="checkbox" name="showHex" value="1"> '
-        "<span>Показывать шестигранную сетку</span></label>"
+        f"<span>{escape(_st('lattice_hex'))}</span></label>"
         + row("hexSize", "Ребро шестигранника", "18", "72", "1", "Размер ячейки сетки, px")
         + row("hexLine", "Контраст сетки", "0", "0.6", "0.01", "0 — сетка не видна")
         + row("idleRadius", "Атом в покое", "0", "16", "0.5", "0 — покоящиеся атомы скрыты")
@@ -1604,21 +1651,19 @@ def _lattice_demo_body() -> str:
         '<section class="lattice-stage">'
         '<canvas class="hero-lattice" width="1290" height="800" aria-hidden="true"></canvas>'
         '<form class="lattice-panel" id="lattice-form">'
-        "<h1>Сетка атомов</h1>"
-        "<p>Только случайные кольца. Курсор сетку не трогает. "
-        "Цвет общий для всех волн и идёт по кругу, минуя жёлтый через белый.</p>"
+        f"<h1>{escape(_st('lattice_title'))}</h1>"
+        f"<p>{escape(_st('lattice_lead'))}</p>"
         f"{controls}"
         '<div class="lattice-actions">'
-        '<button type="button" data-lattice-action="save">Сохранить в браузере</button>'
-        '<button type="button" data-lattice-action="copy">Скопировать JSON</button>'
-        '<button type="button" data-lattice-action="download">Скачать JSON</button>'
-        '<button type="button" data-lattice-action="reset">Сброс</button>'
+        f'<button type="button" data-lattice-action="save">{escape(_st("lattice_save"))}</button>'
+        f'<button type="button" data-lattice-action="copy">{escape(_st("lattice_copy"))}</button>'
+        f'<button type="button" data-lattice-action="download">{escape(_st("lattice_download"))}</button>'
+        f'<button type="button" data-lattice-action="reset">{escape(_st("lattice_reset"))}</button>'
         "</div>"
         '<p id="lattice-status" role="status"></p>'
-        "<p>Главная читает сохранённый профиль из этого браузера. "
-        "Чтобы зафиксировать вид в коде — пришлите JSON в чат.</p>"
+        f"<p>{escape(_st('lattice_note'))}</p>"
         '<pre id="lattice-json"></pre>'
-        '<p><a href="index.html">На главную</a></p>'
+        f'<p><a href="index.html">{escape(_st("lattice_home"))}</a></p>'
         "</form></section>"
     )
     return inner
@@ -1627,112 +1672,111 @@ def _lattice_demo_body() -> str:
 def _home_body(model: SiteModel) -> str:
     _begin_page(0)
     copy = load_migrated_copy()
-    intro = _t(copy.get("home_intro", model.legal_name))
+    intro = _t(_st("home_intro") if _LOCALE.get() != "ru" else copy.get("home_intro", model.legal_name))
     news_cards = _home_mix_cards()
     event = copy.get("next_event") or {}
     labs = copy.get("labs", [])
     lab_cards = "".join(
         f'<li><a href="labs/{escape(lab.get("slug") or lab["id"])}/index.html">'
-        f'{escape(lab["title"])}</a></li>'
+        f'{escape(_lt(lab))}</a></li>'
         for lab in labs
     )
     founded = int(copy.get("founded_year", 1998))
     years = date.today().year - founded
+    note = ""
+    if _LOCALE.get() != "ru" and _st("copy_note"):
+        note = f'<p class="fish-banner" role="note">{escape(_st("copy_note"))}</p>'
     ribbon = (
-        '<p class="filled-ribbon" role="note">Наполненный макет: рыба по буквам лабораторий '
-        "(А — наноструктуры, Б — плёнки, В — ЖК, Г — композиты, Д — лесохимия). "
-        "Не официальная версия сайта.</p>"
+        f'<p class="filled-ribbon" role="note">{escape(_st("filled_ribbon"))}</p>'
         if is_filled_copy()
-        else ""
+        else note
     )
     return (
         f"{ribbon}"
         '<section class="hero ichnm-home-block" data-ichnm-block="official_intro">'
         '<canvas class="hero-lattice" width="1290" height="720" aria-hidden="true"></canvas>'
         '<div class="wrap hero-layout"><div class="hero-copy">'
-        '<p class="hero-kicker">Национальная академия наук Беларуси</p>'
-        "<h1>Институт химии новых материалов</h1>"
+        f'<p class="hero-kicker">{escape(_ui("kicker"))}</p>'
+        f"<h1>{escape(_ui('brand'))}</h1>"
         f'<p class="hero-lead">{intro}</p>'
         '<div class="hero-entries">'
-        '<a class="hero-pill hero-pill-primary" href="about.html">Сведения</a>'
-        '<a class="hero-pill ichnm-home-block" data-ichnm-block="structure_entry" href="structure.html">Структура</a>'
-        '<a class="hero-pill ichnm-home-block" data-ichnm-block="developments_entry" href="developments.html">Разработки</a>'
-        '<a class="hero-pill" href="feedback.html">Написать нам</a>'
+        f'<a class="hero-pill hero-pill-primary" href="about.html">{escape(_st("overview_pill"))}</a>'
+        f'<a class="hero-pill ichnm-home-block" data-ichnm-block="structure_entry" href="structure.html">{escape(i18n.menu_title("structure", "Структура"))}</a>'
+        f'<a class="hero-pill ichnm-home-block" data-ichnm-block="developments_entry" href="developments.html">{escape(i18n.menu_title("developments", "Разработки"))}</a>'
+        f'<a class="hero-pill" href="feedback.html">{escape(_ui("write"))}</a>'
         f"</div></div></div></section>"
-        '<section class="stats-band" aria-label="Цифры об институте">'
+        f'<section class="stats-band" aria-label="{escape(_st("stats_label"))}">'
         '<div class="wrap stats-grid">'
         f'<article class="stat" data-count-to="{years}" data-suffix="+" tabindex="0" '
-        f'aria-label="{years} лет опыта работы, {founded}—{date.today().year}">'
+        f'aria-label="{years} {_st("years_aria")}, {founded}—{date.today().year}">'
         f'<p class="stat-value" aria-hidden="true"><span class="stat-num">{years}</span>'
         '<span class="stat-suffix">+</span></p>'
-        "<h2>Опыт работы</h2>"
+        f"<h2>{escape(_st('years_work'))}</h2>"
         f'<p class="stat-note">{founded} — {date.today().year}</p></article>'
         f'<article class="stat" data-count-to="{len(labs)}" tabindex="0" '
-        f'aria-label="{len(labs)} лабораторий">'
+        f'aria-label="{len(labs)} {_st("labs_aria")}">'
         f'<p class="stat-value" aria-hidden="true"><span class="stat-num">{len(labs)}</span></p>'
-        "<h2>Лабораторий</h2>"
-        '<p class="stat-note"><a href="structure.html">Подразделения</a></p></article>'
+        f"<h2>{escape(_st('labs_count'))}</h2>"
+        f'<p class="stat-note"><a href="structure.html">{escape(_st("units_link"))}</a></p></article>'
         "</div></section>"
         '<section class="home-band">'
-        '<div class="wrap"><h2>Основные направления</h2>'
+        f'<div class="wrap"><h2>{escape(_st("main_directions"))}</h2>'
         '<ul class="dir-grid">'
-        '<li><a href="science.html">Тонкоплёночные и наноструктурированные материалы'
-        "<p>Органические плёнки и наноструктуры с заданными свойствами.</p></a></li>"
-        '<li><a href="developments.html">Композиты лесо- и нефтехимии'
-        "<p>Материалы на основе продуктов лесо- и нефтехимии и технологии их получения.</p></a></li>"
-        '<li><a href="science.html">Синтез новых органических соединений'
-        "<p>Потенциальные физиологически активные вещества.</p></a></li>"
+        f'<li><a href="science.html">{escape(_st("home_dir_1"))}'
+        f"<p>{escape(_st('home_dir_1p'))}</p></a></li>"
+        f'<li><a href="developments.html">{escape(_st("home_dir_2"))}'
+        f"<p>{escape(_st('home_dir_2p'))}</p></a></li>"
+        f'<li><a href="science.html">{escape(_st("home_dir_3"))}'
+        f"<p>{escape(_st('home_dir_3p'))}</p></a></li>"
         "</ul></div></section>"
         '<section class="home-band band-muted ichnm-home-block" data-ichnm-block="news">'
-        '<div class="wrap"><h2>Актуальные новости и мероприятия</h2>'
+        f'<div class="wrap"><h2>{escape(_st("home_news"))}</h2>'
         f'<div class="news-grid">{news_cards}</div>'
-        '<p><a class="band-link" href="news.html">Все новости</a>'
-        ' · <a class="band-link" href="news.html#smi">СМИ о нас</a>'
-        ' · <a class="band-link" href="feedback.html">Написать нам</a></p>'
+        f'<p><a class="band-link" href="news.html">{escape(_st("all_news"))}</a>'
+        f' · <a class="band-link" href="news.html#smi">{escape(_ui("footer_media"))}</a>'
+        f' · <a class="band-link" href="feedback.html">{escape(_ui("write"))}</a></p>'
         "</div></section>"
         '<section class="home-band">'
-        '<div class="wrap"><h2>Структура</h2>'
+        f'<div class="wrap"><h2>{escape(i18n.menu_title("structure", "Структура"))}</h2>'
         f'<ul class="lab-grid">{lab_cards}</ul>'
-        '<p><a class="band-link" href="structure.html">Все подразделения</a></p>'
+        f'<p><a class="band-link" href="structure.html">{escape(_st("all_units"))}</a></p>'
         "</div></section>"
         '<section class="home-band ichnm-home-block" data-ichnm-block="next_event">'
         '<div class="wrap"><div class="event-banner">'
-        f"<h2>{escape(_HOME_LABELS['next_event'])}</h2>"
+        f"<h2>{escape(_st('next_event'))}</h2>"
         f"<p><strong>{escape(event.get('title', ''))}</strong></p>"
         f"<p>{escape(event.get('when', ''))}</p>"
-        f'<p><a href="aist.html">Раздел AIST</a> · '
-        f'<a href="{escape(event.get("href", "aist.html"))}">Регистрация</a></p>'
+        f'<p><a href="aist.html">{escape(_st("aist_section"))}</a> · '
+        f'<a href="{escape(event.get("href", "aist.html"))}">{escape(_st("register"))}</a></p>'
         "</div></div></section>"
     )
-
 
 def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
     if item.id == "aist":
         event = load_migrated_copy().get("next_event") or {}
         return (
             '<div class="conf-hero">'
-            f'<p class="leader-role">Серия AIST · раздел на ichnm.by</p>'
+            f'<p class="leader-role">{escape(_st("aist_series"))}</p>'
             f"<h2>{escape(event.get('title', 'AIST'))}</h2>"
             f"<p>{escape(event.get('when', ''))}</p>"
-            "<p>Программа, ключевые даты и сборник появятся в этом разделе. "
-            "Регистрация текущего цикла пока на "
-            '<a href="http://aist.ichnm.by/">aist.ichnm.by</a> — отдельный домен в v1 не поднимаем.</p>'
-            f'<p><a class="hero-pill hero-pill-primary" href="{escape(event.get("href", "http://aist.ichnm.by/"))}">Регистрация</a> '
-            '<a class="hero-pill" href="events.html">Весь архив мероприятий</a></p>'
+            f"<p>{escape(_st('aist_body'))}"
+            '<a href="http://aist.ichnm.by/">aist.ichnm.by</a>' + escape(_st("aist_no_domain")) + "</p>"
+            f'<p><a class="hero-pill hero-pill-primary" href="{escape(event.get("href", "http://aist.ichnm.by/"))}">{escape(_st("register"))}</a> '
+            f'<a class="hero-pill" href="events.html">{escape(_st("all_events"))}</a></p>'
             "</div>"
             + _conference_archive()
         )
     if item.id == "feedback":
         return (
-            "<p>Форма откроет письмо на приёмную. Электронные обращения по закону — "
-            '<a href="e-appeals.html">отдельная страница</a>.</p>'
+            f"<p>{escape(_st('feedback_lead'))}"
+            f'<a href="e-appeals.html">{escape(_st("separate_page"))}</a>.</p>'
             '<form class="form" action="mailto:ichnm@ichnm.by" method="post" enctype="text/plain">'
-            '<label for="name">Имя</label><input id="name" name="name" required>'
-            '<label for="email">Электронная почта</label>'
+            f'<label for="name">{escape(_st("form_name"))}</label><input id="name" name="name" required>'
+            f'<label for="email">{escape(_st("form_email"))}</label>'
             '<input id="email" name="email" type="email" required>'
-            '<label for="message">Сообщение</label>'
+            f'<label for="message">{escape(_st("form_message"))}</label>'
             '<textarea id="message" name="message" rows="6" required></textarea>'
-            '<button type="submit">Отправить</button></form>'
+            f'<button type="submit">{escape(_st("form_send"))}</button></form>'
         )
     if item.id == "science":
         paras = "".join(f"<p>{escape(p)}</p>" for p in page_copy("science").get("paragraphs", []))
@@ -1740,9 +1784,9 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
         labs = [row for row in roster.science_catalog() if row.get("scope") == "lab"]
         return (
             paras
-            + "<h2>Общеинститутские направления</h2>"
+            + f"<h2>{escape(_st('science_institute'))}</h2>"
             + _catalog_cards(inst, "science", columns=3)
-            + "<h2>Направления лабораторий</h2>"
+            + f"<h2>{escape(_st('science_labs'))}</h2>"
             + _catalog_cards(labs, "science", columns=3)
         )
     if item.id == "developments":
@@ -1753,8 +1797,8 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
         labs = [row for row in roster.developments_catalog() if row.get("scope") == "lab"]
         return (
             paras
-            + ("<h2>Общеинститутские разработки</h2>" + _catalog_cards(inst, "developments", columns=3) if inst else "")
-            + "<h2>Разработки лабораторий</h2>"
+            + (f"<h2>{escape(_st('dev_institute'))}</h2>" + _catalog_cards(inst, "developments", columns=3) if inst else "")
+            + f"<h2>{escape(_st('dev_labs'))}</h2>"
             + _catalog_cards(labs, "developments", columns=3)
         )
     if item.id == "facilities":
@@ -1766,12 +1810,12 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
         return (
             paras
             + (
-                "<h2>Общеинститутское оснащение</h2>"
+                f"<h2>{escape(_st('fac_institute'))}</h2>"
                 + _catalog_cards(inst, "facilities", columns=3)
                 if inst
                 else ""
             )
-            + "<h2>Оборудование лабораторий</h2>"
+            + f"<h2>{escape(_st('fac_labs'))}</h2>"
             + _catalog_cards(labs, "facilities", columns=3)
         )
     if item.id == "cooperation":
@@ -1786,7 +1830,7 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
             for row in partners
         )
         partner_block = (
-            "<h2>Партнёры</h2>"
+            f"<h2>{escape(_st('partners'))}</h2>"
             f'<div class="info-grid">{partner_cards}</div>'
             if partners
             else ""
@@ -1798,7 +1842,7 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
         return _admin_unit_inner(item.id)
     if item.id == "media_about":
         return (
-            '<p class="unit-back"><a href="news.html#smi">К новостям Института и СМИ</a></p>'
+            f'<p class="unit-back"><a href="news.html#smi">{escape(_st("back_to_news_smi"))}</a></p>'
             + _media_about_inner()
         )
     if item.id == "leadership":
@@ -1810,10 +1854,7 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
     if item.id == "announcement":
         paras = page_copy("announcement").get("paragraphs", [])
         intro = "".join(f"<p>{escape(p)}</p>" for p in paras)
-        return intro + _empty_state(
-            "Объявлений пока нет",
-            "Служебные сообщения появятся здесь, отдельно от новостей и мероприятий.",
-        )
+        return intro + _empty_state(_st("no_announcements"), _st("no_announcements_text"))
     if item.id == "vacancies":
         copied = page_copy("vacancies")
         paras = "".join(f"<p>{escape(p)}</p>" for p in copied.get("paragraphs", []))
@@ -1821,10 +1862,7 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
         if rows:
             items = "".join(f"<li>{escape(row)}</li>" for row in rows)
             return paras + f'<ul class="plain-list">{items}</ul>'
-        return paras + _empty_state(
-            "Открытых вакансий нет",
-            "Когда появится ставка, её опубликуют в этом разделе. Вопросы в отдел кадров: +375 (17) 243-67-56.",
-        )
+        return paras + _empty_state(_st("no_vacancies"), _st("no_vacancies_text"))
     if item.id == "publications":
         paras = "".join(
             f"<p>{escape(p)}</p>" for p in page_copy("publications").get("paragraphs", [])
@@ -1834,7 +1872,7 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
         copied = page_copy(item.id)
         chunks = [f"<p>{_t(para)}</p>" for para in copied.get("paragraphs", [])]
         if copied.get("list"):
-            chunks.append(_card_list(copied["list"], "Направления исследований"))
+            chunks.append(_card_list(copied["list"], _st("research_directions")))
         chunks.append(_about_gallery())
         return "".join(chunks)
     copied = page_copy(item.id)
@@ -1842,36 +1880,26 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
     for para in copied.get("paragraphs", []):
         chunks.append(f"<p>{_t(para)}</p>")
     heading = {
-        "about": "Награды и достижения",
-        "developments": "Разработки",
-        "facilities": "Приборы и установки",
-        "cooperation": "Центры и договоры",
-        "science": "Направления",
+        "about": _st("awards"),
+        "developments": i18n.menu_title("developments", "Разработки"),
+        "facilities": i18n.menu_title("facilities", "Материальная база"),
+        "cooperation": i18n.menu_title("cooperation", "Сотрудничество"),
+        "science": i18n.menu_title("science", "Направления работы"),
     }.get(item.id, "")
     if copied.get("list") and item.id in _LIST_AS_CARDS:
-        chunks.append(_card_list(copied["list"], heading or "Перечень"))
+        chunks.append(_card_list(copied["list"], heading or _st("list_heading")))
     elif copied.get("list") and item.id == "contacts":
         chunks.append(_contact_cards(copied["list"]))
         chunks.append(
-            '<p><a href="requisites.html">Реквизиты</a> · '
-            '<a href="feedback.html">Форма обратной связи</a> · '
-            '<a href="e-appeals.html">Электронные обращения</a></p>'
+            f'<p><a href="requisites.html">{escape(_st("requisites_link"))}</a> · '
+            f'<a href="feedback.html">{escape(_st("feedback_form_link"))}</a> · '
+            f'<a href="e-appeals.html">{escape(_ui("cookies_appeals_link"))}</a></p>'
         )
         chunks.append(
-            (
-                '<div class="map-slot is-filled">'
-                '<img src="media/maps/institute.svg" width="640" height="400" '
-                'alt="Институт на карте Минска, ул. Ф. Скорины, 36">'
-                f"<p>{_t('ул. Ф. Скорины, 36, Минск')}</p>"
-                "</div>"
-            )
-            if is_filled_copy()
-            else (
-                '<div class="map-slot" role="img" aria-label="Место для карты">'
-                "<p>Карта проезда появится после согласования. "
-                f"Адрес: {_t('ул. Ф. Скорины, 36, Минск')}.</p>"
-                "</div>"
-            )
+            '<div class="map-slot is-filled">'
+            f"{_minsk_map()}"
+            f"<p>{_t(_st('street'))}</p>"
+            "</div>"
         )
     elif copied.get("list") and item.id not in {"structure"}:
         items = "".join(f"<li>{escape(row)}</li>" for row in copied["list"])
@@ -1879,14 +1907,14 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
     if item.id == "structure":
         labs = load_migrated_copy().get("labs", [])
         if labs:
-            chunks.append("<h2>Лаборатории</h2>")
+            chunks.append(f"<h2>{escape(_st('labs_heading'))}</h2>")
             lab_links = "".join(
                 f'<li><a href="labs/{escape(lab.get("slug") or lab["id"])}/index.html">'
-                f'{_t(lab["title"])}</a></li>'
+                f'{_t(_lt(lab))}</a></li>'
                 for lab in labs
             )
             chunks.append(f'<ul class="lab-grid">{lab_links}</ul>')
-        chunks.append("<h2>Административные подразделения</h2>")
+        chunks.append(f"<h2>{escape(_st('admin_heading'))}</h2>")
         admin_ids = _admin_unit_ids()
         admin_children = tuple(child for child in item.children if child.id in admin_ids)
         community_children = tuple(
@@ -1894,12 +1922,12 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
         )
         chunks.append(_hub_cards(admin_children, heading=""))
         if community_children:
-            chunks.append("<h2>Общественные объединения</h2>")
+            chunks.append(f"<h2>{escape(_st('community_heading'))}</h2>")
             chunks.append(_hub_cards(community_children, heading=""))
     if item.id == "union":
         chunks.append(
-            '<p><a href="https://profnan.by/">Профсоюз работников НАН Беларуси</a> '
-            "(общеакадемический сайт, не замена этой страницы).</p>"
+            f'<p><a href="https://profnan.by/">{escape(_st("union_nas_note"))}</a> '
+            f"{escape(_st('union_nas_aside'))}</p>"
         )
     if item.id == "young-scientists":
         chunks.append('<div class="people-list">')
@@ -1911,7 +1939,7 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
                     role=person.get("unit_role") or person["role"],
                     initials=person.get("initials", ""),
                     href=roster.person_href(person["id"]),
-                    lines=["Контакт появится после передачи состава."]
+                    lines=[_st("contact_pending")]
                     if not is_filled_copy()
                     else [person.get("degree") or ""],
                 )
@@ -1924,8 +1952,7 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
         chunks.append(_hub_cards(item.children))
     if not chunks:
         chunks.append(
-            '<p class="placeholder">Плейсхолдер. Текст будет перенесён с ichnm.by '
-            "или придёт в пакете к переключению.</p>"
+            f'<p class="placeholder">{escape(_st("placeholder"))}</p>'
         )
     return "".join(chunks)
 
@@ -1933,10 +1960,10 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
 def _vitrine_body(model: SiteModel, item: MenuItem) -> str:
     _begin_page(0)
     extra = " is-wide" if item.id in _WIDE_PAGES else ""
-    trail = _trail(model, item.id, item.title)
+    trail = _trail(model, item.id, _mt(item))
     return (
         f'<header class="page-hero"><div class="wrap">{trail}'
-        f"<h1>{_t(item.title)}</h1></div></header>"
+        f"<h1>{_t(_mt(item))}</h1></div></header>"
         f'<div class="page-body{extra}">{_vitrine_inner(model, item)}</div>'
     )
 
@@ -1956,9 +1983,9 @@ def _photo_slot(
             f'<img src="{escape(src)}" alt="" width="640" height="400"></div>'
         )
     mark = f"<span>{escape(initials)}</span>" if initials else ""
-    note = "" if compact else "<p>Фото появится после передачи файла</p>"
+    note = "" if compact else f"<p>{escape(_st('photo_pending'))}</p>"
     return (
-        f'<div class="photo-slot" role="img" aria-label="Место для фото: {escape(label)}">'
+        f'<div class="photo-slot" role="img" aria-label="{escape(_st("photo_slot") + label)}">'
         f"{mark}{note}</div>"
     )
 
@@ -2001,7 +2028,7 @@ def _news_article_body(model: SiteModel, item: dict, depth: int = 2) -> str:
         f"{_photo_slot(item['title'], kind='cover')}"
         f"<p class=\"leader-role\">{escape(item.get('date_label') or item.get('date', ''))}</p>"
         f"{paras}"
-        f'<p><a href="{prefix}news.html">Ко всем новостям</a></p>'
+        f'<p><a href="{prefix}news.html">{escape(_st("back_to_news"))}</a></p>'
     )
     return _with_page_hero(
         item["title"],
@@ -2017,9 +2044,9 @@ def _catalog_detail_body(model: SiteModel, parent: str, item: dict, depth: int =
     _begin_page(depth, letter)
     parent_file = f"{parent}.html"
     parent_title = {
-        "science": "Направления работы",
-        "developments": "Разработки",
-        "facilities": "Материальная база",
+        "science": i18n.menu_title("science", "Направления работы"),
+        "developments": i18n.menu_title("developments", "Разработки"),
+        "facilities": i18n.menu_title("facilities", "Материальная база"),
     }[parent]
     spec = item.get("spec") or item.get("product") or ""
     contacts = item.get("contacts") or roster.catalog_meta(item) or "ichnm@ichnm.by"
@@ -2028,10 +2055,10 @@ def _catalog_detail_body(model: SiteModel, parent: str, item: dict, depth: int =
     extra_links = []
     if lab_id:
         href, title = roster.unit_link(str(lab_id), depth)
-        extra_links.append(f'<p>Лаборатория: <a href="{escape(href)}">{escape(title)}</a></p>')
+        extra_links.append(f'<p>{escape(_st("lab_label"))}<a href="{escape(href)}">{escape(title)}</a></p>')
     if staff_id:
         extra_links.append(
-            f'<p>Закреплено: <a href="{escape(roster.person_href(str(staff_id), depth))}">'
+            f'<p>{escape(_st("assigned"))}<a href="{escape(roster.person_href(str(staff_id), depth))}">'
             f"{escape(roster.person_contact_line(str(staff_id)) or staff_id)}</a></p>"
         )
     kind = "equipment" if parent == "facilities" else "cover"
@@ -2039,10 +2066,10 @@ def _catalog_detail_body(model: SiteModel, parent: str, item: dict, depth: int =
         f"{_fish_banner()}"
         f"{_photo_slot(item['title'], kind=kind)}"
         f"<p>{escape(item.get('lead', ''))}</p>"
-        "<h2>Описание и контакты</h2>"
+        f"<h2>{escape(_st('description_contacts'))}</h2>"
         f"<p>{escape(contacts)}</p>"
         f"{''.join(extra_links)}"
-        f"<h2>{'Спецификация' if parent == 'facilities' else 'Продукт / результат'}</h2>"
+        f"<h2>{escape(_st('spec' if parent == 'facilities' else 'product'))}</h2>"
         f"<p>{escape(spec)}</p>"
         f'<p><a href="{prefix}{parent_file}">{escape(parent_title)}</a></p>'
     )
@@ -2065,7 +2092,7 @@ def _person_body(model: SiteModel, person: dict, depth: int = 0) -> str:
     _begin_page(depth, letter)
     contacts = []
     if person.get("phone"):
-        contacts.append(f"<p>{_t('Тел. ' + person['phone'])}</p>")
+        contacts.append(f"<p>{_t(_st('tel') + person['phone'])}</p>")
     if person.get("email"):
         contacts.append(
             f'<p><a href="mailto:{escape(person["email"])}">{escape(person["email"])}</a></p>'
@@ -2075,9 +2102,9 @@ def _person_body(model: SiteModel, person: dict, depth: int = 0) -> str:
         if is_filled_copy()
         else (
             '<div class="leader-photo leader-photo-lg" role="img" '
-            f'aria-label="Место для официального фото: {escape(person["name"])}">'
+            f'aria-label="{escape(_st("official_photo_slot") + person["name"])}">'
             f'<span>{escape(person.get("initials", ""))}</span>'
-            "<p>Официальное фото появится после передачи файла Институтом</p>"
+            f"<p>{escape(_st('official_photo_pending'))}</p>"
             "</div>"
         )
     )
@@ -2090,7 +2117,7 @@ def _person_body(model: SiteModel, person: dict, depth: int = 0) -> str:
             label = f"{label} — {_t(str(role))}"
         aff_items.append(f'<li><a href="{escape(href)}">{label}</a></li>')
     aff_block = (
-        "<h2>Подразделения</h2>"
+        f"<h2>{escape(_st('units'))}</h2>"
         f'<ul class="plain-list">{"".join(aff_items)}</ul>'
         if aff_items
         else ""
@@ -2117,17 +2144,17 @@ def _person_body(model: SiteModel, person: dict, depth: int = 0) -> str:
         _person_metrics(model, person),
     ]
     if person.get("bio"):
-        profile_bits.append("<h2>Биография</h2>")
+        profile_bits.append(f"<h2>{escape(_st('biography'))}</h2>")
         profile_bits.append(bio)
     if person.get("interests"):
-        profile_bits.append("<h2>Научные интересы</h2>")
+        profile_bits.append(f"<h2>{escape(_st('interests'))}</h2>")
         profile_bits.append(f'<ul class="plain-list">{interests}</ul>')
     if person.get("publications"):
-        profile_bits.append("<h2>Избранные публикации</h2>")
+        profile_bits.append(f"<h2>{escape(_st('selected_pubs'))}</h2>")
         profile_bits.append(f'<ul class="plain-list">{pubs}</ul>')
     if person.get("sources_note"):
         profile_bits.append(f"<p class=\"leader-source\">{escape(person['sources_note'])}</p>")
-    profile_bits.append(f'<p><a href="{prefix}structure.html">К структуре Института</a></p>')
+    profile_bits.append(f'<p><a href="{prefix}structure.html">{escape(_st("to_structure"))}</a></p>')
     profile_bits.append("</div></div>")
     inner = "".join(profile_bits)
     return (
@@ -2255,26 +2282,20 @@ def _person_metrics(model: SiteModel, person: dict) -> str:
             continue
         bits: list[str] = []
         if h_index is not None and h_index != "":
-            bits.append(f"h-индекс {escape(str(h_index))}")
+            bits.append(f"{escape(_st('h_index'))} {escape(str(h_index))}")
         if citations is not None and citations != "":
-            bits.append(f"цитирований {escape(str(citations))}")
+            bits.append(f"{escape(_st('citations'))} {escape(str(citations))}")
         if href:
             bits.append(
-                f'<a href="{escape(href)}" rel="noopener noreferrer">профиль</a>'
+                f'<a href="{escape(href)}" rel="noopener noreferrer">{escape(_st("profile"))}</a>'
             )
         label = _METRIC_LABELS.get(field, field)
         rows.append(f"<dt>{escape(label)}</dt><dd>{' · '.join(bits) or '—'}</dd>")
     if not rows:
-        return _empty_state(
-            "Профили и показатели ещё не указаны",
-            "ORCID, Google Scholar, Scopus, eLIBRARY/РИНЦ и ResearchGate появятся "
-            "после передачи ссылок. Индекс Хирша и число цитирований вносит "
-            "сотрудник или редактор — сайт базы сам не опрашивает.",
-        )
+        return _empty_state(_st("metrics_empty"), _st("metrics_empty_text"))
     return (
-        "<h2>Наукометрия</h2>"
-        "<p class=\"metrics-note\">Цифры и ссылки вносит сотрудник или редактор. "
-        "Сайт не подтягивает базы автоматически.</p>"
+        f"<h2>{escape(_st('metrics'))}</h2>"
+        f"<p class=\"metrics-note\">{escape(_st('metrics_note'))}</p>"
         f'<dl class="metrics-list">{"".join(rows)}</dl>'
     )
 
@@ -2287,20 +2308,62 @@ def _about_gallery() -> str:
     for row in photos:
         figs.append(
             "<figure class=\"about-photo\">"
-            f'<img src="{escape(row["src"])}" alt="{escape(row.get("caption") or "")}" '
+            f'<img src="{escape(_asset_prefix() + row["src"] if not str(row["src"]).startswith("http") else row["src"])}" alt="{escape(row.get("caption") or "")}" '
             'width="640" height="400" loading="lazy">'
             f"<figcaption>{escape(row.get('caption') or '')}</figcaption>"
             "</figure>"
         )
-    return "<h2>Фотоархив</h2>" f'<div class="about-gallery">{"".join(figs)}</div>'
+    return f"<h2>{escape(_st('photo_archive'))}</h2>" f'<div class="about-gallery">{"".join(figs)}</div>'
 
 
 _WORLD_SVG = _HERE.parents[1] / "assets" / "maps" / "world-countries.svg"
+_MINSK_SVG = _HERE.parents[1] / "assets" / "maps" / "minsk.svg"
 
 
 def _world_outline() -> str:
     raw = _WORLD_SVG.read_text(encoding="utf-8")
     return re.sub(r"<\?xml[^?]*\?>", "", raw).strip()
+
+
+def _minsk_outline() -> str:
+    raw = _MINSK_SVG.read_text(encoding="utf-8")
+    return re.sub(r"<\?xml[^?]*\?>", "", raw).strip()
+
+
+def _minsk_pin_pct() -> tuple[str, str]:
+    raw = _MINSK_SVG.read_text(encoding="utf-8")
+    left = re.search(r'data-pin-left="([\d.]+)"', raw)
+    top = re.search(r'data-pin-top="([\d.]+)"', raw)
+    if not left or not top:
+        raise RuntimeError("minsk.svg is missing data-pin-left/top")
+    return left.group(1), top.group(1)
+
+
+def _minsk_map(*, compact: bool = False) -> str:
+    left, top = _minsk_pin_pct()
+    hotspot = (
+        f'<div class="map-hotspot" style="left:{left}%;top:{top}%">'
+    )
+    if compact:
+        pin = f'{hotspot}<span class="map-pin"></span></div>'
+        return (
+            '<figure class="world-map city-map is-compact" aria-hidden="true">'
+            f"{_minsk_outline()}{pin}</figure>"
+        )
+    pin = (
+        f'{hotspot}'
+        f'<button type="button" class="map-pin" aria-describedby="pop-ichnm">'
+        f'<span class="visually-hidden">{escape(_st("minsk_pin"))}</span></button>'
+        f'<div class="map-pop" id="pop-ichnm">'
+        f'<p class="leader-role">{escape(_st("minsk_city"))}</p>'
+        f'<h3>{escape(_st("minsk_pin"))}</h3>'
+        f'<p>{escape(_st("street"))}</p>'
+        "</div></div>"
+    )
+    return (
+        f'<figure class="world-map city-map" aria-label="{escape(_st("minsk_map"))}">'
+        f"{_minsk_outline()}{pin}</figure>"
+    )
 
 
 def _world_map() -> str:
@@ -2318,7 +2381,7 @@ def _world_map() -> str:
             "</div></div>"
         )
     return (
-        '<figure class="world-map" aria-label="Карта сотрудничества">'
+        f'<figure class="world-map" aria-label="{escape(_st("coop_map"))}">'
         f"{_world_outline()}{''.join(pins)}</figure>"
     )
 
@@ -2348,7 +2411,7 @@ def _admin_unit_inner(unit_id: str) -> str:
     units = load_migrated_copy().get("admin_units", [])
     unit = next((row for row in units if row["id"] == unit_id), None)
     if not unit:
-        return "<p>Подразделение появится после передачи состава.</p>"
+        return f"<p>{escape(_st('unit_pending'))}</p>"
     seen: set[str] = set()
     people = []
     for person in roster.people_for_unit(unit_id):
@@ -2361,7 +2424,7 @@ def _admin_unit_inner(unit_id: str) -> str:
                 initials=person.get("initials", ""),
                 href=roster.person_href(pid),
                 lines=[
-                    f"Тел. {person.get('phone', '')}" if person.get("phone") else "",
+                    f"{_st('tel')}{person.get('phone', '')}" if person.get("phone") else "",
                     person.get("email") or "",
                 ],
             )
@@ -2377,31 +2440,23 @@ def _admin_unit_inner(unit_id: str) -> str:
                 initials=person.get("initials", ""),
                 href=roster.person_href(pid) if pid else "",
                 lines=[
-                    f"Тел. {person.get('phone', '')}" if person.get("phone") else "",
+                    f"{_st('tel')}{person.get('phone', '')}" if person.get("phone") else "",
                     person.get("email") or "",
                 ],
             )
         )
     return (
         f"{_fish_banner()}"
-        f'<p class="unit-back"><a href="structure.html">Ко всем подразделениям</a></p>'
-        f"<p>{_t('Тел. подразделения: ' + str(unit.get('phone', '')))}</p>"
+        f'<p class="unit-back"><a href="structure.html">{escape(_st("back_to_units"))}</a></p>'
+        f"<p>{_t(_st('unit_phone') + str(unit.get('phone', '')))}</p>"
         f'<div class="people-list">{"".join(people)}</div>'
     )
 
 
 def _fish_banner() -> str:
-    if is_filled_copy():
-        return (
-            '<p class="fish-banner is-filled" role="note">'
-            "Наполненный макет. ФИО, приборы, разработки и статьи лабораторий — рыба: "
-            "лаборатория наноструктур на букву А, оптических плёнок — Б, ЖК — В, "
-            "композитов — Г, лесохимии — Д. Это не официальные сведения.</p>"
-        )
-    return (
-        '<p class="fish-banner" role="note">Макет. Рыбный текст и пустые слоты показывают структуру. '
-        "Замените данными и файлами Института — это не официальные сведения.</p>"
-    )
+    key = "fish_filled" if is_filled_copy() else "fish_honest"
+    cls = "fish-banner is-filled" if is_filled_copy() else "fish-banner"
+    return f'<p class="{cls}" role="note">{escape(_st(key))}</p>'
 
 
 def _file_slots(labels: list[str]) -> str:
@@ -2410,16 +2465,16 @@ def _file_slots(labels: list[str]) -> str:
             f'<li class="file-slot is-filled">'
             f'<img src="{escape(_fish_src("document", label))}" alt="" width="64" height="64">'
             f"<span>{escape(label)}</span>"
-            "<small>Макетный файл</small></li>"
+            f"<small>{escape(_st('mock_file'))}</small></li>"
             for label in labels
         )
     else:
         items = "".join(
             f'<li class="file-slot"><span>{escape(label)}</span>'
-            "<small>Файл не загружен</small></li>"
+            f"<small>{escape(_st('file_missing'))}</small></li>"
             for label in labels
         )
-    return f'<ul class="file-shelf" aria-label="Слоты для документов">{items}</ul>'
+    return f'<ul class="file-shelf" aria-label="{escape(_st("file_slots"))}">{items}</ul>'
 
 
 def _publications_inner() -> str:
@@ -2447,7 +2502,7 @@ def _publications_inner() -> str:
         delay = round(0.05 * offset, 2)
         bars.append(
             f'<li><button type="button" class="chart-bar" data-year="{year}" '
-            f'data-count="{count}" aria-label="{year}: {count} статей">'
+            f'data-count="{count}" aria-label="{year}: {count} {_st("articles_n")}">'
             f'<span class="chart-col" style="height:{px}px;animation-delay:{delay}s"></span>'
             f'<span class="chart-year">{year}</span></button></li>'
         )
@@ -2455,13 +2510,13 @@ def _publications_inner() -> str:
     note = escape(str(data.get("note", "")))
     catalog = _publications_grouped(roster.lab_publications(), 0, show_lab=True)
     if not catalog:
-        catalog = "<p>Список появится из пакетов лабораторий.</p>"
+        catalog = f"<p>{escape(_st('pub_list_pending'))}</p>"
     return (
         f'<script type="application/json" id="pub-year-data">{payload}</script>'
         f'<p class="fish-banner" role="note">{note}</p>'
         '<figure class="pub-chart">'
-        "<figcaption>Статьи по годам</figcaption>"
-        '<p class="chart-readout" aria-live="polite">Наведите на столбец, чтобы увидеть число</p>'
+        f"<figcaption>{escape(_st('articles_by_year'))}</figcaption>"
+        f'<p class="chart-readout" aria-live="polite">{escape(_st("chart_hint"))}</p>'
         '<div class="chart-plot">'
         f'<ul class="chart-bars">{"".join(bars)}</ul>'
         '<svg class="chart-sma" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">'
@@ -2470,7 +2525,7 @@ def _publications_inner() -> str:
         "</svg>"
         "</div>"
         "</figure>"
-        "<h2>Публикации лабораторий</h2>"
+        f"<h2>{escape(_st('pubs_labs'))}</h2>"
         f"{_fish_banner()}"
         f"{catalog}"
     )
@@ -2479,7 +2534,7 @@ def _publications_inner() -> str:
 def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
     prefix = "../" * depth
     _begin_page(depth, letter_for_lab(str(lab["id"])))
-    kicker = escape(str(lab.get("kicker") or "Подразделение Института"))
+    kicker = escape(str(lab.get("kicker") or _st("lab_kicker_default")))
     people = []
     for pid in lab.get("staff_ids") or []:
         row = roster.person(str(pid))
@@ -2513,7 +2568,7 @@ def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
     directions = (
         f'<div class="cover-grid is-3">{"".join(direction_cards)}</div>'
         if direction_cards
-        else "<p>Направления появятся из пакета лаборатории.</p>"
+        else f"<p>{escape(_st('directions_pending'))}</p>"
     )
     equip_items = []
     for item in lab.get("equipment") or []:
@@ -2531,7 +2586,7 @@ def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
     equipment = (
         f'<ul class="lab-equip">{"".join(equip_items)}</ul>'
         if equip_items
-        else "<p>Список приборов появится из пакета лаборатории.</p>"
+        else f"<p>{escape(_st('equipment_pending'))}</p>"
     )
     service_cards = []
     for item in lab.get("developments") or []:
@@ -2546,68 +2601,64 @@ def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
     services = (
         f'<div class="cover-grid is-3">{"".join(service_cards)}</div>'
         if service_cards
-        else "<p>Карточки разработок появятся из пакета лаборатории.</p>"
+        else f"<p>{escape(_st('services_pending'))}</p>"
     )
     pubs = _publications_grouped(lab.get("publications") or [], depth, show_lab=False)
     if not pubs:
-        pubs = "<p>Избранные публикации появятся из пакета лаборатории.</p>"
+        pubs = f"<p>{escape(_st('lab_pubs_pending'))}</p>"
     phone = lab.get("phone") or "+375 (17) 000-00-00"
     email = lab.get("email") or "lab@ichnm.by"
     head_line = roster.head_contact_line(lab)
     inner = (
         f"{_fish_banner()}"
-        f'<p class="unit-back"><a href="{prefix}structure.html">Ко всем подразделениям</a></p>'
-        '<nav class="lab-local" aria-label="Разделы лаборатории">'
-        '<a href="#about">О лаборатории</a>'
-        '<a href="#directions">Направления</a>'
-        '<a href="#equipment">Оборудование</a>'
-        '<a href="#services">Услуги и разработки</a>'
-        '<a href="#staff">Команда</a>'
-        '<a href="#pubs">Публикации</a>'
-        '<a href="#contacts">Контакты</a>'
+        f'<p class="unit-back"><a href="{prefix}structure.html">{escape(_st("back_to_units"))}</a></p>'
+        f'<nav class="lab-local" aria-label="{escape(_st("lab_local"))}">'
+        f'<a href="#about">{escape(_st("lab_about"))}</a>'
+        f'<a href="#directions">{escape(_st("lab_directions"))}</a>'
+        f'<a href="#equipment">{escape(_st("lab_equipment"))}</a>'
+        f'<a href="#services">{escape(_st("lab_services"))}</a>'
+        f'<a href="#staff">{escape(_st("lab_team"))}</a>'
+        f'<a href="#pubs">{escape(_st("lab_pubs"))}</a>'
+        f'<a href="#contacts">{escape(_st("lab_contacts"))}</a>'
         "</nav>"
         '<section id="about" class="lab-split">'
-        f'{_photo_slot(lab["title"], kicker[:2] if kicker else "ЛБ", kind="cover")}'
+        f'{_photo_slot(_lt(lab), kicker[:2] if kicker else "ЛБ", kind="cover")}'
         "<div>"
-        "<h2>О лаборатории</h2>"
+        f"<h2>{escape(_st('lab_about'))}</h2>"
         + (
             f"<p>{escape(lab['about_filled'])}</p>"
             if lab.get("about_filled")
             else (
-                "<p>Подразделение Института химии новых материалов НАН Беларуси. "
-                "Пакет страницы собран как у лабораторных сайтов (локальное меню, команда, "
-                "приборы, контакты), но живёт на ichnm.by — не отдельный домен в v1.</p>"
-                "<p>Рыба: лаборатория ведёт работы по направлению, указанному в названии. "
-                "Тексты задач, приборов и договоров появятся из пакета подразделения.</p>"
+                f"<p>{escape(_st('lab_about_placeholder'))}</p>"
+                f"<p>{escape(_st('lab_about_fish'))}</p>"
             )
         )
         + "</div></section>"
         '<section id="directions">'
-        "<h2>Направления</h2>"
+        f"<h2>{escape(_st('lab_directions'))}</h2>"
         f"{directions}</section>"
         '<section id="equipment">'
-        "<h2>Оборудование</h2>"
+        f"<h2>{escape(_st('lab_equipment'))}</h2>"
         f"{equipment}</section>"
         '<section id="services">'
-        "<h2>Услуги и разработки</h2>"
+        f"<h2>{escape(_st('lab_services'))}</h2>"
         f"{services}</section>"
         '<section id="staff">'
-        "<h2>Наша команда</h2>"
+        f"<h2>{escape(_st('our_team'))}</h2>"
         '<div class="staff-tab">'
-        "<p>Карточка ведёт на персональную страницу. У человека может быть несколько подразделений. "
-        "Индекс Хирша и профили баз — на персональной странице.</p>"
+        f"<p>{escape(_st('staff_tab_note'))}</p>"
         f'<div class="people-list">{"".join(people)}</div>'
         "</div></section>"
         '<section id="pubs">'
-        "<h2>Избранные публикации</h2>"
+        f"<h2>{escape(_st('selected_pubs'))}</h2>"
         f"{pubs}"
         "</section>"
         '<section id="contacts" class="lab-contacts">'
-        "<h2>Контакты</h2>"
-        f"<p>Адрес: {_t('220084, г. Минск, ул. Ф. Скорины, 36')}</p>"
-        f"<p>Тел.: {_t(str(phone))}</p>"
+        f"<h2>{escape(_st('lab_contacts'))}</h2>"
+        f"<p>{escape(_st('address_label'))}{_t(_st('address_full'))}</p>"
+        f"<p>{escape(_st('tel'))}{_t(str(phone))}</p>"
         f"<p>E-mail: {escape(str(email))}</p>"
-        + (f"<p>Заведующий: {_t(head_line)}</p>" if head_line else "")
+        + (f"<p>{escape(_st('head_label'))}{_t(head_line)}</p>" if head_line else "")
         + "</section>"
     )
     extra = (
@@ -2615,13 +2666,12 @@ def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
         if kicker
         else ""
     )
-    trail = _trail(model, lab["id"], lab["title"], depth=depth)
+    trail = _trail(model, lab["id"], _lt(lab), depth=depth)
     return (
         f'<header class="page-hero"><div class="wrap">{trail}'
-        f"{extra}<h1>{escape(lab['title'])}</h1></div></header>"
+        f"{extra}<h1>{escape(_lt(lab))}</h1></div></header>"
         f'<div class="page-body is-wide is-lab">{inner}</div>'
     )
-
 
 def _media_card(item: dict) -> str:
     issue = escape(item.get("date_label", ""))
@@ -2634,7 +2684,7 @@ def _media_card(item: dict) -> str:
         f"<p class=\"media-meta\"><span>{outlet}</span><time datetime=\"{escape(item.get('date', ''))}\">{issue}</time></p>"
         f"<h3><a href=\"{href}\" rel=\"noopener noreferrer\">{title}</a></h3>"
         f"<p>{summary}</p>"
-        f"<p class=\"media-source\"><a href=\"{href}\" rel=\"noopener noreferrer\">Читать оригинал</a></p>"
+        f"<p class=\"media-source\"><a href=\"{href}\" rel=\"noopener noreferrer\">{escape(_st('read_original'))}</a></p>"
         "</article>"
     )
 
@@ -2649,14 +2699,14 @@ def _media_about_inner() -> str:
     navuka.sort(key=lambda row: row.get("date", ""), reverse=True)
     if press:
         cards = "".join(_media_card(row) for row in press)
-        parts.append("<h2>Внешние СМИ</h2>")
+        parts.append(f"<h2>{escape(_st('press'))}</h2>")
         parts.append(f'<div class="media-grid">{cards}</div>')
     if navuka:
         cards = "".join(_media_card(row) for row in navuka)
-        parts.append("<h2>Газета «Навука»</h2>")
+        parts.append(f"<h2>{escape(_st('navuka'))}</h2>")
         parts.append(
-            "<p>Онлайн-версии материалов академической газеты. Полные PDF-выпуски — "
-            '<a href="https://gazeta-navuka.by/">в архиве gazeta-navuka.by</a>.</p>'
+            f"<p>{escape(_st('navuka_note'))}"
+            f'<a href="https://gazeta-navuka.by/">{escape(_st("navuka_archive"))}</a>.</p>'
         )
         parts.append(f'<div class="media-grid">{cards}</div>')
     return "".join(parts)

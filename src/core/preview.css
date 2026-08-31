@@ -1219,6 +1219,7 @@ html:not(.js-motion) .chart-sma-line {
   --map-ocean: #c5dcec;
   --map-land: #ffffff;
   --map-stroke: var(--navy);
+  --map-water: #b4cfe0;
 }
 
 .world-outline {
@@ -1244,6 +1245,35 @@ html.theme-night .world-map {
   --map-ocean: #0a1c2e;
   --map-land: #16324a;
   --map-stroke: #8eb8d4;
+  --map-water: #0d2438;
+}
+
+.world-map.city-map {
+  aspect-ratio: 8 / 5;
+}
+
+.city-map .world-land,
+.city-map .world-land path {
+  stroke-width: 1.05;
+}
+
+.city-water {
+  fill: var(--map-water);
+  stroke: none;
+}
+
+.city-river,
+.city-river path {
+  fill: none;
+  stroke: var(--map-water);
+  stroke-width: 4.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.city-map .map-pop {
+  left: auto;
+  right: 1.2rem;
 }
 
 .world-map::after {
@@ -1595,12 +1625,27 @@ a.leader-card:hover {
   max-width: 17rem;
 }
 
-.footer-map img {
-  display: block;
-  width: 100%;
-  height: auto;
+.footer-map .world-map {
+  margin: 0;
+  box-shadow: none;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  background: #0b1c2c;
+  /* Light card on the navy footer so the outline does not vanish at night. */
+  --map-ocean: #c5dcec;
+  --map-land: #ffffff;
+  --map-stroke: #0f2a43;
+  --map-water: #b4cfe0;
+}
+
+.footer-map .map-hotspot {
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+}
+
+.footer-map .map-pin {
+  width: 0.65rem;
+  height: 0.65rem;
+  cursor: inherit;
 }
 
 .footer-map span {
@@ -2687,6 +2732,10 @@ html.is-bvi body.is-home .home-band {
 .map-slot.is-filled {
   padding: 0;
   overflow: hidden;
+}
+
+.map-slot.is-filled .world-map {
+  margin: 0;
 }
 
 .map-slot.is-filled img {
