@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from hashlib import sha1
+import re
 from typing import Any
 
 from src.core.copy import disk_copy
@@ -332,9 +333,10 @@ def filled_copy() -> dict[str, Any]:
                 }
             )
         for index, cite in enumerate(pack["pubs"], start=1):
+            found = re.search(r"\b((?:19|20)\d{2})\b", cite)
             lab.setdefault("publications", []).append(
                 {
-                    "year": 2024,
+                    "year": int(found.group(1)) if found else 2025 - index,
                     "cite": cite,
                     "doi": f"10.0000/ichnm.{lab.get('slug')}.{index}",
                 }

@@ -55,9 +55,14 @@ def test_icnm_mark_uses_bew_vector():
 def test_language_stubs_and_aist():
     model = load_site_model()
     files = render_site_files(model)
-    for prefix in ("en", "be", "zh"):
-        stub = files[f"{prefix}/index.html"]
-        assert "Версия готовится" in stub
+    en = files["en/index.html"]
+    assert 'lang="en"' in en
+    assert "English version in preparation" in en
+    assert "Institute of Chemistry of New Materials" in en
+    assert files["en/about.html"].count("About") >= 1
+    assert "Пра інстытут" in files["be/about.html"]
+    assert "关于研究所" in files["zh/about.html"]
+    assert "Russian version" in en
     aist = files["aist.html"]
     assert "aist.ichnm.by" in aist
     assert "conf-card" in aist
@@ -201,6 +206,7 @@ def test_nas_emblem_lattice_lab_packs_and_publication_chart():
     assert "text-decoration: none" in tool_btn_block
     assert "news/sinyutich-defense-2025/index.html" in files
     assert "cover-card" in files["science.html"]
+    assert "Направления работы" in files["science.html"]
     assert "Общеинститутские направления" in files["science.html"]
     assert "Направления лабораторий" in files["science.html"]
     assert "nano-carriers" in files["science.html"]
@@ -212,10 +218,23 @@ def test_nas_emblem_lattice_lab_packs_and_publication_chart():
     assert "people/rogachev/index.html" in files["facilities.html"] or "Рогачёв" in files["facilities.html"]
     assert "Публикации лабораторий" in files["publications.html"]
     assert "world-map" in files["cooperation.html"]
-    assert "Центры и договоры" in files["cooperation.html"]
-    assert "world.jpg" in files["cooperation.html"]
+    assert "Центры и договоры" not in files["cooperation.html"]
+    assert "world.jpg" not in files["cooperation.html"]
+    assert "world-outline" in files["cooperation.html"]
+    assert "world-land" in files["cooperation.html"]
+    assert "M58 78c62-38" not in files["cooperation.html"]
+    assert "Партнёры" in files["cooperation.html"]
     assert "Борескова" in files["cooperation.html"]
     assert "chart-sma" in files["publications.html"]
+    assert 'pathLength="1"' in files["publications.html"]
+    assert 'id="pub-year-2024"' in files["publications.html"]
+    assert 'class="pub-year"' in files["labs/nano/index.html"]
+    assert "lab-equip-card" in files["labs/nano/index.html"]
+    assert "cover-grid is-3" in files["labs/nano/index.html"]
+    assert "nav-parent" in files["index.html"]
+    assert "nav-folder" in files["index.html"]
+    assert "Научная деятельность" in files["index.html"]
+    assert 'class="nav-folder"' in files["index.html"]
     assert "photo-slot" in files["scientific-council.html"]
     assert "announcement.html" not in files
     assert "picto-strip" in files["index.html"]
@@ -237,17 +256,20 @@ def test_nas_emblem_lattice_lab_packs_and_publication_chart():
     assert "страница раздела" not in files["index.html"]
     assert "nav-more-label" not in files["index.html"]
     assert "feedback.html" in files["contacts.html"]
+    assert "requisites.html" in files["contacts.html"]
     assert "cover-grid is-3" in files["science.html"]
     assert "cover-grid is-3" in files["facilities.html"]
+    assert "cover-grid is-3" in files["developments.html"]
     assert "doi.org/10.0000/ichnm.mock.nano-1" in files["publications.html"]
     assert "people/kulikouskaya" not in files["publications.html"]
     assert "orcid.org/0000-0001-6505-3929" in files["people/kulikouskaya/index.html"]
     assert "Наукометрия" in files["people/kulikouskaya/index.html"] or "Профили и показатели" in files["people/rogachev/index.html"]
     assert "vacancies.html" in files["index.html"]
     assert "facilities.html" in files["index.html"]
-    assert "publications.html" in files["science.html"]
+    assert "publications.html" in files["index.html"]
+    assert "research.html" not in files
     assert "Страницы раздела" in files["about.html"]
-    assert "Страницы раздела" in files["science.html"]
+    assert "structure.html" in files["about.html"]
     assert "facilities.html" in files["about.html"]
     assert "vacancies.html" in files["about.html"]
     assert "section-jump" in files["news.html"]
@@ -255,6 +277,11 @@ def test_nas_emblem_lattice_lab_packs_and_publication_chart():
     assert 'href="#smi"' in files["news.html"]
     assert "news.html#smi" in files["index.html"]
     assert "--header-fg" in files["site.css"]
+    assert 'content: "+"' in files["site.css"]
+    assert "nav-folder" in files["site.css"]
+    assert "li.has-children > .nav-parent::after" in files["site.css"]
+    assert "setSubmenuOpen" in files["site.js"]
+    assert "research.html" not in files["sitemap.html"]
     assert "body.is-home .site-header.is-scrolled" in files["site.css"]
     assert ".site-header .ichnm-menu > ul > li > a:visited" in files["site.css"]
 

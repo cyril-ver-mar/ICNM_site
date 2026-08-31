@@ -84,7 +84,39 @@
       "children": [
         {"id": "about-overview", "title": "Сведения", "kind": "vitrine"},
         {"id": "leadership", "title": "Руководство", "kind": "vitrine"},
+        {"id": "structure", "title": "Структура", "kind": "vitrine", "children": [
+          {"id": "hr", "title": "Отдел кадров", "kind": "vitrine"},
+          {"id": "labor-protection", "title": "Охрана труда", "kind": "vitrine"},
+          {"id": "engineering", "title": "Главный инженер", "kind": "vitrine"},
+          {"id": "accounting", "title": "Бухгалтерия", "kind": "vitrine"},
+          {"id": "union", "title": "Профсоюз", "kind": "vitrine"},
+          {"id": "young-scientists", "title": "Совет молодых учёных", "kind": "vitrine"}
+        ]},
+        {
+          "id": "research",
+          "title": "Научная деятельность",
+          "kind": "folder",
+          "children": [
+            {"id": "science", "title": "Направления работы", "kind": "vitrine"},
+            {"id": "developments", "title": "Разработки", "kind": "vitrine"},
+            {"id": "cooperation", "title": "Сотрудничество", "kind": "vitrine"},
+            {"id": "publications", "title": "Публикации", "kind": "feed"},
+            {
+              "id": "education",
+              "title": "Научно-ориентированное образование",
+              "kind": "vitrine",
+              "children": [
+                {"id": "aspirantura", "title": "Аспирантура", "kind": "vitrine"},
+                {"id": "doctorate", "title": "Докторантура", "kind": "vitrine"},
+                {"id": "defense-council", "title": "Совет по защитам", "kind": "vitrine"},
+                {"id": "internships", "title": "Стажировки", "kind": "vitrine"},
+                {"id": "courses", "title": "Курсы", "kind": "vitrine"}
+              ]
+            }
+          ]
+        },
         {"id": "scientific-council", "title": "Учёный совет", "kind": "vitrine"},
+        {"id": "facilities", "title": "Материальная база", "kind": "vitrine"},
         {
           "id": "documents",
           "title": "Документы",
@@ -92,42 +124,10 @@
           "children": [
             {"id": "charter", "title": "Устав", "kind": "vitrine"},
             {"id": "anti-corruption", "title": "Антикоррупция", "kind": "vitrine"},
-            {"id": "e-appeals", "title": "Электронные обращения", "kind": "vitrine"},
-            {"id": "requisites", "title": "Реквизиты", "kind": "vitrine"}
+            {"id": "e-appeals", "title": "Электронные обращения", "kind": "vitrine"}
           ]
         },
-        {"id": "facilities", "title": "Материальная база", "kind": "vitrine"},
         {"id": "vacancies", "title": "Вакансии", "kind": "vitrine"}
-      ]
-    },
-    {"id": "structure", "title": "Структура", "kind": "vitrine", "children": [
-      {"id": "hr", "title": "Отдел кадров", "kind": "vitrine"},
-      {"id": "labor-protection", "title": "Охрана труда", "kind": "vitrine"},
-      {"id": "engineering", "title": "Главный инженер", "kind": "vitrine"},
-      {"id": "accounting", "title": "Бухгалтерия", "kind": "vitrine"},
-      {"id": "union", "title": "Профсоюз", "kind": "vitrine"},
-      {"id": "young-scientists", "title": "Совет молодых учёных", "kind": "vitrine"}
-    ]},
-    {
-      "id": "science",
-      "title": "Научная деятельность",
-      "kind": "vitrine",
-      "children": [
-        {"id": "developments", "title": "Разработки", "kind": "vitrine"},
-        {"id": "cooperation", "title": "Сотрудничество", "kind": "vitrine"},
-        {"id": "publications", "title": "Публикации", "kind": "feed"},
-        {
-          "id": "education",
-          "title": "Научно-ориентированное образование",
-          "kind": "vitrine",
-          "children": [
-            {"id": "aspirantura", "title": "Аспирантура", "kind": "vitrine"},
-            {"id": "doctorate", "title": "Докторантура", "kind": "vitrine"},
-            {"id": "defense-council", "title": "Совет по защитам", "kind": "vitrine"},
-            {"id": "internships", "title": "Стажировки", "kind": "vitrine"},
-            {"id": "courses", "title": "Курсы", "kind": "vitrine"}
-          ]
-        }
       ]
     },
     {
@@ -148,7 +148,8 @@
       "title": "Контакты",
       "kind": "vitrine",
       "children": [
-        {"id": "feedback", "title": "Обратная связь", "kind": "vitrine"}
+        {"id": "feedback", "title": "Обратная связь", "kind": "vitrine"},
+        {"id": "requisites", "title": "Реквизиты", "kind": "vitrine"}
       ]
     }
   ]

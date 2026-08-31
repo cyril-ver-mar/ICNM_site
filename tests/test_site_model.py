@@ -27,31 +27,45 @@ def test_top_menu_covers_locked_information_architecture(model):
     roots = model.top_menu_titles()
     assert roots == [
         "Об институте",
-        "Структура",
-        "Научная деятельность",
         "Новости",
         "Мероприятия",
         "Контакты",
     ]
-    science = model.menu_item("science")
-    assert [child.id for child in science.children] == [
+    about_ids = [child.id for child in model.menu_item("about").children]
+    assert about_ids == [
+        "about-overview",
+        "leadership",
+        "structure",
+        "research",
+        "scientific-council",
+        "facilities",
+        "documents",
+        "vacancies",
+    ]
+    research = model.menu_item("research")
+    assert research.kind == "folder"
+    assert [child.id for child in research.children] == [
+        "science",
         "developments",
         "cooperation",
         "publications",
         "education",
     ]
+    assert model.menu_item("science").title == "Направления работы"
+    assert model.menu_item("science").children == ()
     assert model.menu_item("education").title == "Научно-ориентированное образование"
     structure_ids = [child.id for child in model.menu_item("structure").children]
     assert structure_ids[-2:] == ["union", "young-scientists"]
     assert model.menu_item("news").children == ()
-    about_ids = [child.id for child in model.menu_item("about").children]
-    assert about_ids[-2:] == ["facilities", "vacancies"]
-    assert [child.id for child in model.menu_item("contacts").children] == ["feedback"]
+    assert [child.id for child in model.menu_item("contacts").children] == [
+        "feedback",
+        "requisites",
+    ]
 
 
 def test_about_and_education_children(model):
     about = model.menu_item("about")
-    assert {"Сведения", "Руководство", "Учёный совет", "Документы", "Материальная база", "Вакансии"} <= set(
+    assert {"Сведения", "Руководство", "Учёный совет", "Документы", "Материальная база", "Вакансии", "Структура"} <= set(
         child.title for child in about.children
     )
     education = model.menu_item("education")
@@ -70,8 +84,8 @@ def test_documents_set(model):
         "Устав",
         "Антикоррупция",
         "Электронные обращения",
-        "Реквизиты",
     } <= set(child.title for child in docs.children)
+    assert "Реквизиты" not in {child.title for child in docs.children}
 
 
 def test_homepage_rhythm_forbids_3d_promo(model):

@@ -18,13 +18,12 @@ _HERE = Path(__file__).resolve().parent
 
 _ASSET_PREFIX: ContextVar[str] = ContextVar("asset_prefix", default="")
 _CURRENT_LETTER: ContextVar[str] = ContextVar("current_letter", default="И")
+_LOCALE: ContextVar[str] = ContextVar("locale", default="ru")
 _FISH_FILES: dict[str, str] = {}
 
 _VISIBLE_MENU = frozenset(
     {
         "about",
-        "structure",
-        "science",
         "news",
         "events",
         "contacts",
@@ -37,6 +36,180 @@ _METRIC_LABELS = {
     "scopus_author": "Scopus Author",
     "elibrary": "eLIBRARY / РИНЦ",
     "researchgate": "ResearchGate",
+}
+
+_LOCALE_SECTIONS = (
+    ("about", "nav_about"),
+    ("news", "nav_news"),
+    ("events", "nav_events"),
+    ("contacts", "nav_contacts"),
+)
+
+_CHROME: dict[str, dict[str, str]] = {
+    "ru": {
+        "skip": "К содержанию",
+        "search": "Поиск",
+        "sitemap": "Карта сайта",
+        "night": "Ночная тема",
+        "bvi": "Версия для слабовидящих",
+        "write": "Написать нам",
+        "menu": "Меню",
+        "lang": "Язык",
+        "submenu": "Подменю",
+        "nav_label": "Разделы",
+        "kicker": "Национальная академия наук Беларуси",
+        "brand": "Институт химии новых материалов",
+        "title_suffix": "ИХНМ НАН Беларуси",
+        "nav_about": "Об институте",
+        "nav_news": "Новости",
+        "nav_events": "Мероприятия",
+        "nav_contacts": "Контакты",
+        "cookie_title": "Файлы cookie",
+        "cookie_body": (
+            "Сайт запоминает язык, тему и версию для слабовидящих. Это необходимые cookie. "
+            "Аналитические cookie в макете выключены. Подробнее — "
+        ),
+        "cookie_policy": "политика cookie",
+        "cookie_personal": "персональные данные",
+        "cookie_accept": "Принять",
+        "cookie_reject": "Отклонить необязательные",
+        "cookie_settings": "Настроить",
+        "cookie_necessary": "Необходимые (всегда)",
+        "cookie_analytics": "Аналитические",
+        "cookie_save": "Сохранить",
+        "day": "Дневная тема",
+        "year_unknown": "Год не указан",
+        "to_ru": "Русская версия",
+    },
+    "en": {
+        "skip": "Skip to content",
+        "search": "Search",
+        "sitemap": "Sitemap",
+        "night": "Dark mode",
+        "bvi": "Visually impaired version",
+        "write": "Write to us",
+        "menu": "Menu",
+        "lang": "Language",
+        "submenu": "Submenu",
+        "nav_label": "Sections",
+        "kicker": "National Academy of Sciences of Belarus",
+        "brand": "Institute of Chemistry of New Materials",
+        "title_suffix": "ICNM NASB",
+        "nav_about": "About",
+        "nav_news": "News",
+        "nav_events": "Events",
+        "nav_contacts": "Contacts",
+        "cookie_title": "Cookies",
+        "cookie_body": (
+            "The site remembers language, theme, and the visually impaired mode. "
+            "These are necessary cookies. Analytics cookies are off in this mock. See "
+        ),
+        "cookie_policy": "cookie policy",
+        "cookie_personal": "personal data",
+        "cookie_accept": "Accept",
+        "cookie_reject": "Reject optional",
+        "cookie_settings": "Settings",
+        "cookie_necessary": "Necessary (always on)",
+        "cookie_analytics": "Analytics",
+        "cookie_save": "Save",
+        "day": "Light mode",
+        "year_unknown": "Year not stated",
+        "to_ru": "Russian version",
+        "stub_title": "English version in preparation",
+        "stub_lead": (
+            "The public site launches in Russian. English pages keep the same "
+            "addresses from day one; institute texts will be translated after v1."
+        ),
+        "stub_note": "Until then, the Russian pages remain the official source.",
+        "home": "home",
+    },
+    "be": {
+        "skip": "Да зместу",
+        "search": "Пошук",
+        "sitemap": "Карта сайта",
+        "night": "Начны рэжым",
+        "bvi": "Версія для слабавідушчых",
+        "write": "Напісаць нам",
+        "menu": "Меню",
+        "lang": "Мова",
+        "submenu": "Падменю",
+        "nav_label": "Раздзелы",
+        "kicker": "Нацыянальная акадэмія навук Беларусі",
+        "brand": "Інстытут хіміі новых матэрыялаў",
+        "title_suffix": "ІХНМ НАН Беларусі",
+        "nav_about": "Пра інстытут",
+        "nav_news": "Навіны",
+        "nav_events": "Мерапрыемствы",
+        "nav_contacts": "Кантакты",
+        "cookie_title": "Файлы cookie",
+        "cookie_body": (
+            "Сайт запамінае мову, тэму і версію для слабавідушчых. Гэта неабходныя cookie. "
+            "Аналітычныя cookie ў макеце выключаны. Падрабязней — "
+        ),
+        "cookie_policy": "палітыка cookie",
+        "cookie_personal": "персанальныя даныя",
+        "cookie_accept": "Прыняць",
+        "cookie_reject": "Адхіліць неабавязковыя",
+        "cookie_settings": "Наладзіць",
+        "cookie_necessary": "Неабходныя (заўсёды)",
+        "cookie_analytics": "Аналітычныя",
+        "cookie_save": "Захаваць",
+        "day": "Дзённы рэжым",
+        "year_unknown": "Год не пазначаны",
+        "to_ru": "Руская версія",
+        "stub_title": "Беларуская версія рыхтуецца",
+        "stub_lead": (
+            "Публічны сайт запускаецца па-руску. Адрасы /be/ закладзены з першага дня; "
+            "тэксты інстытута з’явяцца пасля перакладу."
+        ),
+        "stub_note": "Да перакладу афіцыйнай застаецца руская версія.",
+        "home": "галоўная",
+    },
+    "zh": {
+        "skip": "跳到正文",
+        "search": "搜索",
+        "sitemap": "网站地图",
+        "night": "深色模式",
+        "bvi": "无障碍版本",
+        "write": "联系我们",
+        "menu": "菜单",
+        "lang": "语言",
+        "submenu": "子菜单",
+        "nav_label": "栏目",
+        "kicker": "白俄罗斯国家科学院",
+        "brand": "新材料化学研究所",
+        "title_suffix": "白俄罗斯国家科学院新材料化学研究所",
+        "nav_about": "关于研究所",
+        "nav_news": "新闻",
+        "nav_events": "活动",
+        "nav_contacts": "联系我们",
+        "cookie_title": "Cookie",
+        "cookie_body": (
+            "网站会记住语言、主题和无障碍模式。这些是必要 Cookie。"
+            "本预览中分析 Cookie 已关闭。详见 "
+        ),
+        "cookie_policy": "Cookie 政策",
+        "cookie_personal": "个人数据",
+        "cookie_accept": "接受",
+        "cookie_reject": "拒绝非必要项",
+        "cookie_settings": "设置",
+        "cookie_necessary": "必要（始终开启）",
+        "cookie_analytics": "分析",
+        "cookie_save": "保存",
+        "day": "浅色模式",
+        "year_unknown": "年份未注明",
+        "to_ru": "俄文版",
+        "stub_title": "中文版正在准备中",
+        "stub_lead": "网站以俄文发布。/zh/ 路径从第一天起保留，研究所文稿将在翻译后填入。",
+        "stub_note": "在此之前，俄文页面为正式文本。",
+        "home": "首页",
+    },
+}
+
+_STUB_SECTION_LEAD = {
+    "en": "This section will appear in English after translation.",
+    "be": "Гэты раздзел з’явіцца па-беларуску пасля перакладу.",
+    "zh": "本栏目将在翻译后提供中文内容。",
 }
 
 _HOME_LABELS = {
@@ -85,7 +258,7 @@ _HUB_BLURB = {
     "about-overview": "Задачи и направления исследований",
     "leadership": "Директор, заместители, учёный секретарь, приёмная",
     "scientific-council": "Заседания и состав совета",
-    "documents": "Устав, антикоррупция, обращения, реквизиты",
+    "documents": "Устав, антикоррупция, обращения",
     "charter": "Текст устава — после передачи PDF",
     "anti-corruption": "Положение и план — после передачи PDF",
     "e-appeals": "Куда писать и какие сроки",
@@ -103,6 +276,8 @@ _HUB_BLURB = {
     "publications": "Статьи Института и лабораторий",
     "facilities": "Приборы и установки лабораторий",
     "vacancies": "Открытые ставки",
+    "structure": "Лаборатории и подразделения",
+    "science": "Направления исследований Института",
     "cooperation": "Центры, договоры, карта партнёров",
     "search": "Персоналии, подразделения, разработки",
     "sitemap": "Все разделы одним списком",
@@ -168,6 +343,11 @@ def _t(text: str) -> str:
     return escape(_typo(text))
 
 
+def _ui(key: str) -> str:
+    pack = _CHROME.get(_LOCALE.get(), _CHROME["ru"])
+    return pack.get(key) or _CHROME["ru"].get(key) or key
+
+
 def _admin_unit_ids() -> set[str]:
     return {str(unit["id"]) for unit in load_migrated_copy().get("admin_units", [])}
 
@@ -193,10 +373,13 @@ def render_site_files(model: SiteModel) -> dict[str, str]:
     files["site.css"] = (_HERE / "preview.css").read_text(encoding="utf-8")
     files["site.js"] = (_HERE / "preview.js").read_text(encoding="utf-8")
     files["index.html"] = _page(model, "Главная", _home_body(model), current="home", is_home=True)
-    files["en/index.html"] = _stub_page(model, "en")
-    files["be/index.html"] = _stub_page(model, "be")
-    files["zh/index.html"] = _stub_page(model, "zh")
+    for code in ("en", "be", "zh"):
+        files[f"{code}/index.html"] = _stub_page(model, code, "home")
+        for section, _key in _LOCALE_SECTIONS:
+            files[f"{code}/{section}.html"] = _stub_page(model, code, section)
     for item in _walk(model.menu_roots()):
+        if item.kind == "folder":
+            continue
         files[f"{item.id}.html"] = _page(
             model,
             item.title,
@@ -362,6 +545,8 @@ def _href(page_id: str, depth: int = 0) -> str:
 
 
 def _item_href(item: MenuItem, depth: int = 0) -> str:
+    if item.kind == "folder":
+        return ""
     prefix = "../" * depth
     if item.href:
         return f"{prefix}{item.href}"
@@ -422,20 +607,27 @@ def _nav(model: SiteModel, current: str, depth: int = 0) -> str:
                 marked_community = True
             cls = f' class="{" ".join(classes)}"' if classes else ""
             href = _item_href(item, depth)
-            parts.append(
-                f"<li{cls}><a href=\"{href}\">{_t(item.title)}</a>"
-            )
+            parts.append(f"<li{cls}>")
+            folder = item.kind == "folder"
+            if kids:
+                parts.append('<div class="nav-parent">')
+            if folder:
+                parts.append(f'<span class="nav-folder">{_t(item.title)}</span>')
+            else:
+                parts.append(f'<a href="{href}">{_t(item.title)}</a>')
             if kids:
                 sep = item.id == "structure"
                 parts.append(
                     f'<button type="button" class="submenu-toggle" aria-expanded="false" '
-                    f'aria-label="Подменю: {escape(item.title)}"></button>'
+                    f'aria-label="{escape(_ui("submenu") + ": " + item.title)}"></button>'
+                    "</div>"
                 )
                 nested = branch(kids, admin_sep=sep)
-                self_link = (
-                    f'<li class="nav-self"><a href="{href}">{_t(item.title)}</a></li>'
-                )
-                nested = nested[:4] + self_link + nested[4:]
+                if href:
+                    self_link = (
+                        f'<li class="nav-self"><a href="{href}">{_t(item.title)}</a></li>'
+                    )
+                    nested = nested[:4] + self_link + nested[4:]
                 parts.append(nested)
             parts.append("</li>")
         parts.append("</ul>")
@@ -458,7 +650,22 @@ def _nav(model: SiteModel, current: str, depth: int = 0) -> str:
     # Insert "Ещё" into the top-level <ul> before closing.
     if more_block:
         primary = primary[:-5] + more_block + "</ul>"
-    return f'<nav id="primary-nav" class="ichnm-menu" aria-label="Разделы">{primary}</nav>'
+    return (
+        f'<nav id="primary-nav" class="ichnm-menu" aria-label="{escape(_ui("nav_label"))}">'
+        f"{primary}</nav>"
+    )
+
+
+def _locale_nav(current: str, depth: int) -> str:
+    bits = [
+        f'<nav id="primary-nav" class="ichnm-menu" aria-label="{escape(_ui("nav_label"))}"><ul>'
+    ]
+    for section, key in _LOCALE_SECTIONS:
+        href = "index.html" if section == "home" else f"{section}.html"
+        cls = ' class="is-current"' if current == section else ""
+        bits.append(f'<li{cls}><a href="{escape(href)}">{escape(_ui(key))}</a></li>')
+    bits.append("</ul></nav>")
+    return "".join(bits)
 
 
 def _bvi_panel() -> str:
@@ -485,20 +692,19 @@ def _cookie_banner(prefix: str) -> str:
     return (
         '<div class="cookie-banner" id="cookie-banner" hidden role="dialog" '
         'aria-labelledby="cookie-title">'
-        '<p id="cookie-title">Файлы cookie</p>'
-        "<p>Сайт запоминает язык, тему и версию для слабовидящих. Это необходимые cookie. "
-        "Аналитические cookie в макете выключены. Подробнее — "
-        f'<a href="{prefix}cookies.html">политика cookie</a> и '
-        f'<a href="{prefix}personal-data.html">персональные данные</a>.</p>'
+        f'<p id="cookie-title">{escape(_ui("cookie_title"))}</p>'
+        f"<p>{escape(_ui('cookie_body'))}"
+        f'<a href="{prefix}cookies.html">{escape(_ui("cookie_policy"))}</a> · '
+        f'<a href="{prefix}personal-data.html">{escape(_ui("cookie_personal"))}</a>.</p>'
         '<div class="cookie-actions">'
-        '<button type="button" data-cookie="accept">Принять</button>'
-        '<button type="button" data-cookie="reject">Отклонить необязательные</button>'
-        '<button type="button" data-cookie="settings">Настроить</button>'
+        f'<button type="button" data-cookie="accept">{escape(_ui("cookie_accept"))}</button>'
+        f'<button type="button" data-cookie="reject">{escape(_ui("cookie_reject"))}</button>'
+        f'<button type="button" data-cookie="settings">{escape(_ui("cookie_settings"))}</button>'
         "</div>"
         '<form class="cookie-settings" id="cookie-settings" hidden>'
-        '<label><input type="checkbox" name="necessary" checked disabled> Необходимые (всегда)</label>'
-        '<label><input type="checkbox" name="analytics"> Аналитические</label>'
-        '<button type="submit">Сохранить</button>'
+        f'<label><input type="checkbox" name="necessary" checked disabled> {escape(_ui("cookie_necessary"))}</label>'
+        f'<label><input type="checkbox" name="analytics"> {escape(_ui("cookie_analytics"))}</label>'
+        f'<button type="submit">{escape(_ui("cookie_save"))}</button>'
         "</form></div>"
     )
 
@@ -536,7 +742,7 @@ def _social_icon(network: str) -> str:
 
 
 def _langs(model: SiteModel, current_code: str = "ru", depth: int = 0) -> str:
-    bits = ['<nav class="ichnm-lang-switch" aria-label="Язык">']
+    bits = [f'<nav class="ichnm-lang-switch" aria-label="{escape(_ui("lang"))}">']
     prefix = "../" * depth
     for lang in model.languages:
         code = lang.code.upper()
@@ -653,7 +859,10 @@ def _sitemap_inner(model: SiteModel) -> str:
         parts = ["<ul>"]
         for item in items:
             href = _item_href(item, 0)
-            parts.append(f'<li><a href="{href}">{_t(item.title)}</a>')
+            if item.kind == "folder":
+                parts.append(f"<li><span>{_t(item.title)}</span>")
+            else:
+                parts.append(f'<li><a href="{href}">{_t(item.title)}</a>')
             if item.id == "news":
                 parts.append(
                     "<ul>"
@@ -694,15 +903,23 @@ def _shell(
 ) -> str:
     prefix = "../" * depth
     _ASSET_PREFIX.set(prefix)
-    home = f"{prefix}index.html"
-    css = f"{prefix}site.css?v=header-fg2"
-    js = f"{prefix}site.js"
+    _LOCALE.set(current_code)
+    if current_code == "ru":
+        home = f"{prefix}index.html"
+    else:
+        home = "index.html" if depth >= 1 else f"{current_code}/index.html"
+    css = f"{prefix}site.css?v=ia-nav-map2"
+    js = f"{prefix}site.js?v=ia-nav-map2"
     mark = f"{prefix}media/ichnm-mark.svg?v=bew"
     nas = f"{prefix}media/nas-emblem.webp"
     body_class = " ".join(
         part for part in ("is-home" if is_home else "is-inner", extra_body_class) if part
     )
-    nav = _nav(model, current, depth=depth) if current_code == "ru" else ""
+    nav = (
+        _nav(model, current, depth=depth)
+        if current_code == "ru"
+        else _locale_nav(current, depth)
+    )
     nas_block = (
         f'<a class="nas-emblem" href="{escape(model.nas_portal_href)}" '
         'title="Национальная академия наук Беларуси">'
@@ -729,12 +946,13 @@ def _shell(
         "})();"
         "</script>"
     )
+    html_lang = {"ru": "ru", "en": "en", "be": "be", "zh": "zh"}.get(current_code, "ru")
     return f"""<!DOCTYPE html>
-<html lang="ru">
+<html lang="{html_lang}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{escape(title)} — ИХНМ НАН Беларуси</title>
+  <title>{escape(title)} — {escape(_ui("title_suffix"))}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
@@ -744,7 +962,7 @@ def _shell(
 </head>
 <body class="{body_class}" data-search-index="{prefix}search.json">
   <div class="page-veil" aria-hidden="true"></div>
-  <a class="skip-link" href="#content">К содержанию</a>
+  <a class="skip-link" href="#content">{escape(_ui("skip"))}</a>
   <header class="site-header">
     <div class="masthead">
       <div class="wrap masthead-inner">
@@ -753,20 +971,20 @@ def _shell(
           <a class="brand" href="{home}">
             <img class="brand-mark" src="{mark}" width="397" height="392" alt="Эмблема ИХНМ">
             <span class="brand-lockup">
-              <span class="brand-kicker">Национальная академия наук Беларуси</span>
-              <span class="brand-title">Институт химии новых материалов</span>
+              <span class="brand-kicker">{escape(_ui("kicker"))}</span>
+              <span class="brand-title">{escape(_ui("brand"))}</span>
             </span>
           </a>
         </div>
         {nav}
         <div class="header-tools">
-          <button type="button" class="tool-btn" data-search-open aria-controls="site-search">Поиск</button>
-          <a class="tool-btn" href="{prefix}sitemap.html">Карта сайта</a>
-          <button type="button" class="tool-btn" data-theme-toggle aria-pressed="false">Ночная тема</button>
-          <button type="button" class="tool-btn" data-bvi aria-pressed="false" aria-controls="bvi-panel">Версия для слабовидящих</button>
-          <a class="tool-btn" href="{prefix}feedback.html">Написать нам</a>
+          <button type="button" class="tool-btn" data-search-open aria-controls="site-search">{escape(_ui("search"))}</button>
+          <a class="tool-btn" href="{prefix}sitemap.html">{escape(_ui("sitemap"))}</a>
+          <button type="button" class="tool-btn" data-theme-toggle aria-pressed="false" data-label-day="{escape(_ui('day'))}" data-label-night="{escape(_ui('night'))}">{escape(_ui("night"))}</button>
+          <button type="button" class="tool-btn" data-bvi aria-pressed="false" aria-controls="bvi-panel">{escape(_ui("bvi"))}</button>
+          <a class="tool-btn" href="{prefix}feedback.html">{escape(_ui("write"))}</a>
           {_langs(model, current_code=current_code, depth=depth)}
-          {('<button type="button" class="menu-toggle" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Меню</button>' if nav else "")}
+          {('<button type="button" class="menu-toggle" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">' + escape(_ui("menu")) + "</button>" if nav else "")}
         </div>
       </div>
     </div>
@@ -802,20 +1020,30 @@ def _page(
     )
 
 
-def _stub_page(model: SiteModel, code: str) -> str:
+def _stub_page(model: SiteModel, code: str, section: str = "home") -> str:
+    title = _CHROME[code]["stub_title"] if section == "home" else _CHROME[code][
+        dict(_LOCALE_SECTIONS)[section]
+    ]
+    ru_href = "../index.html" if section == "home" else f"../{section}.html"
+    section_note = ""
+    if section != "home":
+        section_note = f"<p>{escape(_STUB_SECTION_LEAD[code])}</p>"
     inner = (
-        f"<p>Языковой префикс <code>/{code}/</code> заложен с первого дня. "
-        f"Публичное наполнение — после перевода. "
-        f'<a href="../index.html">Русская версия</a>.</p>'
+        f"<p>{escape(_CHROME[code]['stub_lead'])}</p>"
+        f"{section_note}"
+        f"<p>{escape(_CHROME[code]['stub_note'])} "
+        f'<a href="{escape(ru_href)}">{escape(_CHROME[code]["to_ru"])}</a>.</p>'
+        f"<p><code>/{code}/</code></p>"
     )
-    body = _with_page_hero("Версия готовится", inner)
+    body = _with_page_hero(title, inner)
     return _shell(
         model,
-        "Версия готовится",
+        title,
         body,
-        current="home",
+        current=section,
         depth=1,
         current_code=code,
+        extra_body_class="is-locale-stub",
     )
 
 
@@ -859,7 +1087,7 @@ def _trail(model: SiteModel, page_id: str, title: str, depth: int = 0) -> str:
     elif page_id.startswith("news/") or page_id == "media_about":
         bits.append(f'<a href="{prefix}news.html">Новости</a>')
     elif page_id.startswith("science/"):
-        bits.append(f'<a href="{prefix}science.html">Научная деятельность</a>')
+        bits.append(f'<a href="{prefix}science.html">Направления работы</a>')
     elif page_id.startswith("developments/"):
         bits.append(f'<a href="{prefix}developments.html">Разработки</a>')
     elif page_id.startswith("facilities/"):
@@ -868,6 +1096,8 @@ def _trail(model: SiteModel, page_id: str, title: str, depth: int = 0) -> str:
         bits.append(f'<a href="{prefix}events.html">Мероприятия</a>')
     else:
         parent = _find_parent(model, page_id)
+        while parent is not None and parent.kind == "folder":
+            parent = _find_parent(model, parent.id)
         if parent:
             bits.append(f'<a href="{prefix}{parent.id}.html">{escape(parent.title)}</a>')
     bits.append(f'<span aria-current="page">{escape(title)}</span>')
@@ -883,11 +1113,15 @@ def _hub_cards(
         return ""
     cards = []
     for child in children:
+        if child.kind == "folder":
+            continue
         blurb = _HUB_BLURB.get(child.id, "")
         extra = f"<p>{_t(blurb)}</p>" if blurb else ""
         cards.append(
             f'<li><a href="{child.id}.html">{_t(child.title)}{extra}</a></li>'
         )
+    if not cards:
+        return ""
     head = f"<h2>{escape(heading)}</h2>" if heading else ""
     return f'{head}<ul class="dir-grid">{"".join(cards)}</ul>'
 
@@ -1251,7 +1485,6 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
             + _catalog_cards(inst, "science", columns=3)
             + "<h2>Направления лабораторий</h2>"
             + _catalog_cards(labs, "science", columns=3)
-            + _hub_cards(item.children)
         )
     if item.id == "developments":
         paras = "".join(
@@ -1261,9 +1494,9 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
         labs = [row for row in roster.developments_catalog() if row.get("scope") == "lab"]
         return (
             paras
-            + ("<h2>Общеинститутские разработки</h2>" + _catalog_cards(inst, "developments") if inst else "")
+            + ("<h2>Общеинститутские разработки</h2>" + _catalog_cards(inst, "developments", columns=3) if inst else "")
             + "<h2>Разработки лабораторий</h2>"
-            + _catalog_cards(labs, "developments")
+            + _catalog_cards(labs, "developments", columns=3)
         )
     if item.id == "facilities":
         paras = "".join(
@@ -1285,7 +1518,6 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
     if item.id == "cooperation":
         copied = page_copy("cooperation")
         paras = "".join(f"<p>{escape(p)}</p>" for p in copied.get("paragraphs", []))
-        cards = _card_list(copied.get("list") or [], "Центры и договоры")
         partners = load_migrated_copy().get("partners") or []
         partner_cards = "".join(
             '<article class="info-card">'
@@ -1295,14 +1527,12 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
             for row in partners
         )
         partner_block = (
-            "<h2>Партнёры на карте</h2>"
-            "<p>Те же договоры и центры, что в списке выше, отмечены на карте. "
-            "Это дубль сведений, не отдельная вкладка.</p>"
+            "<h2>Партнёры</h2>"
             f'<div class="info-grid">{partner_cards}</div>'
             if partners
             else ""
         )
-        return paras + cards + partner_block + _world_map()
+        return paras + partner_block + _world_map()
     if item.id == "scientific-council":
         return _council_listing()
     if item.id in _admin_unit_ids():
@@ -1528,7 +1758,7 @@ def _catalog_detail_body(model: SiteModel, parent: str, item: dict, depth: int =
     _begin_page(depth, letter)
     parent_file = f"{parent}.html"
     parent_title = {
-        "science": "Научная деятельность",
+        "science": "Направления работы",
         "developments": "Разработки",
         "facilities": "Материальная база",
     }[parent]
@@ -1712,6 +1942,34 @@ def _publication_line(row: dict, depth: int = 0, *, show_lab: bool = True) -> st
     return f"<li>{escape(cite)}{doi_html}{lab_html}</li>"
 
 
+def _pub_year(row: dict) -> int:
+    try:
+        return int(row.get("year") or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def _publications_grouped(rows: list, depth: int, *, show_lab: bool) -> str:
+    groups: dict[int, list] = {}
+    for row in rows:
+        groups.setdefault(_pub_year(row), []).append(row)
+    if not groups:
+        return ""
+    parts = []
+    for year in sorted(groups, reverse=True):
+        label = str(year) if year else _ui("year_unknown")
+        slug = str(year) if year else "unknown"
+        items = "".join(
+            _publication_line(row, depth, show_lab=show_lab) for row in groups[year]
+        )
+        parts.append(
+            f'<section class="pub-year" aria-labelledby="pub-year-{escape(slug)}">'
+            f'<h3 id="pub-year-{escape(slug)}">{escape(label)}</h3>'
+            f'<ul class="plain-list">{items}</ul></section>'
+        )
+    return "".join(parts)
+
+
 def _profile_href(field: str, raw: str) -> str:
     value = raw.strip()
     if not value:
@@ -1778,6 +2036,14 @@ def _about_gallery() -> str:
     return "<h2>Фотоархив</h2>" f'<div class="about-gallery">{"".join(figs)}</div>'
 
 
+_WORLD_SVG = _HERE.parents[1] / "assets" / "maps" / "world-countries.svg"
+
+
+def _world_outline() -> str:
+    raw = _WORLD_SVG.read_text(encoding="utf-8")
+    return re.sub(r"<\?xml[^?]*\?>", "", raw).strip()
+
+
 def _world_map() -> str:
     pins = []
     for partner in load_migrated_copy().get("partners", []):
@@ -1794,9 +2060,7 @@ def _world_map() -> str:
         )
     return (
         '<figure class="world-map" aria-label="Карта сотрудничества">'
-        f'<img class="world-base" src="media/maps/world.jpg" width="1280" height="640" '
-        'alt="Карта мира">'
-        f"{''.join(pins)}</figure>"
+        f"{_world_outline()}{''.join(pins)}</figure>"
     )
 
 
@@ -1909,10 +2173,11 @@ def _publications_inner() -> str:
         window = counts[max(0, index - 2) : index + 1]
         sma.append(sum(window) / len(window))
     sma_max = max(sma + [float(max_count)]) or 1
+    count_n = max(len(sma), 1)
     points = []
     for index, value in enumerate(sma):
-        x = 6 + (88 * index / max(len(sma) - 1, 1))
-        y = 36 - (28 * value / sma_max)
+        x = (100 / count_n) * (index + 0.5)
+        y = 36 - (30 * value / sma_max)
         points.append(f"{x:.1f},{y:.1f}")
     sma_path = " ".join(points)
     bars = []
@@ -1929,31 +2194,26 @@ def _publications_inner() -> str:
         )
     payload = json.dumps(data, ensure_ascii=False)
     note = escape(str(data.get("note", "")))
-    catalog_rows = []
-    for row in roster.lab_publications():
-        catalog_rows.append(_publication_line(row, depth=0, show_lab=True))
-    catalog = "".join(catalog_rows) or (
-        "".join(
-            "<li>Фамилия И. О., Фамилия И. О. Название статьи-рыбы // "
-            f"Журнал-макет. {year}. Т. 1, № 1. С. 1–8.</li>"
-            for year in (2024, 2023, 2022)
-        )
-    )
+    catalog = _publications_grouped(roster.lab_publications(), 0, show_lab=True)
+    if not catalog:
+        catalog = "<p>Список появится из пакетов лабораторий.</p>"
     return (
         f'<script type="application/json" id="pub-year-data">{payload}</script>'
         f'<p class="fish-banner" role="note">{note}</p>'
         '<figure class="pub-chart">'
         "<figcaption>Статьи по годам</figcaption>"
         '<p class="chart-readout" aria-live="polite">Наведите на столбец, чтобы увидеть число</p>'
+        '<div class="chart-plot">'
         f'<ul class="chart-bars">{"".join(bars)}</ul>'
         '<svg class="chart-sma" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">'
-        f'<polyline class="chart-sma-line" points="{sma_path}" fill="none" '
-        'stroke="#28a7ea" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>'
+        f'<polyline class="chart-sma-line" pathLength="1" points="{sma_path}" fill="none" '
+        'stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>'
         "</svg>"
+        "</div>"
         "</figure>"
         "<h2>Публикации лабораторий</h2>"
         f"{_fish_banner()}"
-        f'<ul class="plain-list">{catalog}</ul>'
+        f"{catalog}"
     )
 
 
@@ -2001,17 +2261,14 @@ def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
         staff = roster.person_contact_line(str(item.get("staff_id") or ""))
         staff_html = f" — {escape(staff)}" if staff else ""
         href = f'{prefix}facilities/{escape(item["slug"])}/index.html'
-        if is_filled_copy():
-            equip_items.append(
-                f'<li class="lab-equip-item">{_photo_slot(item["title"], kind="equipment")}'
-                f"<div><a href=\"{href}\">{escape(item['title'])}</a>"
-                f"<p>{escape(item.get('lead', ''))}{staff_html}</p></div></li>"
-            )
-        else:
-            equip_items.append(
-                f'<li><a href="{href}">{escape(item["title"])}</a>'
-                f"<p>{escape(item.get('lead', ''))}{staff_html}</p></li>"
-            )
+        equip_items.append(
+            f'<li class="lab-equip-item">'
+            f'<a class="lab-equip-card" href="{href}">'
+            f'{_photo_slot(item["title"], kind="equipment")}'
+            f"<h3>{escape(item['title'])}</h3>"
+            f"<p>{escape(item.get('lead', ''))}{staff_html}</p>"
+            "</a></li>"
+        )
     equipment = (
         f'<ul class="lab-equip">{"".join(equip_items)}</ul>'
         if equip_items
@@ -2028,18 +2285,13 @@ def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
             )
         )
     services = (
-        f'<div class="cover-grid">{"".join(service_cards)}</div>'
+        f'<div class="cover-grid is-3">{"".join(service_cards)}</div>'
         if service_cards
         else "<p>Карточки разработок появятся из пакета лаборатории.</p>"
     )
-    pub_items = []
-    for row in lab.get("publications") or []:
-        pub_items.append(_publication_line(row, depth, show_lab=False))
-    pubs = (
-        f'<ul class="plain-list">{"".join(pub_items)}</ul>'
-        if pub_items
-        else "<p>Избранные публикации появятся из пакета лаборатории.</p>"
-    )
+    pubs = _publications_grouped(lab.get("publications") or [], depth, show_lab=False)
+    if not pubs:
+        pubs = "<p>Избранные публикации появятся из пакета лаборатории.</p>"
     phone = lab.get("phone") or "+375 (17) 000-00-00"
     email = lab.get("email") or "lab@ichnm.by"
     head_line = roster.head_contact_line(lab)

@@ -73,7 +73,9 @@
     root.classList.toggle("theme-night", night);
     if (themeBtn) {
       themeBtn.setAttribute("aria-pressed", night ? "true" : "false");
-      themeBtn.textContent = night ? "Дневная тема" : "Ночная тема";
+      themeBtn.textContent = night
+        ? themeBtn.getAttribute("data-label-day") || "Дневная тема"
+        : themeBtn.getAttribute("data-label-night") || "Ночная тема";
     }
     if (persist) {
       try {
@@ -167,15 +169,36 @@
     toggle.addEventListener("click", function () {
       const open = nav.classList.toggle("is-open");
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      if (!open) {
+        nav.querySelectorAll("li.is-open").forEach(function (item) {
+          setSubmenuOpen(item, false);
+        });
+      }
     });
+    function setSubmenuOpen(item, open) {
+      item.classList.toggle("is-open", open);
+      const button = item.querySelector(":scope > .nav-parent > .submenu-toggle");
+      if (button) button.setAttribute("aria-expanded", open ? "true" : "false");
+      if (!open) {
+        item.querySelectorAll("li.is-open").forEach(function (child) {
+          child.classList.remove("is-open");
+          const nested = child.querySelector(":scope > .nav-parent > .submenu-toggle");
+          if (nested) nested.setAttribute("aria-expanded", "false");
+        });
+      }
+    }
+
     nav.addEventListener("click", function (event) {
       const target = event.target;
       if (!(target instanceof Element)) return;
       const button = target.closest(".submenu-toggle");
-      if (!button) return;
-      const item = button.closest("li");
-      const open = item.classList.toggle("is-open");
-      button.setAttribute("aria-expanded", open ? "true" : "false");
+      const folder = target.closest(".nav-folder");
+      if (!button && !folder) return;
+      const item = (button || folder).closest("li");
+      if (!item || !nav.contains(item)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      setSubmenuOpen(item, !item.classList.contains("is-open"));
     });
   }
 
