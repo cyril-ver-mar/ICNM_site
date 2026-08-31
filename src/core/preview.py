@@ -59,6 +59,7 @@ _CHROME: dict[str, dict[str, str]] = {
         "nav_label": "Разделы",
         "kicker": "Национальная академия наук Беларуси",
         "brand": "Институт химии новых материалов",
+        "brand_short": "ИХНМ",
         "title_suffix": "ИХНМ НАН Беларуси",
         "nav_about": "Об институте",
         "nav_news": "Новости",
@@ -94,6 +95,7 @@ _CHROME: dict[str, dict[str, str]] = {
         "nav_label": "Sections",
         "kicker": "National Academy of Sciences of Belarus",
         "brand": "Institute of Chemistry of New Materials",
+        "brand_short": "ICNM",
         "title_suffix": "ICNM NASB",
         "nav_about": "About",
         "nav_news": "News",
@@ -136,6 +138,7 @@ _CHROME: dict[str, dict[str, str]] = {
         "nav_label": "Раздзелы",
         "kicker": "Нацыянальная акадэмія навук Беларусі",
         "brand": "Інстытут хіміі новых матэрыялаў",
+        "brand_short": "ІХНМ",
         "title_suffix": "ІХНМ НАН Беларусі",
         "nav_about": "Пра інстытут",
         "nav_news": "Навіны",
@@ -178,6 +181,7 @@ _CHROME: dict[str, dict[str, str]] = {
         "nav_label": "栏目",
         "kicker": "白俄罗斯国家科学院",
         "brand": "新材料化学研究所",
+        "brand_short": "新材料所",
         "title_suffix": "白俄罗斯国家科学院新材料化学研究所",
         "nav_about": "关于研究所",
         "nav_news": "新闻",
@@ -908,8 +912,8 @@ def _shell(
         home = f"{prefix}index.html"
     else:
         home = "index.html" if depth >= 1 else f"{current_code}/index.html"
-    css = f"{prefix}site.css?v=ia-nav-map2"
-    js = f"{prefix}site.js?v=ia-nav-map2"
+    css = f"{prefix}site.css?v=mobile-hdr3"
+    js = f"{prefix}site.js?v=mobile-hdr3"
     mark = f"{prefix}media/ichnm-mark.svg?v=bew"
     nas = f"{prefix}media/nas-emblem.webp"
     body_class = " ".join(
@@ -973,18 +977,23 @@ def _shell(
             <span class="brand-lockup">
               <span class="brand-kicker">{escape(_ui("kicker"))}</span>
               <span class="brand-title">{escape(_ui("brand"))}</span>
+              <span class="brand-title-short" aria-hidden="true">{escape(_ui("brand_short"))}</span>
             </span>
           </a>
         </div>
-        {nav}
         <div class="header-tools">
-          <button type="button" class="tool-btn" data-search-open aria-controls="site-search">{escape(_ui("search"))}</button>
-          <a class="tool-btn" href="{prefix}sitemap.html">{escape(_ui("sitemap"))}</a>
-          <button type="button" class="tool-btn" data-theme-toggle aria-pressed="false" data-label-day="{escape(_ui('day'))}" data-label-night="{escape(_ui('night'))}">{escape(_ui("night"))}</button>
-          <button type="button" class="tool-btn" data-bvi aria-pressed="false" aria-controls="bvi-panel">{escape(_ui("bvi"))}</button>
-          <a class="tool-btn" href="{prefix}feedback.html">{escape(_ui("write"))}</a>
-          {_langs(model, current_code=current_code, depth=depth)}
           {('<button type="button" class="menu-toggle" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">' + escape(_ui("menu")) + "</button>" if nav else "")}
+        </div>
+        <div class="header-panel">
+          <div class="header-utilities">
+            <button type="button" class="tool-btn" data-search-open aria-controls="site-search">{escape(_ui("search"))}</button>
+            <a class="tool-btn" href="{prefix}sitemap.html">{escape(_ui("sitemap"))}</a>
+            <button type="button" class="tool-btn" data-theme-toggle aria-pressed="false" data-label-day="{escape(_ui('day'))}" data-label-night="{escape(_ui('night'))}">{escape(_ui("night"))}</button>
+            <button type="button" class="tool-btn" data-bvi aria-pressed="false" aria-controls="bvi-panel">{escape(_ui("bvi"))}</button>
+            <a class="tool-btn" href="{prefix}feedback.html">{escape(_ui("write"))}</a>
+            {_langs(model, current_code=current_code, depth=depth)}
+          </div>
+          {nav}
         </div>
       </div>
     </div>

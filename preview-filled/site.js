@@ -166,9 +166,19 @@
   window.addEventListener("scroll", onScroll, { passive: true });
 
   if (toggle && nav) {
+    function closeNav() {
+      nav.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("nav-open");
+      nav.querySelectorAll("li.is-open").forEach(function (item) {
+        setSubmenuOpen(item, false);
+      });
+    }
+
     toggle.addEventListener("click", function () {
       const open = nav.classList.toggle("is-open");
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      document.body.classList.toggle("nav-open", open);
       if (!open) {
         nav.querySelectorAll("li.is-open").forEach(function (item) {
           setSubmenuOpen(item, false);
@@ -200,6 +210,13 @@
       event.stopPropagation();
       setSubmenuOpen(item, !item.classList.contains("is-open"));
     });
+
+    const navBreak = window.matchMedia("(max-width: 1180px)");
+    if (typeof navBreak.addEventListener === "function") {
+      navBreak.addEventListener("change", function (event) {
+        if (!event.matches) closeNav();
+      });
+    }
   }
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

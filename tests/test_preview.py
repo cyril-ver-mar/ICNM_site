@@ -353,3 +353,21 @@ def test_filled_preview_is_letter_coded_and_separate():
     assert "people/lab-nano-fish" not in filled["publications.html"]
     assert "Рогачёв" in filled["search.json"] or "Рогачев" in filled["search.json"]
     assert "Адамович" in filled["search.json"]
+
+
+def test_mobile_header_keeps_a_single_bar():
+    files = render_site_files(load_site_model())
+    home = files["index.html"]
+    css = files["site.css"]
+    js = files["site.js"]
+    assert 'class="header-panel"' in home
+    assert 'class="header-utilities"' in home
+    assert 'class="brand-title-short"' in home
+    assert "ИХНМ" in home
+    assert ":has(#primary-nav.is-open)" in css
+    assert "@media (min-width: 1181px)" in css
+    assert "nav-open" in js
+    tools_chunk = home.split('class="header-tools"', 1)[1].split("header-panel", 1)[0]
+    assert "data-search-open" not in tools_chunk
+    assert "data-nav-toggle" in tools_chunk
+    assert "data-search-open" in home
