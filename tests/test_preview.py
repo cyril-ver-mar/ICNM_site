@@ -188,6 +188,9 @@ def test_nas_emblem_lattice_lab_packs_and_publication_chart():
     assert "leader-card" in lab
     assert "Наша команда" in lab
     assert "Оборудование" in lab
+    assert "Действующие и завершённые научные проекты" in lab
+    assert 'id="projects"' in lab
+    assert "Список проектов появится из пакета лаборатории." in lab
     assert "Отдельных персональных страниц нет" not in lab
     assert "people/kulikouskaya/index.html" in lab
     assert "is-lab-site" in lab
@@ -376,6 +379,10 @@ def test_filled_preview_is_letter_coded_and_separate():
     films = filled["labs/films/index.html"]
     assert "Адамович" in nano
     assert "Аэрогелевые" in nano
+    assert "Адресные аэрогели" in nano
+    assert "Амфифильные агрегаты (БРФФИ)" in nano
+    assert "Список проектов появится из пакета лаборатории." not in nano
+    assert "Current and completed research projects" in filled["en/labs/nano/index.html"]
     assert "Борисова" in films
     assert "Адамович" not in films
     assert "Борисова" not in nano

@@ -1192,8 +1192,8 @@ def _shell(
     page = _page_prefix()
     asset = _asset_prefix()
     home = f"{page}index.html"
-    css = f"{asset}site.css?v=aist-news1"
-    js = f"{asset}site.js?v=aist-news1"
+    css = f"{asset}site.css?v=lab-proj1"
+    js = f"{asset}site.js?v=lab-proj1"
     mark = f"{asset}media/ichnm-mark.svg?v=bew"
     nas = f"{asset}media/nas-emblem.webp"
     body_class = " ".join(
@@ -2658,6 +2658,38 @@ def _publications_inner() -> str:
     )
 
 
+def _lab_projects_block(lab: dict) -> str:
+    rows = lab.get("projects") or []
+    if not rows:
+        return f"<p>{escape(_st('lab_projects_pending'))}</p>"
+    chunks: list[str] = []
+    for status, heading in (
+        ("active", "lab_projects_active"),
+        ("completed", "lab_projects_done"),
+    ):
+        group = [row for row in rows if row.get("status") == status]
+        if not group:
+            continue
+        badge = _st("project_active" if status == "active" else "project_completed")
+        cards = []
+        for item in group:
+            years = str(item.get("years") or "").strip()
+            kicker = f"{badge} · {years}" if years else badge
+            lead = str(item.get("lead") or "").strip()
+            cards.append(
+                '<article class="conf-card">'
+                f'<p class="leader-role">{escape(kicker)}</p>'
+                f"<h3>{escape(item.get('title') or '')}</h3>"
+                + (f"<p>{escape(lead)}</p>" if lead else "")
+                + "</article>"
+            )
+        chunks.append(
+            f"<h3>{escape(_st(heading))}</h3>"
+            f'<div class="conf-grid">{"".join(cards)}</div>'
+        )
+    return "".join(chunks) if chunks else f"<p>{escape(_st('lab_projects_pending'))}</p>"
+
+
 def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
     prefix = "../" * depth
     _begin_page(depth, letter_for_lab(str(lab["id"])))
@@ -2733,6 +2765,7 @@ def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
     pubs = _publications_grouped(lab.get("publications") or [], depth, show_lab=False)
     if not pubs:
         pubs = f"<p>{escape(_st('lab_pubs_pending'))}</p>"
+    projects = _lab_projects_block(lab)
     phone = lab.get("phone") or "+375 (17) 000-00-00"
     email = lab.get("email") or "lab@ichnm.by"
     head_line = roster.head_contact_line(lab)
@@ -2742,6 +2775,7 @@ def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
         f'<nav class="lab-local" aria-label="{escape(_st("lab_local"))}">'
         f'<a href="#about">{escape(_st("lab_about"))}</a>'
         f'<a href="#directions">{escape(_st("lab_directions"))}</a>'
+        f'<a href="#projects">{escape(_st("lab_projects"))}</a>'
         f'<a href="#equipment">{escape(_st("lab_equipment"))}</a>'
         f'<a href="#services">{escape(_st("lab_services"))}</a>'
         f'<a href="#staff">{escape(_st("lab_team"))}</a>'
@@ -2764,6 +2798,9 @@ def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
         '<section id="directions">'
         f"<h2>{escape(_st('lab_directions'))}</h2>"
         f"{directions}</section>"
+        '<section id="projects">'
+        f"<h2>{escape(_st('lab_projects'))}</h2>"
+        f"{projects}</section>"
         '<section id="equipment">'
         f"<h2>{escape(_st('lab_equipment'))}</h2>"
         f"{equipment}</section>"
