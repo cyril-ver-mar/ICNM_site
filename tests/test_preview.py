@@ -29,7 +29,7 @@ def test_homepage_preview_has_identity_menu_footer_and_no_3d():
     assert "Версия для слабовидящих" in home
     assert "К содержанию" in home
     assert "media/ichnm-mark.svg" in home
-    assert 'width="397"' in home
+    assert 'width="230"' in home
     assert "hero-figure" not in home
     assert "arc-blue" not in home
     assert "animateMotion" not in home
@@ -41,15 +41,15 @@ def test_homepage_preview_has_identity_menu_footer_and_no_3d():
     assert "Материалы для 3D" not in home
 
 
-def test_icnm_mark_uses_bew_vector():
+def test_icnm_mark_uses_previous_icon_vector():
     from pathlib import Path
 
     svg = (Path(__file__).resolve().parents[1] / "assets" / "brand" / "ichnm-mark.svg").read_text(
         encoding="utf-8"
     )
-    assert "#9d1c2d" in svg
-    assert "#0e4c85" in svg
-    assert "#1f2427" in svg
+    assert "#e52220" in svg
+    assert "#2a4b9b" in svg
+    assert "#9d1c2d" not in svg
 
 
 def test_language_structure_mirrors_russian_ia():
@@ -207,6 +207,9 @@ def test_nas_emblem_lattice_lab_packs_and_publication_chart():
     assert "lattice-demo.html" in files
     demo = files["lattice-demo.html"]
     assert "ichnm-lattice-v7" in files["site.js"]
+    assert "entriesKeepout" in files["site.js"]
+    assert "hitsKeepout" in files["site.js"]
+    assert ".hero-entries .hero-pill" in files["site.js"]
     assert "paletteStep" in demo
     assert "PALETTE_STOPS" in files["site.js"]
     assert "emitTrail" not in files["site.js"]
@@ -335,6 +338,16 @@ def test_nas_emblem_lattice_lab_packs_and_publication_chart():
     assert "research.html" not in files["sitemap.html"]
     assert "body.is-home .site-header.is-scrolled" in files["site.css"]
     assert ".site-header .ichnm-menu > ul > li > a:visited" in files["site.css"]
+    assert "html.is-bvi *" in files["site.css"]
+    assert "html.is-bvi * {\n  color: #000 !important;" in files["site.css"]
+    assert files["site.css"].count("min-height: 80px") == 2
+    assert ".masthead,\n  .masthead-inner {\n    min-height: 0;" in files["site.css"]
+    assert "min-height: 200px" not in files["site.css"]
+    assert ".page-hero {\n  background: var(--navy);\n  color: #fff;\n  min-height: 0;" in files["site.css"]
+    assert "--submenu-bg: #0f2a43" in files["site.css"]
+    assert "--submenu-fg: #fff" in files["site.css"]
+    assert "html.theme-night .ichnm-menu li ul,\nhtml.theme-night .header-panel {\n  background: var(--submenu-bg);\n  color: var(--submenu-fg);" in files["site.css"]
+    assert "html.theme-night .ichnm-menu li ul {\n  background: var(--navy-deep);" not in files["site.css"]
 
 
 def test_search_sitemap_and_page_veil_exist():

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild web SVG/PNG from assets/brand/ICHNM_Bew.ai (PDF-based Illustrator)."""
+"""Rebuild web SVG/PNG from assets/brand/ИХНМ-Иконка.ai (the live header mark)."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "assets" / "brand" / "ICHNM_Bew.ai"
+SRC = ROOT / "assets" / "brand" / "ИХНМ-Иконка.ai"
 OUT_DIR = ROOT / "assets" / "brand"
 THEME_ASSETS = ROOT / "wp-content" / "themes" / "ichnm-kadence" / "assets"
 

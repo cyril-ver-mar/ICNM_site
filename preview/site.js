@@ -623,6 +623,40 @@
       ctx.stroke();
     }
 
+    function entriesKeepout() {
+      const pills = host.querySelectorAll(".hero-entries .hero-pill");
+      if (!pills.length) return null;
+      const hostRect = host.getBoundingClientRect();
+      const pad = Math.max(cfg.peakRadius || 18, 18) + 24;
+      let left = Infinity;
+      let top = Infinity;
+      let right = -Infinity;
+      let bottom = -Infinity;
+      for (let i = 0; i < pills.length; i++) {
+        const box = pills[i].getBoundingClientRect();
+        left = Math.min(left, box.left);
+        top = Math.min(top, box.top);
+        right = Math.max(right, box.right);
+        bottom = Math.max(bottom, box.bottom);
+      }
+      return {
+        left: left - hostRect.left - pad,
+        top: top - hostRect.top - pad,
+        right: right - hostRect.left + pad,
+        bottom: hostRect.height + pad,
+      };
+    }
+
+    function hitsKeepout(x, y, radius, box) {
+      if (!box) return false;
+      return (
+        x + radius >= box.left &&
+        x - radius <= box.right &&
+        y + radius >= box.top &&
+        y - radius <= box.bottom
+      );
+    }
+
     function drawAtom(x, y, r) {
       if (r < 0.35) return;
       const idx = Math.max(
@@ -649,10 +683,21 @@
       ctx.clearRect(0, 0, width, height);
       const wrap = ((paletteT - paletteShow + 1.5) % 1) - 0.5;
       paletteShow = (paletteShow + wrap * Math.min(1, dt * 2.4) + 1) % 1;
+      const keepout = entriesKeepout();
       drawHexes();
       for (let i = 0; i < atoms.length; i++) {
         const a = atoms[i];
-        drawAtom(a.x, a.y, sampleAtom(a));
+        const radius = sampleAtom(a);
+        if (hitsKeepout(a.x, a.y, radius, keepout)) continue;
+        drawAtom(a.x, a.y, radius);
+      }
+      if (keepout) {
+        ctx.clearRect(
+          keepout.left,
+          keepout.top,
+          Math.max(0, keepout.right - keepout.left),
+          Math.max(0, keepout.bottom - keepout.top)
+        );
       }
       if (reduceMotion) return;
       waves = waves.filter(function (wave) {
@@ -661,8 +706,13 @@
       });
       if (cfg.randomEvery > 0 && ts > lastRandom) {
         lastRandom = ts + cfg.randomEvery + Math.random() * cfg.randomEvery * 0.5;
-        const pick = atoms[(Math.random() * atoms.length) | 0];
-        if (pick) {
+        let pick = atoms[(Math.random() * atoms.length) | 0];
+        let tries = 0;
+        while (pick && hitsKeepout(pick.x, pick.y, cfg.peakRadius, keepout) && tries < 12) {
+          pick = atoms[(Math.random() * atoms.length) | 0];
+          tries += 1;
+        }
+        if (pick && !hitsKeepout(pick.x, pick.y, cfg.peakRadius, keepout)) {
           spawnWave(pick.x, pick.y, "random");
           advancePalette();
         }

@@ -1192,9 +1192,9 @@ def _shell(
     page = _page_prefix()
     asset = _asset_prefix()
     home = f"{page}index.html"
-    css = f"{asset}site.css?v=lab-proj1"
-    js = f"{asset}site.js?v=lab-proj1"
-    mark = f"{asset}media/ichnm-mark.svg?v=bew"
+    css = f"{asset}site.css?v=night-sub1"
+    js = f"{asset}site.js?v=lattice-keep2"
+    mark = f"{asset}media/ichnm-mark.svg?v=icon1"
     nas = f"{asset}media/nas-emblem.webp"
     body_class = " ".join(
         part for part in ("is-home" if is_home else "is-inner", extra_body_class) if part
@@ -1262,7 +1262,7 @@ def _shell(
         <div class="brand-row">
           {nas_block}
           <a class="brand" href="{home}">
-            <img class="brand-mark" src="{mark}" width="397" height="392" alt="{escape(_st("icnm_mark_alt"))}">
+            <img class="brand-mark" src="{mark}" width="230" height="193" alt="{escape(_st("icnm_mark_alt"))}">
             <span class="brand-lockup">
               <span class="brand-kicker">{escape(_ui("kicker"))}</span>
               <span class="brand-title">{escape(_ui("brand"))}</span>

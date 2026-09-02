@@ -14,6 +14,8 @@
   --ink: #313131;
   --navy: #0f2a43;
   --navy-deep: #0a1c2e;
+  --submenu-bg: #0f2a43;
+  --submenu-fg: #fff;
   --header-glass: rgba(15, 42, 67, 0.82);
   --line: rgba(26, 32, 44, 0.12);
   --shadow: 0 2px 13px rgba(0, 0, 0, 0.1);
@@ -475,7 +477,8 @@ html.theme-night body.is-home .site-header.is-scrolled .brand-mark {
   top: calc(100% - 2px);
   min-width: 22rem;
   max-width: 28rem;
-  background: var(--navy);
+  background: var(--submenu-bg);
+  color: var(--submenu-fg);
   box-shadow: var(--shadow);
   z-index: 8;
   display: flex;
@@ -509,12 +512,18 @@ html.theme-night body.is-home .site-header.is-scrolled .brand-mark {
 .ichnm-menu li ul a,
 .ichnm-menu li ul .nav-folder {
   display: block;
-  color: #fff;
+  color: var(--submenu-fg);
+  -webkit-text-fill-color: var(--submenu-fg);
   text-decoration: none;
   font-size: 0.92rem;
   line-height: 1.25;
   padding: 0.7em 1em;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ichnm-menu li ul .submenu-toggle {
+  color: var(--submenu-fg);
+  -webkit-text-fill-color: var(--submenu-fg);
 }
 
 .ichnm-menu li ul .nav-parent {
@@ -531,7 +540,8 @@ html.theme-night body.is-home .site-header.is-scrolled .brand-mark {
 .ichnm-menu li ul .nav-parent:hover > a,
 .ichnm-menu li ul .nav-parent:hover > .nav-folder {
   background: var(--palette1);
-  color: #fff;
+  color: var(--submenu-fg);
+  -webkit-text-fill-color: var(--submenu-fg);
 }
 
 .ichnm-menu li ul .nav-self > a {
@@ -562,13 +572,26 @@ html.theme-night body.is-home .site-header.is-scrolled .brand-mark {
   padding-top: 0.2rem;
 }
 
-html.theme-night .ichnm-menu li ul {
-  background: var(--navy-deep);
+html.theme-night .ichnm-menu li ul,
+html.theme-night .header-panel {
+  background: var(--submenu-bg);
+  color: var(--submenu-fg);
 }
 
-html.theme-night .ichnm-menu li ul a,
-html.theme-night .ichnm-menu li ul .nav-folder {
-  color: #fff;
+html.theme-night .site-header .ichnm-menu li ul a,
+html.theme-night .site-header .ichnm-menu li ul a:link,
+html.theme-night .site-header .ichnm-menu li ul a:visited,
+html.theme-night .site-header .ichnm-menu li ul .nav-folder,
+html.theme-night .site-header .ichnm-menu li ul .submenu-toggle,
+html.theme-night .header-panel a,
+html.theme-night .header-panel a:link,
+html.theme-night .header-panel a:visited,
+html.theme-night .header-panel .nav-folder,
+html.theme-night .header-panel .nav-more-label,
+html.theme-night .header-panel .submenu-toggle,
+html.theme-night .header-panel .tool-btn {
+  color: var(--submenu-fg);
+  -webkit-text-fill-color: var(--submenu-fg);
 }
 
 main { display: block; }
@@ -669,6 +692,8 @@ html.is-bvi .hero-figure { display: none; }
 }
 
 .hero-entries {
+  position: relative;
+  z-index: 3;
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
@@ -686,7 +711,7 @@ html.is-bvi .hero-figure { display: none; }
   font-family: Montserrat, sans-serif;
   font-weight: 600;
   font-size: 0.95rem;
-  background: rgba(255, 255, 255, 0.14);
+  background: #17344f;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   transition: background-color 180ms ease, transform 160ms var(--ease-out);
 }
@@ -853,10 +878,10 @@ a.news-card:hover {
 .page-hero {
   background: var(--navy);
   color: #fff;
-  min-height: 200px;
+  min-height: 0;
   display: flex;
   align-items: flex-end;
-  padding: 5.5rem 0 2rem;
+  padding: 1.1rem 0 1.25rem;
 }
 
 .page-hero h1 {
@@ -2010,12 +2035,21 @@ html.is-bvi .stat-value {
 }
 
 @media (max-width: 1180px) {
+  html {
+    scroll-padding-top: 4.1rem;
+  }
+
+  .masthead,
+  .masthead-inner {
+    min-height: 0;
+  }
+
   .masthead-inner {
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas: "brand tools";
-    min-height: 3.6rem;
-    padding: 0.35rem 0;
+    padding: 0.28rem 0;
     column-gap: 0.5rem;
+    align-items: center;
   }
 
   .brand-title { display: none; }
@@ -2030,6 +2064,17 @@ html.is-bvi .stat-value {
     display: inline-flex;
     align-items: center;
     flex: none;
+    color: var(--header-fg);
+    -webkit-text-fill-color: var(--header-fg);
+    border-color: var(--header-btn-border);
+    font-weight: 700;
+  }
+
+  html:not(.theme-night) body.is-home .site-header.is-scrolled .menu-toggle {
+    color: #1a202c;
+    -webkit-text-fill-color: #1a202c;
+    background: #edf2f7;
+    border-color: #1a202c;
   }
 
   .header-tools {
@@ -2043,8 +2088,8 @@ html.is-bvi .stat-value {
     left: 0;
     right: 0;
     top: 100%;
-    background: var(--navy-deep);
-    color: #fff;
+    background: var(--submenu-bg);
+    color: var(--submenu-fg);
     z-index: 12;
     max-height: min(75vh, calc(100dvh - 4.5rem));
     overflow-x: hidden;
@@ -2080,7 +2125,8 @@ html.is-bvi .stat-value {
   .header-panel .ichnm-lang-switch a:visited,
   body.is-home .site-header.is-scrolled .header-panel .tool-btn,
   body.is-home .site-header.is-scrolled .header-panel .ichnm-lang-switch a {
-    color: #fff;
+    color: var(--submenu-fg);
+    -webkit-text-fill-color: var(--submenu-fg);
     border-color: rgba(255, 255, 255, 0.45);
   }
 
@@ -2114,7 +2160,15 @@ html.is-bvi .stat-value {
   }
 
   body.is-home .hero {
-    margin-top: -4.15rem;
+    margin-top: -3.55rem;
+  }
+
+  .hero {
+    padding-top: 5.35rem;
+  }
+
+  .page-hero {
+    padding: 0.95rem 0 1.1rem;
   }
 
   .ichnm-menu > ul { justify-content: stretch; flex-direction: column; }
@@ -2123,7 +2177,8 @@ html.is-bvi .stat-value {
   .ichnm-menu.is-open > ul > li > .nav-parent > a,
   .ichnm-menu.is-open > ul > li > .nav-parent > .nav-folder,
   .ichnm-menu.is-open > ul > li > .nav-more-label {
-    color: #fff;
+    color: var(--submenu-fg);
+    -webkit-text-fill-color: var(--submenu-fg);
   }
 
   .ichnm-menu li.has-children > .nav-parent::after,
@@ -2208,7 +2263,7 @@ html.is-bvi .stat-value {
 
   .hero-figure { justify-self: center; max-width: 16rem; }
 
-  .hero { min-height: 0; align-items: stretch; padding-top: 6.5rem; }
+  .hero { min-height: 0; align-items: stretch; padding-top: 5.35rem; }
 
   .brand-kicker { display: none; }
 }
@@ -2928,4 +2983,167 @@ html.theme-night .site-search-form button[data-search-close] {
 @media (max-width: 720px) {
   .sitemap > ul { columns: 1; }
 }
+
+/* BVI: later layout rules paint #fff on navy chrome; force ink on paper. */
+html.is-bvi {
+  --header-fg: #000;
+  --header-bg: #fff;
+  --header-btn-border: #000;
+  --ink: #000;
+  --paper: #fff;
+  --navy: #000;
+  --navy-deep: #000;
+  --submenu-bg: #fff;
+  --submenu-fg: #000;
+  --accent: #00e;
+  --palette1: #00e;
+  --palette2: #00e;
+  --palette3: #000;
+  --palette4: #000;
+  --palette5: #000;
+}
+
+html.is-bvi,
+html.is-bvi body {
+  background: #fff !important;
+  color: #000 !important;
+}
+
+html.is-bvi * {
+  color: #000 !important;
+}
+
+html.is-bvi .site-header,
+html.is-bvi .masthead,
+html.is-bvi .header-panel,
+html.is-bvi .ichnm-menu,
+html.is-bvi .hero,
+html.is-bvi .page-hero,
+html.is-bvi .stats-band,
+html.is-bvi .ichnm-footer,
+html.is-bvi .lab-contacts,
+html.is-bvi .event-banner,
+html.is-bvi .conf-hero,
+html.is-bvi .cookie-banner {
+  background: #fff !important;
+  color: #000 !important;
+}
+
+html.is-bvi .hero,
+html.is-bvi .page-hero {
+  padding-top: 1.15rem !important;
+  margin-top: 0 !important;
+  min-height: 0 !important;
+}
+
+html.is-bvi a,
+html.is-bvi a:link,
+html.is-bvi a:visited,
+html.is-bvi .tool-btn,
+html.is-bvi .menu-toggle,
+html.is-bvi .submenu-toggle,
+html.is-bvi .hero-pill {
+  color: #00e !important;
+  -webkit-text-fill-color: #00e !important;
+}
+
+html.is-bvi .bvi-panel,
+html.is-bvi .bvi-panel *:not(.bvi-invert):not(.bvi-blue) {
+  color: #000 !important;
+  background: #fff !important;
+  border-color: #000 !important;
+}
+
+html.is-bvi .bvi-invert {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+html.is-bvi .bvi-blue {
+  background: #9dd1ff !important;
+  color: #003 !important;
+}
+
+html.is-bvi[data-bvi-scheme="wb"],
+html.is-bvi[data-bvi-scheme="wb"] body {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+html.is-bvi[data-bvi-scheme="wb"] {
+  --submenu-bg: #000;
+  --submenu-fg: #fff;
+}
+
+html.is-bvi[data-bvi-scheme="wb"] * {
+  color: #fff !important;
+}
+
+html.is-bvi[data-bvi-scheme="wb"] .site-header,
+html.is-bvi[data-bvi-scheme="wb"] .masthead,
+html.is-bvi[data-bvi-scheme="wb"] .header-panel,
+html.is-bvi[data-bvi-scheme="wb"] .ichnm-menu,
+html.is-bvi[data-bvi-scheme="wb"] .hero,
+html.is-bvi[data-bvi-scheme="wb"] .page-hero,
+html.is-bvi[data-bvi-scheme="wb"] .stats-band,
+html.is-bvi[data-bvi-scheme="wb"] .ichnm-footer,
+html.is-bvi[data-bvi-scheme="wb"] .lab-contacts,
+html.is-bvi[data-bvi-scheme="wb"] .event-banner,
+html.is-bvi[data-bvi-scheme="wb"] .conf-hero,
+html.is-bvi[data-bvi-scheme="wb"] .cookie-banner,
+html.is-bvi[data-bvi-scheme="wb"] .bvi-panel {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+html.is-bvi[data-bvi-scheme="wb"] a,
+html.is-bvi[data-bvi-scheme="wb"] a:link,
+html.is-bvi[data-bvi-scheme="wb"] a:visited,
+html.is-bvi[data-bvi-scheme="wb"] .tool-btn,
+html.is-bvi[data-bvi-scheme="wb"] .menu-toggle,
+html.is-bvi[data-bvi-scheme="wb"] .submenu-toggle,
+html.is-bvi[data-bvi-scheme="wb"] .hero-pill {
+  color: #ff0 !important;
+  -webkit-text-fill-color: #ff0 !important;
+}
+
+html.is-bvi[data-bvi-scheme="blue"],
+html.is-bvi[data-bvi-scheme="blue"] body {
+  background: #9dd1ff !important;
+  color: #003 !important;
+}
+
+html.is-bvi[data-bvi-scheme="blue"] {
+  --submenu-bg: #9dd1ff;
+  --submenu-fg: #003;
+}
+
+html.is-bvi[data-bvi-scheme="blue"] * {
+  color: #003 !important;
+}
+
+html.is-bvi[data-bvi-scheme="blue"] .site-header,
+html.is-bvi[data-bvi-scheme="blue"] .masthead,
+html.is-bvi[data-bvi-scheme="blue"] .header-panel,
+html.is-bvi[data-bvi-scheme="blue"] .hero,
+html.is-bvi[data-bvi-scheme="blue"] .page-hero,
+html.is-bvi[data-bvi-scheme="blue"] .stats-band,
+html.is-bvi[data-bvi-scheme="blue"] .ichnm-footer,
+html.is-bvi[data-bvi-scheme="blue"] .lab-contacts,
+html.is-bvi[data-bvi-scheme="blue"] .bvi-panel {
+  background: #9dd1ff !important;
+  color: #003 !important;
+}
+
+html.is-bvi[data-bvi-scheme="blue"] a,
+html.is-bvi[data-bvi-scheme="blue"] a:link,
+html.is-bvi[data-bvi-scheme="blue"] a:visited,
+html.is-bvi[data-bvi-scheme="blue"] .tool-btn,
+html.is-bvi[data-bvi-scheme="blue"] .menu-toggle,
+html.is-bvi[data-bvi-scheme="blue"] .submenu-toggle,
+html.is-bvi[data-bvi-scheme="blue"] .hero-pill {
+  color: #00e !important;
+  -webkit-text-fill-color: #00e !important;
+}
+
 
