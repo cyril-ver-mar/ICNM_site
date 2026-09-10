@@ -190,7 +190,13 @@ def test_nas_emblem_lattice_lab_packs_and_publication_chart():
     assert "Оборудование" in lab
     assert "Действующие и завершённые научные проекты" in lab
     assert 'id="projects"' in lab
-    assert "Список проектов появится из пакета лаборатории." in lab
+    assert "ГПНИ «Химия древесины-3»" in lab
+    assert "Список проектов появится из пакета лаборатории." not in lab
+    assert "Layer-by-Layer" in lab or "послойная самосборка" in lab
+    assert "ДНС" in files["labs/composites/index.html"]
+    assert "СОЖ ЛХ-2" in files["developments.html"]
+    assert "01.09.2025" in files["about-overview.html"]
+    assert "22.10.1998" in files["about-overview.html"]
     assert "Отдельных персональных страниц нет" not in lab
     assert "people/kulikouskaya/index.html" in lab
     assert "is-lab-site" in lab

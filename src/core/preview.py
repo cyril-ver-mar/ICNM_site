@@ -2787,8 +2787,8 @@ def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
         "<div>"
         f"<h2>{escape(_st('lab_about'))}</h2>"
         + (
-            f"<p>{escape(lab['about_filled'])}</p>"
-            if lab.get("about_filled")
+            f"<p>{escape(lab.get('about_filled') or lab.get('about') or '')}</p>"
+            if (lab.get("about_filled") or lab.get("about"))
             else (
                 f"<p>{escape(_st('lab_about_placeholder'))}</p>"
                 f"<p>{escape(_st('lab_about_fish'))}</p>"
