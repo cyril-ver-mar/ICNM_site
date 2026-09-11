@@ -73,6 +73,9 @@ function ichnm_chrome_strings(?string $lang = null): array
             'close' => 'Закрыть',
             'search_hint' => 'Введите не меньше двух букв. Есть и отдельная страница результатов.',
             'nas' => 'Национальная академия наук Беларуси',
+            'cookies' => 'Политика cookie',
+            'personal' => 'Персональные данные',
+            'sections' => 'Разделы',
         ],
         'en' => [
             'lang_aria' => 'Language',
@@ -88,6 +91,9 @@ function ichnm_chrome_strings(?string $lang = null): array
             'close' => 'Close',
             'search_hint' => 'Enter at least two characters. A full results page is also available.',
             'nas' => 'National Academy of Sciences of Belarus',
+            'cookies' => 'Cookie policy',
+            'personal' => 'Personal data',
+            'sections' => 'Sections',
         ],
         'be' => [
             'lang_aria' => 'Мова',
@@ -103,6 +109,9 @@ function ichnm_chrome_strings(?string $lang = null): array
             'close' => 'Закрыць',
             'search_hint' => 'Увядзіце не менш за дзве літары. Ёсць і асобная старонка вынікаў.',
             'nas' => 'Нацыянальная акадэмія навук Беларусі',
+            'cookies' => 'Палітыка cookie',
+            'personal' => 'Персанальныя даныя',
+            'sections' => 'Раздзелы',
         ],
         'zh' => [
             'lang_aria' => '语言',
@@ -118,9 +127,40 @@ function ichnm_chrome_strings(?string $lang = null): array
             'close' => '关闭',
             'search_hint' => '请至少输入两个字符。也可打开完整结果页。',
             'nas' => '白俄罗斯国家科学院',
+            'cookies' => 'Cookie 政策',
+            'personal' => '个人数据',
+            'sections' => '栏目',
         ],
     ];
     return $pack[$lang] ?? $pack['ru'];
+}
+
+/**
+ * Hub kicker labels for CPT singles.
+ *
+ * @return array{label:string,href:string}
+ */
+function ichnm_hub_kicker(string $hub_slug): array
+{
+    $labels = [
+        'news' => ['ru' => 'Новости', 'en' => 'News', 'be' => 'Навіны', 'zh' => '新闻'],
+        'events' => ['ru' => 'Мероприятия', 'en' => 'Events', 'be' => 'Мерапрыемствы', 'zh' => '活动'],
+        'publications' => ['ru' => 'Публикации', 'en' => 'Publications', 'be' => 'Публікацыі', 'zh' => '出版物'],
+        'leadership' => ['ru' => 'Руководство', 'en' => 'Leadership', 'be' => 'Кіраўніцтва', 'zh' => '领导班子'],
+        'structure' => ['ru' => 'Структура', 'en' => 'Structure', 'be' => 'Структура', 'zh' => '机构设置'],
+        'media_about' => ['ru' => 'СМИ о нас', 'en' => 'Media about us', 'be' => 'СМІ пра нас', 'zh' => '媒体报道'],
+    ];
+    $lang = function_exists('pll_current_language') ? (string) pll_current_language('slug') : 'ru';
+    if ($lang === '') {
+        $lang = 'ru';
+    }
+    $page_slug = $hub_slug === 'media_about' ? 'news' : $hub_slug;
+    $page = ichnm_translated_page($page_slug);
+    $href = $page instanceof WP_Post
+        ? (string) get_permalink($page)
+        : home_url('/' . rawurlencode($page_slug) . '/');
+    $label = $labels[$hub_slug][$lang] ?? ($labels[$hub_slug]['ru'] ?? $hub_slug);
+    return ['label' => $label, 'href' => $href];
 }
 
 function ichnm_translated_page(string $slug): ?WP_Post
@@ -264,7 +304,7 @@ function ichnm_render_primary_menu(): void
     if (!has_nav_menu('ichnm-primary')) {
         return;
     }
-    echo '<nav id="ichnm-primary-nav" class="ichnm-menu" aria-label="Разделы">';
+    echo '<nav id="ichnm-primary-nav" class="ichnm-menu" aria-label="' . esc_attr(ichnm_chrome_strings()['sections']) . '">';
     wp_nav_menu([
         'theme_location' => 'ichnm-primary',
         'container' => false,
@@ -308,6 +348,7 @@ add_action('wp_body_open', 'ichnm_render_search_overlay', 9);
 
 add_action('wp_footer', static function (): void {
     $model = ichnm_theme_model();
+    $ui = ichnm_chrome_strings();
     $legal = $model['footer']['legal_links'] ?? [];
     $nas_social = $model['footer']['nas_social'] ?? [];
     $icnm_social = array_values(array_filter(
@@ -316,10 +357,10 @@ add_action('wp_footer', static function (): void {
             return !empty($row['href']);
         }
     ));
-    $search = get_page_by_path('search');
-    $sitemap = get_page_by_path('sitemap');
-    $cookies = get_page_by_path('cookies');
-    $personal = get_page_by_path('personal-data');
+    $search = ichnm_translated_page('search');
+    $sitemap = ichnm_translated_page('sitemap');
+    $cookies = ichnm_translated_page('cookies');
+    $personal = ichnm_translated_page('personal-data');
     echo '<div class="ichnm-footer-extra"><div class="wrap ichnm-footer-grid">';
     echo '<div class="ichnm-footer-col">';
     echo '<ul class="ichnm-footer-legal">';
@@ -327,16 +368,16 @@ add_action('wp_footer', static function (): void {
         echo '<li><a href="' . esc_url($link['href']) . '">' . esc_html($link['title']) . '</a></li>';
     }
     if ($search instanceof WP_Post) {
-        echo '<li><a href="' . esc_url(get_permalink($search)) . '">Поиск</a></li>';
+        echo '<li><a href="' . esc_url(get_permalink($search)) . '">' . esc_html($ui['search']) . '</a></li>';
     }
     if ($sitemap instanceof WP_Post) {
-        echo '<li><a href="' . esc_url(get_permalink($sitemap)) . '">Карта сайта</a></li>';
+        echo '<li><a href="' . esc_url(get_permalink($sitemap)) . '">' . esc_html($ui['sitemap']) . '</a></li>';
     }
     if ($cookies instanceof WP_Post) {
-        echo '<li><a href="' . esc_url(get_permalink($cookies)) . '">Политика cookie</a></li>';
+        echo '<li><a href="' . esc_url(get_permalink($cookies)) . '">' . esc_html($ui['cookies']) . '</a></li>';
     }
     if ($personal instanceof WP_Post) {
-        echo '<li><a href="' . esc_url(get_permalink($personal)) . '">Персональные данные</a></li>';
+        echo '<li><a href="' . esc_url(get_permalink($personal)) . '">' . esc_html($ui['personal']) . '</a></li>';
     }
     echo '</ul>';
     echo '<ul class="ichnm-footer-social">';
@@ -350,3 +391,86 @@ add_action('wp_footer', static function (): void {
     }
     echo '</div></div>';
 }, 20);
+
+/**
+ * Language shells use slugs like news-en; map them onto dedicated hub templates.
+ */
+add_filter('template_include', static function (string $template): string {
+    if (!is_singular('page')) {
+        return $template;
+    }
+    $page = get_queried_object();
+    if (!$page instanceof WP_Post) {
+        return $template;
+    }
+    $base = (string) $page->post_name;
+    if (function_exists('pll_get_post_language') && function_exists('pll_get_post')) {
+        $lang = (string) pll_get_post_language((int) $page->ID);
+        if ($lang && $lang !== 'ru') {
+            $ru_id = (int) pll_get_post((int) $page->ID, 'ru');
+            if ($ru_id > 0) {
+                $ru = get_post($ru_id);
+                if ($ru instanceof WP_Post) {
+                    $base = (string) $ru->post_name;
+                }
+            }
+        }
+    }
+    $base = preg_replace('/-(en|be|zh)$/', '', $base) ?: $base;
+    $map = [
+        'news' => 'page-news.php',
+        'events' => 'page-events.php',
+        'publications' => 'page-publications.php',
+        'search' => 'page-search.php',
+        'sitemap' => 'page-sitemap.php',
+    ];
+    if (!isset($map[$base])) {
+        return $template;
+    }
+    $candidate = get_stylesheet_directory() . '/' . $map[$base];
+    return is_readable($candidate) ? $candidate : $template;
+}, 40);
+
+/**
+ * Point the institute chrome menu at Polylang translations when browsing EN/BE/ZH.
+ *
+ * @param list<\WP_Post> $items
+ * @return list<\WP_Post>
+ */
+add_filter('wp_nav_menu_objects', static function (array $items, $args): array {
+    $location = is_object($args) ? (string) ($args->theme_location ?? '') : '';
+    if ($location !== 'ichnm-primary' || !function_exists('pll_current_language') || !function_exists('pll_get_post')) {
+        return $items;
+    }
+    $lang = (string) pll_current_language('slug');
+    if ($lang === '' || $lang === 'ru') {
+        return $items;
+    }
+    foreach ($items as $item) {
+        $object = (string) ($item->object ?? '');
+        $type = (string) ($item->type ?? '');
+        $object_id = (int) ($item->object_id ?? 0);
+        if ($object_id <= 0) {
+            continue;
+        }
+        if (!in_array($type, ['post_type', 'post_type_archive'], true) && $object === 'custom') {
+            continue;
+        }
+        if (!in_array($object, ['page', 'department', 'person', 'news', 'event', 'media_about', 'publication'], true)
+            && $type !== 'post_type') {
+            continue;
+        }
+        $translated = (int) pll_get_post($object_id, $lang);
+        if ($translated <= 0 || $translated === $object_id) {
+            continue;
+        }
+        $post = get_post($translated);
+        if (!$post instanceof WP_Post || $post->post_status !== 'publish') {
+            continue;
+        }
+        $item->object_id = $translated;
+        $item->url = (string) get_permalink($translated);
+        $item->title = get_the_title($translated);
+    }
+    return $items;
+}, 20, 2);

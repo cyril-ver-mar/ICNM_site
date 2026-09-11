@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-const ICHNM_CONTENT_SEED_VERSION = 17;
+const ICHNM_CONTENT_SEED_VERSION = 18;
 
 function ichnm_migrated_copy(): array
 {
