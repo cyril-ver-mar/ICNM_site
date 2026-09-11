@@ -1,0 +1,231 @@
+{
+  "pages": {
+    "about": {
+      "en": "About the institute",
+      "be": "Пра інстытут",
+      "zh": "关于研究所"
+    },
+    "about-overview": {
+      "en": "Overview",
+      "be": "Звесткі",
+      "zh": "概况"
+    },
+    "leadership": {
+      "en": "Leadership",
+      "be": "Кіраўніцтва",
+      "zh": "领导班子"
+    },
+    "structure": {
+      "en": "Structure",
+      "be": "Структура",
+      "zh": "机构设置"
+    },
+    "science": {
+      "en": "Research areas",
+      "be": "Напрамкі працы",
+      "zh": "研究方向"
+    },
+    "developments": {
+      "en": "Developments",
+      "be": "Распрацоўкі",
+      "zh": "研发成果"
+    },
+    "facilities": {
+      "en": "Research facilities",
+      "be": "Матэрыяльная база",
+      "zh": "仪器设备"
+    },
+    "cooperation": {
+      "en": "Cooperation",
+      "be": "Супрацоўніцтва",
+      "zh": "合作"
+    },
+    "publications": {
+      "en": "Publications",
+      "be": "Публікацыі",
+      "zh": "论文"
+    },
+    "education": {
+      "en": "Research-oriented education",
+      "be": "Навукова-арыентаваная адукацыя",
+      "zh": "科研导向教育"
+    },
+    "news": {
+      "en": "News",
+      "be": "Навіны",
+      "zh": "新闻"
+    },
+    "events": {
+      "en": "Events",
+      "be": "Мерапрыемствы",
+      "zh": "活动"
+    },
+    "contacts": {
+      "en": "Contacts",
+      "be": "Кантакты",
+      "zh": "联系我们"
+    },
+    "feedback": {
+      "en": "Feedback",
+      "be": "Зваротная сувязь",
+      "zh": "反馈"
+    },
+    "requisites": {
+      "en": "Bank details",
+      "be": "Рэквізіты",
+      "zh": "银行信息"
+    },
+    "aist": {
+      "en": "AIST",
+      "be": "AIST",
+      "zh": "AIST"
+    },
+    "scientific-council": {
+      "en": "Scientific council",
+      "be": "Вучоны савет",
+      "zh": "学术委员会"
+    },
+    "documents": {
+      "en": "Documents",
+      "be": "Дакументы",
+      "zh": "文件"
+    },
+    "vacancies": {
+      "en": "Vacancies",
+      "be": "Вакансіі",
+      "zh": "招聘"
+    },
+    "union": {
+      "en": "Trade union",
+      "be": "Прафсаюз",
+      "zh": "工会"
+    },
+    "young-scientists": {
+      "en": "Council of Young Scientists",
+      "be": "Савет маладых вучоных",
+      "zh": "青年科学家委员会"
+    },
+    "search": {
+      "en": "Search",
+      "be": "Пошук",
+      "zh": "搜索"
+    },
+    "sitemap": {
+      "en": "Sitemap",
+      "be": "Карта сайта",
+      "zh": "网站地图"
+    },
+    "home": {
+      "en": "Home",
+      "be": "Галоўная",
+      "zh": "首页"
+    },
+    "cookies": {
+      "en": "cookies",
+      "be": "cookies",
+      "zh": "cookies"
+    },
+    "personal-data": {
+      "en": "personal-data",
+      "be": "personal-data",
+      "zh": "personal-data"
+    },
+    "charter": {
+      "en": "Charter",
+      "be": "Статут",
+      "zh": "章程"
+    },
+    "anti-corruption": {
+      "en": "Anti-corruption",
+      "be": "Антыкарупцыя",
+      "zh": "反腐败"
+    },
+    "e-appeals": {
+      "en": "Electronic appeals",
+      "be": "Электронныя звароты",
+      "zh": "电子诉求"
+    },
+    "aspirantura": {
+      "en": "Postgraduate studies",
+      "be": "Аспірантура",
+      "zh": "研究生培养"
+    },
+    "doctorate": {
+      "en": "Doctoral studies",
+      "be": "Дактарантура",
+      "zh": "博士培养"
+    },
+    "defense-council": {
+      "en": "Dissertation council",
+      "be": "Савет па абаронах",
+      "zh": "答辩委员会"
+    },
+    "internships": {
+      "en": "Internships",
+      "be": "Стажыроўкі",
+      "zh": "实习"
+    },
+    "courses": {
+      "en": "Courses",
+      "be": "Курсы",
+      "zh": "课程"
+    },
+    "hr": {
+      "en": "Human resources",
+      "be": "Аддзел кадраў",
+      "zh": "人事处"
+    },
+    "labor-protection": {
+      "en": "Occupational safety",
+      "be": "Ахова працы",
+      "zh": "劳动保护"
+    },
+    "engineering": {
+      "en": "Chief engineer",
+      "be": "Галоўны інжынер",
+      "zh": "总工程师"
+    },
+    "accounting": {
+      "en": "Accounting",
+      "be": "Бухгалтэрыя",
+      "zh": "财务处"
+    }
+  },
+  "labs": {
+    "nano": {
+      "ru": "Лаборатория микро- и наноструктурированных систем",
+      "en": "Laboratory of Micro- and Nanostructured Systems",
+      "be": "Лабараторыя мікра- і нанаструктураваных сістэм",
+      "zh": "微纳米结构系统实验室"
+    },
+    "films": {
+      "ru": "Лаборатория оптических многофункциональных плёнок",
+      "en": "Laboratory of Optical Multifunctional Films",
+      "be": "Лабараторыя аптычных шматфункцыянальных плёнак",
+      "zh": "光学多功能薄膜实验室"
+    },
+    "lcd": {
+      "ru": "Лаборатория материалов и технологий ЖК-устройств",
+      "en": "Laboratory of Materials and Technologies for LC Devices",
+      "be": "Лабараторыя матэрыялаў і тэхналогій ВК-прылад",
+      "zh": "液晶器件材料与技术实验室"
+    },
+    "composites": {
+      "ru": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "en": "Industry Laboratory of Heat-Resistant Polymer Composites",
+      "be": "Галіновая лабараторыя тэрмастойкіх палімерных кампазітаў",
+      "zh": "耐热聚合物复合材料行业实验室"
+    },
+    "woodchem": {
+      "ru": "Лаборатория лесохимических продуктов и технологий",
+      "en": "Laboratory of Forest Chemical Products and Technologies",
+      "be": "Лабараторыя лесахімічных прадуктаў і тэхналогій",
+      "zh": "林产化工产品与技术实验室"
+    }
+  },
+  "notes": {
+    "en": "<p><em>Structure shell. Institute body copy stays Russian until an official translation.</em></p>",
+    "be": "<p><em>Абалонка структуры. Тэксты інстытута пакуль па-руску, пакуль не будзе афіцыйнага перакладу.</em></p>",
+    "zh": "<p><em>结构壳层。研究所正文在正式译本到位前仍为俄语。</em></p>"
+  }
+}

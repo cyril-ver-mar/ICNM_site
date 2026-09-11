@@ -4,3 +4,8 @@ __pycache__/
 *.pyc
 .DS_Store
 .vendor-skills/
+exports/
+
+# Host stubs for Docker bind mounts (real JSON is in src/core/)
+wp-content/plugins/ichnm-site/site-model.json
+wp-content/plugins/ichnm-site/migrated-copy.json

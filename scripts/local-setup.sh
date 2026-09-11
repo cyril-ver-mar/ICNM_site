@@ -21,5 +21,7 @@ docker compose run --rm wpcli theme activate ichnm-kadence
 docker compose run --rm wpcli plugin activate ichnm-site
 docker compose run --rm wpcli plugin install polylang --activate || true
 docker compose run --rm wpcli plugin install button-visually-impaired --activate || true
+docker compose run --rm wpcli rewrite structure '/%postname%/' --hard
+docker compose run --rm wpcli eval 'if (function_exists("ichnm_sync_content")) { ichnm_sync_content(true); echo "ichnm content synced\n"; }'
 echo "Local site: http://localhost:8080"
 echo "Admin: http://localhost:8080/wp-admin  (admin / admin) — change the password."

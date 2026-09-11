@@ -28,7 +28,9 @@ services:
       - wp_data:/var/www/html
       - ./wp-content/plugins/ichnm-site:/var/www/html/wp-content/plugins/ichnm-site
       - ./src/core/site_model.json:/var/www/html/wp-content/plugins/ichnm-site/site-model.json:ro
+      - ./src/core/migrated_copy.json:/var/www/html/wp-content/plugins/ichnm-site/migrated-copy.json:ro
       - ./wp-content/themes/ichnm-kadence:/var/www/html/wp-content/themes/ichnm-kadence
+      - ./assets:/var/www/html/wp-content/uploads/ichnm-source:ro
     depends_on:
       db:
         condition: service_healthy
@@ -50,7 +52,9 @@ services:
       - wp_data:/var/www/html
       - ./wp-content/plugins/ichnm-site:/var/www/html/wp-content/plugins/ichnm-site
       - ./src/core/site_model.json:/var/www/html/wp-content/plugins/ichnm-site/site-model.json:ro
+      - ./src/core/migrated_copy.json:/var/www/html/wp-content/plugins/ichnm-site/migrated-copy.json:ro
       - ./wp-content/themes/ichnm-kadence:/var/www/html/wp-content/themes/ichnm-kadence
+      - ./assets:/var/www/html/wp-content/uploads/ichnm-source:ro
     entrypoint: ["wp", "--path=/var/www/html"]
 
 volumes:
