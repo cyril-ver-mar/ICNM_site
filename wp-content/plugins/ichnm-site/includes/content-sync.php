@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-const ICHNM_CONTENT_SEED_VERSION = 16;
+const ICHNM_CONTENT_SEED_VERSION = 17;
 
 function ichnm_migrated_copy(): array
 {
@@ -57,14 +57,51 @@ function ichnm_blocks_html(array $block): string
 
 function ichnm_find_by_slug(string $post_type, string $slug): ?WP_Post
 {
-    $posts = get_posts([
-        'post_type' => $post_type,
-        'name' => $slug,
-        'post_status' => 'any',
-        'posts_per_page' => 1,
-        'suppress_filters' => true,
-    ]);
-    return $posts[0] ?? null;
+    $meta_key = match ($post_type) {
+        'department' => '_ichnm_lab_slug',
+        'person' => '_ichnm_person_id',
+        default => '',
+    };
+
+    $candidates = [];
+    if ($meta_key !== '') {
+        $candidates = get_posts([
+            'post_type' => $post_type,
+            'post_status' => ['publish', 'draft', 'private'],
+            'posts_per_page' => 50,
+            'meta_key' => $meta_key,
+            'meta_value' => $slug,
+            'suppress_filters' => true,
+        ]);
+    }
+    if (!$candidates) {
+        $candidates = get_posts([
+            'post_type' => $post_type,
+            'name' => $slug,
+            'post_status' => ['publish', 'draft', 'private'],
+            'posts_per_page' => 50,
+            'suppress_filters' => true,
+        ]);
+    }
+
+    $ru = null;
+    $exact = null;
+    foreach ($candidates as $post) {
+        if (!$post instanceof WP_Post) {
+            continue;
+        }
+        $lang = function_exists('pll_get_post_language') ? (string) pll_get_post_language((int) $post->ID) : 'ru';
+        if ($post->post_name === $slug && ($lang === 'ru' || $lang === '')) {
+            return $post;
+        }
+        if (($lang === 'ru' || $lang === '') && $ru === null) {
+            $ru = $post;
+        }
+        if ($post->post_name === $slug && $exact === null) {
+            $exact = $post;
+        }
+    }
+    return $ru ?? $exact;
 }
 
 function ichnm_upsert_post(array $args, string $meta_key, string $meta_value): int
@@ -72,13 +109,27 @@ function ichnm_upsert_post(array $args, string $meta_key, string $meta_value): i
     $existing = get_posts([
         'post_type' => $args['post_type'],
         'post_status' => 'any',
-        'posts_per_page' => 1,
+        'posts_per_page' => 50,
         'meta_key' => $meta_key,
         'meta_value' => $meta_value,
         'suppress_filters' => true,
     ]);
-    if ($existing) {
-        $args['ID'] = (int) $existing[0]->ID;
+    $target = null;
+    foreach ($existing as $post) {
+        if (!$post instanceof WP_Post) {
+            continue;
+        }
+        $lang = function_exists('pll_get_post_language') ? (string) pll_get_post_language((int) $post->ID) : 'ru';
+        if ($lang === 'ru' || $lang === '') {
+            $target = $post;
+            break;
+        }
+    }
+    if ($target === null && $existing) {
+        $target = $existing[0];
+    }
+    if ($target instanceof WP_Post) {
+        $args['ID'] = (int) $target->ID;
         $result = wp_update_post($args, true);
     } else {
         $result = wp_insert_post($args, true);
@@ -89,6 +140,9 @@ function ichnm_upsert_post(array $args, string $meta_key, string $meta_value): i
     $id = (int) $result;
     if ($id > 0) {
         update_post_meta($id, $meta_key, $meta_value);
+        if (function_exists('pll_set_post_language') && !pll_get_post_language($id)) {
+            pll_set_post_language($id, 'ru');
+        }
     }
     return $id;
 }
@@ -1055,6 +1109,74 @@ function ichnm_import_labs(): void
             'post_content' => ichnm_lab_pack_html($lab),
         ], '_ichnm_lab_slug', $slug);
     }
+    ichnm_dedupe_department_posts();
+}
+
+/**
+ * Keep one RU lab per slug; trash bare-slug EN/BE/ZH leftovers that break /labs/{slug}/.
+ */
+function ichnm_dedupe_department_posts(): void
+{
+    $slugs = [];
+    foreach (ichnm_migrated_copy()['labs'] ?? [] as $lab) {
+        if (is_array($lab) && !empty($lab['slug'])) {
+            $slugs[(string) $lab['slug']] = (string) ($lab['title'] ?? $lab['slug']);
+        }
+    }
+    if (!$slugs) {
+        return;
+    }
+
+    $all = get_posts([
+        'post_type' => 'department',
+        'post_status' => ['publish', 'draft', 'private'],
+        'posts_per_page' => -1,
+        'suppress_filters' => true,
+    ]);
+
+    foreach ($slugs as $slug => $ru_title) {
+        $canonical = ichnm_find_by_slug('department', $slug);
+        if (!$canonical instanceof WP_Post) {
+            continue;
+        }
+        $canonical_id = (int) $canonical->ID;
+        if (function_exists('pll_set_post_language')) {
+            pll_set_post_language($canonical_id, 'ru');
+        }
+        wp_update_post([
+            'ID' => $canonical_id,
+            'post_name' => $slug,
+            'post_title' => $ru_title,
+        ]);
+        update_post_meta($canonical_id, '_ichnm_lab_slug', $slug);
+
+        foreach ($all as $post) {
+            if (!$post instanceof WP_Post) {
+                continue;
+            }
+            $id = (int) $post->ID;
+            if ($id === $canonical_id) {
+                continue;
+            }
+            $meta = (string) get_post_meta($id, '_ichnm_lab_slug', true);
+            $name = (string) $post->post_name;
+            $related = ($meta === $slug)
+                || $name === $slug
+                || preg_match('/^' . preg_quote($slug, '/') . '(-\d+|-(en|be|zh)(-\d+)?)$/', $name);
+            if (!$related) {
+                continue;
+            }
+            $lang = function_exists('pll_get_post_language') ? (string) pll_get_post_language($id) : 'ru';
+            if ($lang === 'ru' || $lang === '') {
+                wp_trash_post($id);
+                continue;
+            }
+            // Old shared-slug shells (post_name === slug) break the singular query.
+            if ($name === $slug || preg_match('/^' . preg_quote($slug, '/') . '-\d+$/', $name)) {
+                wp_trash_post($id);
+            }
+        }
+    }
 }
 
 function ichnm_import_people(): void
@@ -1424,12 +1546,29 @@ function ichnm_ensure_utility_pages(): void
  */
 function ichnm_search_catalog(): array
 {
-    static $rows = null;
-    if (is_array($rows)) {
-        return $rows;
+    $lang = function_exists('pll_current_language') ? (string) pll_current_language('slug') : 'ru';
+    if ($lang === '') {
+        $lang = 'ru';
+    }
+    static $cache = [];
+    if (isset($cache[$lang]) && is_array($cache[$lang])) {
+        return $cache[$lang];
     }
     $rows = [];
-    foreach (get_posts(['post_type' => 'person', 'posts_per_page' => 200, 'post_status' => 'publish']) as $post) {
+
+    $people = get_posts([
+        'post_type' => 'person',
+        'posts_per_page' => 200,
+        'post_status' => 'publish',
+        'suppress_filters' => true,
+    ]);
+    foreach ($people as $post) {
+        if (function_exists('pll_get_post_language')) {
+            $post_lang = (string) pll_get_post_language((int) $post->ID);
+            if ($post_lang && $post_lang !== $lang && !($lang === 'ru' && $post_lang === '')) {
+                continue;
+            }
+        }
         $rows[] = [
             'type' => 'person',
             'title' => get_the_title($post),
@@ -1437,11 +1576,45 @@ function ichnm_search_catalog(): array
             'meta' => wp_strip_all_tags((string) $post->post_content),
         ];
     }
-    foreach (get_posts(['post_type' => 'department', 'posts_per_page' => 50, 'post_status' => 'publish']) as $post) {
+
+    $seen_labs = [];
+    $labs = get_posts([
+        'post_type' => 'department',
+        'posts_per_page' => 100,
+        'post_status' => 'publish',
+        'suppress_filters' => true,
+    ]);
+    foreach ($labs as $post) {
+        $slug = (string) get_post_meta((int) $post->ID, '_ichnm_lab_slug', true);
+        if ($slug === '') {
+            $slug = (string) $post->post_name;
+        }
+        $slug = preg_replace('/-(en|be|zh)$/', '', $slug) ?: $slug;
+        if (isset($seen_labs[$slug])) {
+            continue;
+        }
+        $target = $post;
+        if (function_exists('pll_get_post') && function_exists('pll_get_post_language')) {
+            $ru = ichnm_find_by_slug('department', $slug);
+            if ($ru instanceof WP_Post) {
+                $translated = (int) pll_get_post((int) $ru->ID, $lang);
+                if ($translated > 0) {
+                    $translated_post = get_post($translated);
+                    if ($translated_post instanceof WP_Post && $translated_post->post_status === 'publish') {
+                        $target = $translated_post;
+                    } else {
+                        $target = $ru;
+                    }
+                } else {
+                    $target = $ru;
+                }
+            }
+        }
+        $seen_labs[$slug] = true;
         $rows[] = [
             'type' => 'unit',
-            'title' => get_the_title($post),
-            'href' => (string) get_permalink($post),
+            'title' => get_the_title($target),
+            'href' => (string) get_permalink($target),
             'meta' => 'Лаборатория',
         ];
     }
@@ -1479,6 +1652,7 @@ function ichnm_search_catalog(): array
             'meta' => (string) ($item['lead'] ?? $item['product'] ?? 'Разработка'),
         ];
     }
+    $cache[$lang] = $rows;
     return $rows;
 }
 

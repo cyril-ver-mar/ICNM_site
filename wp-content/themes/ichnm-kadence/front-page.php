@@ -21,15 +21,17 @@ $event = is_array($copy['next_event'] ?? null) ? $copy['next_event'] : [];
 $structure_teaser = (string) ($copy['structure_teaser'] ?? '');
 $developments_teaser = (string) ($copy['developments_teaser'] ?? '');
 
-$about = get_page_by_path('about-overview') ?: get_page_by_path('about');
-$structure = get_page_by_path('structure');
-$developments = get_page_by_path('developments');
-$feedback = get_page_by_path('feedback');
-$events_page = get_page_by_path('events');
+$about = function_exists('ichnm_translated_page')
+    ? (ichnm_translated_page('about-overview') ?: ichnm_translated_page('about'))
+    : (get_page_by_path('about-overview') ?: get_page_by_path('about'));
+$structure = function_exists('ichnm_translated_page') ? ichnm_translated_page('structure') : get_page_by_path('structure');
+$developments = function_exists('ichnm_translated_page') ? ichnm_translated_page('developments') : get_page_by_path('developments');
+$feedback = function_exists('ichnm_translated_page') ? ichnm_translated_page('feedback') : get_page_by_path('feedback');
+$events_page = function_exists('ichnm_translated_page') ? ichnm_translated_page('events') : get_page_by_path('events');
 $events_archive = $events_page instanceof WP_Post
     ? (string) get_permalink($events_page)
     : (get_post_type_archive_link('event') ?: home_url('/events/'));
-$news_page = get_page_by_path('news');
+$news_page = function_exists('ichnm_translated_page') ? ichnm_translated_page('news') : get_page_by_path('news');
 $news_archive = $news_page instanceof WP_Post
     ? (string) get_permalink($news_page)
     : (get_post_type_archive_link('news') ?: home_url('/news/'));
@@ -37,35 +39,93 @@ $news_archive = $news_page instanceof WP_Post
 $href = static function (?WP_Post $page, string $fallback = '#'): string {
     return $page instanceof WP_Post ? (string) get_permalink($page) : $fallback;
 };
+
+$ui = function_exists('ichnm_chrome_strings') ? ichnm_chrome_strings() : [];
+$home_ui = [
+    'ru' => [
+        'kicker' => 'Национальная академия наук Беларуси',
+        'about' => 'Сведения',
+        'structure' => 'Структура',
+        'developments' => 'Разработки',
+        'write' => 'Написать нам',
+        'stats' => 'Краткие сведения',
+        'years' => 'лет институту (с %s)',
+        'labs' => 'лабораторий в структуре сайта',
+        'langs' => 'языковых контура структуры',
+        'news' => 'Актуальные новости и СМИ о нас',
+        'all_news' => 'Все новости',
+    ],
+    'en' => [
+        'kicker' => 'National Academy of Sciences of Belarus',
+        'about' => 'Overview',
+        'structure' => 'Structure',
+        'developments' => 'Developments',
+        'write' => 'Contact us',
+        'stats' => 'At a glance',
+        'years' => 'years since %s',
+        'labs' => 'laboratories on the site',
+        'langs' => 'structure language shells',
+        'news' => 'News and media about us',
+        'all_news' => 'All news',
+    ],
+    'be' => [
+        'kicker' => 'Нацыянальная акадэмія навук Беларусі',
+        'about' => 'Звесткі',
+        'structure' => 'Структура',
+        'developments' => 'Распрацоўкі',
+        'write' => 'Напісаць нам',
+        'stats' => 'Кароткія звесткі',
+        'years' => 'гадоў інстытуту (з %s)',
+        'labs' => 'лабараторый у структуры сайта',
+        'langs' => 'моўных контураў структуры',
+        'news' => 'Актуальныя навіны і СМІ пра нас',
+        'all_news' => 'Усе навіны',
+    ],
+    'zh' => [
+        'kicker' => '白俄罗斯国家科学院',
+        'about' => '概况',
+        'structure' => '机构设置',
+        'developments' => '研发成果',
+        'write' => '联系我们',
+        'stats' => '概况数字',
+        'years' => '自 %s 年建所',
+        'labs' => '网站结构中的实验室',
+        'langs' => '结构语言壳层',
+        'news' => '新闻与媒体报道',
+        'all_news' => '全部新闻',
+    ],
+];
+$lang = function_exists('pll_current_language') ? (string) pll_current_language('slug') : 'ru';
+$t = $home_ui[$lang] ?? $home_ui['ru'];
 ?>
 <main class="ichnm-home">
   <section class="ichnm-hero" data-ichnm-block="official_intro">
     <div class="ichnm-hero-inner wrap">
-      <p class="ichnm-hero-kicker">Национальная академия наук Беларуси</p>
+      <p class="ichnm-hero-kicker"><?php echo esc_html($t['kicker']); ?></p>
       <h1 class="ichnm-hero-title"><?php echo esc_html($short); ?></h1>
       <p class="ichnm-hero-lead"><?php echo esc_html($intro); ?></p>
       <div class="ichnm-hero-pills">
-        <a class="ichnm-pill ichnm-pill-primary" href="<?php echo esc_url($href($about)); ?>">Сведения</a>
-        <a class="ichnm-pill" href="<?php echo esc_url($href($structure)); ?>">Структура</a>
-        <a class="ichnm-pill" href="<?php echo esc_url($href($developments)); ?>">Разработки</a>
-        <a class="ichnm-pill" href="<?php echo esc_url($href($feedback, home_url('/feedback/'))); ?>">Написать нам</a>
+        <a class="ichnm-pill ichnm-pill-primary" href="<?php echo esc_url($href($about)); ?>"><?php echo esc_html($t['about']); ?></a>
+        <a class="ichnm-pill" href="<?php echo esc_url($href($structure)); ?>"><?php echo esc_html($t['structure']); ?></a>
+        <a class="ichnm-pill" href="<?php echo esc_url($href($developments)); ?>"><?php echo esc_html($t['developments']); ?></a>
+        <a class="ichnm-pill" href="<?php echo esc_url($href($feedback, home_url('/feedback/'))); ?>"><?php echo esc_html($t['write']); ?></a>
       </div>
     </div>
   </section>
 
-  <section class="ichnm-stats" aria-label="Краткие сведения">
+  <section class="ichnm-stats" aria-label="<?php echo esc_attr($t['stats']); ?>">
     <div class="wrap ichnm-stats-grid">
       <div class="ichnm-stat">
         <span class="ichnm-stat-value"><?php echo esc_html((string) $years); ?></span>
-        <span class="ichnm-stat-label">лет институту (с <?php echo esc_html((string) $founded); ?>)</span>
+        <span class="ichnm-stat-label"><?php echo esc_html(sprintf($t['years'], (string) $founded)); ?></span>
       </div>
       <div class="ichnm-stat">
         <span class="ichnm-stat-value"><?php echo esc_html((string) $labs_count); ?></span>
-        <span class="ichnm-stat-label">лабораторий в структуре сайта</span>
+        <span class="ichnm-stat-label"><?php echo esc_html($t['labs']); ?></span>
       </div>
       <div class="ichnm-stat">
         <span class="ichnm-stat-value">4</span>
-        <span class="ichnm-stat-label">языковых контура структуры</span>
+        <span class="ichnm-stat-label"><?php echo esc_html($t['langs']); ?></span>
       </div>
     </div>
   </section>
@@ -73,8 +133,8 @@ $href = static function (?WP_Post $page, string $fallback = '#'): string {
   <section class="ichnm-home-band" data-ichnm-block="news">
     <div class="wrap">
       <div class="ichnm-band-head">
-        <h2>Актуальные новости и СМИ о нас</h2>
-        <a class="ichnm-band-more" href="<?php echo esc_url($news_archive); ?>">Все новости</a>
+        <h2><?php echo esc_html($t['news']); ?></h2>
+        <a class="ichnm-band-more" href="<?php echo esc_url($news_archive); ?>"><?php echo esc_html($t['all_news']); ?></a>
       </div>
       <?php if ($feed) : ?>
         <div class="ichnm-news-grid">
