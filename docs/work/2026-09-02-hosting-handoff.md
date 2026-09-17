@@ -26,7 +26,7 @@
 
 ### Сид контента
 
-- Константа `ICHNM_CONTENT_SEED_VERSION` в `wp-content/plugins/ichnm-site/includes/content-sync.php` — сейчас **30** (единственный авторитетный номер; preview-parity catalogue/conference сид).
+- Константа `ICHNM_CONTENT_SEED_VERSION` в `wp-content/plugins/ichnm-site/includes/content-sync.php` — сейчас **31** (единственный авторитетный номер; visual class hooks для packs/person/catalogues/contacts).
 - Опция WP: `ichnm_content_seed_version`. После деплоя на PHP при необходимости форс-ресід: `wp eval 'ichnm_sync_content(true);'` (или `scripts/local-setup.sh`).
 
 ### Docker volumes (данные не в git)

@@ -21,6 +21,11 @@ while (have_posts()) {
         </div>
       </header>
 
+      <nav class="section-jump" aria-label="На этой странице">
+        <a href="#ichnm-news-institute"><?php echo esc_html($hub['institute_news'] ?? 'Новости Института'); ?></a>
+        <a href="#ichnm-news-media"><?php echo esc_html($hub['media_about'] ?? 'СМИ о нас'); ?></a>
+      </nav>
+
       <section class="ichnm-home-band" aria-labelledby="ichnm-news-institute">
         <div class="ichnm-band-head">
           <h2 id="ichnm-news-institute"><?php echo esc_html($hub['institute_news'] ?? 'Новости Института'); ?></h2>

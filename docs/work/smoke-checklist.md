@@ -60,6 +60,7 @@ BASE_URL=https://new.ichnm.by ./scripts/wp-smoke.sh
 | H | Feed-editor | войти как `ichnm_feed_editor`: ленты да, Appearance / витрины — нет | ☐ см. `docs/work/notes/feed-editor-role.md` |
 | I | Главная: dir-grid | `/` | ☐ | Полоса «основные направления» (`dir-grid` / эквивалент) |
 | J | Главная: top menu | `/` | ☐ | Верхнее меню: Об институте / Новости / Мероприятия / Контакты |
+| V | Visual pass (preview parity) | `/`, `/labs/nano/`, `/contacts/` side-by-side vs `preview/` | ☐ | Chrome + home bands + packs + footer grid/pictograms; not Kadence default strip. Spec: `docs/work/specs/2026-09-17-wp-visual-preview-parity.md` |
 
 ---
 

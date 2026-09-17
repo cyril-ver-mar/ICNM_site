@@ -7,7 +7,26 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+add_filter('wp_resource_hints', static function (array $urls, string $relation_type): array {
+    if ($relation_type === 'preconnect') {
+        $urls[] = 'https://fonts.googleapis.com';
+        $urls[] = [
+            'href' => 'https://fonts.gstatic.com',
+            'crossorigin' => 'anonymous',
+        ];
+    }
+    return $urls;
+}, 10, 2);
+
 add_action('wp_enqueue_scripts', static function (): void {
+    // Same Google stack as honest preview (Montserrat display + Roboto body).
+    wp_enqueue_style(
+        'ichnm-fonts',
+        'https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Roboto:wght@400;500;700&display=swap',
+        [],
+        null
+    );
+
     $parent_style = get_template_directory() . '/style.css';
     if (is_readable($parent_style)) {
         wp_enqueue_style(
@@ -20,7 +39,10 @@ add_action('wp_enqueue_scripts', static function (): void {
     wp_enqueue_style(
         'ichnm-kadence',
         get_stylesheet_uri(),
-        is_readable($parent_style) ? ['kadence'] : [],
+        array_values(array_filter([
+            'ichnm-fonts',
+            is_readable($parent_style) ? 'kadence' : null,
+        ])),
         wp_get_theme()->get('Version')
     );
     $ver = (string) wp_get_theme()->get('Version');
@@ -75,6 +97,8 @@ function ichnm_chrome_strings(?string $lang = null): array
             'bvi' => 'Версия для слабовидящих',
             'search' => 'Поиск',
             'sitemap' => 'Карта сайта',
+            'theme_day' => 'Дневная тема',
+            'theme_night' => 'Ночная тема',
             'write' => 'Написать нам',
             'menu' => 'Меню',
             'search_aria' => 'Поиск',
@@ -87,12 +111,29 @@ function ichnm_chrome_strings(?string $lang = null): array
             'cookies' => 'Политика cookie',
             'personal' => 'Персональные данные',
             'sections' => 'Разделы',
+            'footer_institute' => 'Институт',
+            'footer_on_site' => 'На сайте',
+            'footer_nas_socials' => 'Соцсети НАН',
+            'footer_webmail' => 'Веб-почта института — адрес появится после PHP-тарифа.',
+            'footer_find_us' => 'Как нас найти',
+            'footer_map_alt' => 'Институт на карте Минска, ул. Ф. Скорины, 36',
+            'footer_pictograms' => 'Ресурсы Академии и государственные порталы',
+            'footer_news' => 'Новости',
+            'footer_media' => 'СМИ о нас',
+            'footer_education' => 'Научно-ориентированное образование',
+            'footer_union' => 'Профсоюз',
+            'footer_publications' => 'Публикации',
+            'footer_feedback' => 'Обратная связь',
+            'footer_street' => 'ул. Ф. Скорины, 36',
+            'footer_address' => '220084, Республика Беларусь, г. Минск, ул. Ф. Скорины, 36',
         ],
         'en' => [
             'lang_aria' => 'Language',
             'bvi' => 'Visually impaired version',
             'search' => 'Search',
             'sitemap' => 'Sitemap',
+            'theme_day' => 'Light mode',
+            'theme_night' => 'Dark mode',
             'write' => 'Contact us',
             'menu' => 'Menu',
             'search_aria' => 'Search',
@@ -105,12 +146,29 @@ function ichnm_chrome_strings(?string $lang = null): array
             'cookies' => 'Cookie policy',
             'personal' => 'Personal data',
             'sections' => 'Sections',
+            'footer_institute' => 'Institute',
+            'footer_on_site' => 'On this site',
+            'footer_nas_socials' => 'NAS social media',
+            'footer_webmail' => 'Institute webmail — the address will appear after the PHP hosting plan.',
+            'footer_find_us' => 'How to find us',
+            'footer_map_alt' => 'The institute on the Minsk map, 36 Skaryna Street',
+            'footer_pictograms' => 'Academy resources and government portals',
+            'footer_news' => 'News',
+            'footer_media' => 'Media about us',
+            'footer_education' => 'Research-oriented education',
+            'footer_union' => 'Trade union',
+            'footer_publications' => 'Publications',
+            'footer_feedback' => 'Feedback',
+            'footer_street' => '36 Skaryna Street',
+            'footer_address' => '220084, Republic of Belarus, Minsk, 36 Skaryna Street',
         ],
         'be' => [
             'lang_aria' => 'Мова',
             'bvi' => 'Версія для слабавідушчых',
             'search' => 'Пошук',
             'sitemap' => 'Карта сайта',
+            'theme_day' => 'Дзённы рэжым',
+            'theme_night' => 'Начны рэжым',
             'write' => 'Напісаць нам',
             'menu' => 'Меню',
             'search_aria' => 'Пошук',
@@ -123,12 +181,29 @@ function ichnm_chrome_strings(?string $lang = null): array
             'cookies' => 'Палітыка cookie',
             'personal' => 'Персанальныя даныя',
             'sections' => 'Раздзелы',
+            'footer_institute' => 'Інстытут',
+            'footer_on_site' => 'На сайце',
+            'footer_nas_socials' => 'Сацсеткі НАН',
+            'footer_webmail' => 'Вэб-пошта інстытута — адрас з’явіцца пасля PHP-тарыфу.',
+            'footer_find_us' => 'Як нас знайсці',
+            'footer_map_alt' => 'Інстытут на карце Мінска, вул. Ф. Скарыны, 36',
+            'footer_pictograms' => 'Рэсурсы Акадэміі і дзяржаўныя парталы',
+            'footer_news' => 'Навіны',
+            'footer_media' => 'СМІ пра нас',
+            'footer_education' => 'Навукова-арыентаваная адукацыя',
+            'footer_union' => 'Прафсаюз',
+            'footer_publications' => 'Публікацыі',
+            'footer_feedback' => 'Зваротная сувязь',
+            'footer_street' => 'вул. Ф. Скарыны, 36',
+            'footer_address' => '220084, Рэспубліка Беларусь, г. Мінск, вул. Ф. Скарыны, 36',
         ],
         'zh' => [
             'lang_aria' => '语言',
             'bvi' => '视力障碍版本',
             'search' => '搜索',
             'sitemap' => '网站地图',
+            'theme_day' => '浅色模式',
+            'theme_night' => '深色模式',
             'write' => '联系我们',
             'menu' => '菜单',
             'search_aria' => '搜索',
@@ -141,6 +216,21 @@ function ichnm_chrome_strings(?string $lang = null): array
             'cookies' => 'Cookie 政策',
             'personal' => '个人数据',
             'sections' => '栏目',
+            'footer_institute' => '研究所',
+            'footer_on_site' => '本站',
+            'footer_nas_socials' => '科学院社交账号',
+            'footer_webmail' => '研究所网页邮箱——地址将在开通 PHP 主机后公布。',
+            'footer_find_us' => '如何找到我们',
+            'footer_map_alt' => '明斯克地图上的研究所，斯卡里纳大街 36 号',
+            'footer_pictograms' => '科学院资源与政府门户',
+            'footer_news' => '新闻',
+            'footer_media' => '媒体报道',
+            'footer_education' => '科研导向教育',
+            'footer_union' => '工会',
+            'footer_publications' => '论文',
+            'footer_feedback' => '反馈',
+            'footer_street' => '斯卡里纳大街 36 号',
+            'footer_address' => '220084，白俄罗斯共和国，明斯克，斯卡里纳大街 36 号',
         ],
     ];
     return $pack[$lang] ?? $pack['ru'];
@@ -463,10 +553,20 @@ function ichnm_render_language_switch(): void
     $current_lang = function_exists('pll_current_language') ? (string) pll_current_language('slug') : 'ru';
 
     echo '<div class="ichnm-chrome-tools">';
-    echo '<button type="button" class="ichnm-menu-toggle" aria-expanded="false" aria-controls="ichnm-primary-nav">' . esc_html($ui['menu']) . '</button>';
+    echo '<button type="button" class="ichnm-menu-toggle tool-btn" aria-expanded="false" aria-controls="ichnm-primary-nav">' . esc_html($ui['menu']) . '</button>';
     echo '</div>';
     echo '<div class="ichnm-header-panel">';
     echo '<div class="ichnm-header-utilities">';
+    // Preview order: search → sitemap → theme → BVI → write → languages.
+    echo '<button type="button" class="ichnm-tool-btn tool-btn" data-ichnm-search-open aria-controls="ichnm-site-search">' . esc_html($ui['search']) . '</button>';
+    echo '<a class="ichnm-tool-btn tool-btn" href="' . esc_url($sitemap_href) . '">' . esc_html($ui['sitemap']) . '</a>';
+    echo '<button type="button" class="ichnm-tool-btn tool-btn" data-theme-toggle aria-pressed="false" data-label-day="' . esc_attr($ui['theme_day']) . '" data-label-night="' . esc_attr($ui['theme_night']) . '">' . esc_html($ui['theme_night']) . '</button>';
+    if (shortcode_exists('bvi')) {
+        echo '<div class="ichnm-bvi">' . do_shortcode('[bvi text="' . esc_attr($ui['bvi']) . '"]') . '</div>';
+    }
+    $feedback = ichnm_translated_page('feedback');
+    $feedback_href = $feedback instanceof WP_Post ? get_permalink($feedback) : home_url('/feedback/');
+    echo '<a class="ichnm-tool-btn tool-btn" href="' . esc_url($feedback_href) . '">' . esc_html($ui['write']) . '</a>';
     if ($langs) {
         echo '<nav class="ichnm-lang-switch" aria-label="' . esc_attr($ui['lang_aria']) . '">';
         foreach ($langs as $lang) {
@@ -497,14 +597,6 @@ function ichnm_render_language_switch(): void
         }
         echo '</nav>';
     }
-    if (shortcode_exists('bvi')) {
-        echo '<div class="ichnm-bvi">' . do_shortcode('[bvi text="' . esc_attr($ui['bvi']) . '"]') . '</div>';
-    }
-    echo '<button type="button" class="ichnm-tool-btn" data-ichnm-search-open aria-controls="ichnm-site-search">' . esc_html($ui['search']) . '</button>';
-    echo '<a class="ichnm-tool-btn" href="' . esc_url($sitemap_href) . '">' . esc_html($ui['sitemap']) . '</a>';
-    $feedback = ichnm_translated_page('feedback');
-    $feedback_href = $feedback instanceof WP_Post ? get_permalink($feedback) : home_url('/feedback/');
-    echo '<a class="ichnm-write-btn" href="' . esc_url($feedback_href) . '">' . esc_html($ui['write']) . '</a>';
     echo '</div>'; // .ichnm-header-utilities
 }
 
@@ -557,6 +649,15 @@ function ichnm_render_search_overlay(): void
     echo '</div></div>';
 }
 
+/**
+ * Early theme + motion boot (same FOUC guard as honest preview).
+ */
+function ichnm_theme_boot_script(): void
+{
+    echo '<script>(function(){try{var t=localStorage.getItem("ichnm-theme");var h=new Date().getHours();var night=t==="night"||(t!=="day"&&(h>=21||h<7));if(night)document.documentElement.classList.add("theme-night")}catch(e){}try{var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(!reduce)document.documentElement.classList.add("js-motion")}catch(e){}})();</script>' . "\n";
+}
+add_action('wp_head', 'ichnm_theme_boot_script', 0);
+
 add_action('wp_body_open', 'ichnm_render_veil', 1);
 add_action('wp_body_open', 'ichnm_render_chrome_open', 4);
 add_action('wp_body_open', 'ichnm_render_identity', 5);
@@ -565,51 +666,161 @@ add_action('wp_body_open', 'ichnm_render_primary_menu', 7);
 add_action('wp_body_open', 'ichnm_render_chrome_close', 8);
 add_action('wp_body_open', 'ichnm_render_search_overlay', 9);
 
-add_action('wp_footer', static function (): void {
+/**
+ * Inline social mark for footer (preview-class icons; label stays visible).
+ */
+function ichnm_footer_social_icon(string $network): string
+{
+    $paths = [
+        'facebook' => 'M10 3.2h1.8V.9H10c-2 0-3.3 1.2-3.3 3.4v1.5H5v2.4h1.7V16h2.5V8.2h2.1l.4-2.4H9.2V4.6c0-.7.3-1.4 1.4-1.4z',
+        'vk' => 'M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1.01-1.49-1.147-1.744-1.147-.356 0-.458.102-.458.593v1.575c0 .424-.135.688-1.261.688-1.862 0-3.926-1.126-5.379-3.224C4.24 10.883 3.5 8.68 3.5 8.36c0-.323.102-.594.593-.594h1.744c.44 0 .61.253.78.843.863 2.49 2.303 4.677 2.896 4.677.226 0 .338-.105.338-.688V9.721c-.068-1.186-.695-1.287-.695-1.71 0-.204.17-.407.44-.407h2.744c.44 0 .525.22.525.688v3.686c0 .355.16.479.254.479.226 0 .407-.124.814-.53 1.254-1.406 2.151-3.574 2.151-3.574.119-.254.322-.593.763-.593h1.744c.525 0 .643.27.525.643-.22 1.017-2.354 4.031-2.354 4.031-.186.305-.256.44 0 .78.186.254.796.779 1.203 1.253.745.847 1.32 1.558 1.473 2.05.17.49-.085.743-.576.743z',
+        'telegram' => 'M15.7 2.3 1.8 7.6c-.9.4-.9 1 .2 1.3l3.5 1.1 1.3 4.1c.2.5.3.7.7.7.4 0 .6-.2.8-.5l2-2.1 4.1 3c.8.4 1.3.2 1.5-.7l2.7-12.7c.3-1.1-.4-1.6-1.2-1.3zM6.7 9.9l7.3-4.6-5.7 5.5-.2 2.5-1.4-3.4z',
+        'instagram' => 'M8 4.4A3.6 3.6 0 1 0 8 11.6 3.6 3.6 0 0 0 8 4.4zm0 5.9A2.3 2.3 0 1 1 8 5.7a2.3 2.3 0 0 1 0 4.6zM12.4 4.2a.84.84 0 1 1-1.68 0 .84.84 0 0 1 1.68 0zM14.7 4.3a4.1 4.1 0 0 0-1.1-2.9 4.1 4.1 0 0 0-2.9-1.1H5.3A4.1 4.1 0 0 0 2.4 1.4 4.1 4.1 0 0 0 1.3 4.3v5.4a4.1 4.1 0 0 0 1.1 2.9 4.1 4.1 0 0 0 2.9 1.1h5.4a4.1 4.1 0 0 0 2.9-1.1 4.1 4.1 0 0 0 1.1-2.9V4.3zm-1.3 5.4a2.8 2.8 0 0 1-.8 2 2.8 2.8 0 0 1-2 .8H5.3a2.8 2.8 0 0 1-2-.8 2.8 2.8 0 0 1-.8-2V4.3a2.8 2.8 0 0 1 .8-2 2.8 2.8 0 0 1 2-.8h5.4a2.8 2.8 0 0 1 2 .8 2.8 2.8 0 0 1 .8 2z',
+        'youtube' => 'M15.6 4.4s-.1-1.2-.5-1.7c-.5-.5-1.1-.5-1.3-.6C11.9 2 8 2 8 2h0s-3.9 0-5.8.1c-.3 0-.8.1-1.3.6-.4.5-.5 1.7-.5 1.7S0 5.8 0 7.2v1.6c0 1.4.2 2.8.2 2.8s.1 1.2.5 1.7c.5.5 1.2.5 1.5.6 1.1.1 5.8.1 5.8.1s3.9 0 5.8-.1c.3 0 .8-.1 1.3-.6.4-.5.5-1.7.5-1.7s.2-1.4.2-2.8V7.2c0-1.4-.2-2.8-.2-2.8zM6.4 10.6V5.4L12 8z',
+    ];
+    $key = strtolower($network);
+    if (!isset($paths[$key])) {
+        return '';
+    }
+    $box = $key === 'vk' ? '0 0 24 24' : '0 0 16 16';
+    return '<svg class="social-icon" viewBox="' . esc_attr($box) . '" width="16" height="16" aria-hidden="true">'
+        . '<path fill="currentColor" d="' . esc_attr($paths[$key]) . '"/></svg>';
+}
+
+/**
+ * Site utility links for the footer «На сайте» column (preview contour; no lattice demo).
+ *
+ * @return list<array{href:string,title:string}>
+ */
+function ichnm_footer_site_links(array $ui): array
+{
+    $rows = [
+        ['slug' => 'news', 'title' => $ui['footer_news']],
+        ['slug' => 'news', 'title' => $ui['footer_media']],
+        ['slug' => 'education', 'title' => $ui['footer_education']],
+        ['slug' => 'union', 'title' => $ui['footer_union']],
+        ['slug' => 'publications', 'title' => $ui['footer_publications']],
+        ['slug' => 'feedback', 'title' => $ui['footer_feedback']],
+        ['slug' => 'search', 'title' => $ui['search']],
+        ['slug' => 'sitemap', 'title' => $ui['sitemap']],
+        ['slug' => 'cookies', 'title' => $ui['cookies']],
+        ['slug' => 'personal-data', 'title' => $ui['personal']],
+    ];
+    $out = [];
+    foreach ($rows as $row) {
+        $page = ichnm_translated_page($row['slug']);
+        if (!$page instanceof WP_Post) {
+            continue;
+        }
+        $out[] = ['href' => (string) get_permalink($page), 'title' => $row['title']];
+    }
+    return $out;
+}
+
+/**
+ * Institute footer matching honest preview: identity / on-site / social / map + NAS pictograms.
+ */
+function ichnm_render_footer(): void
+{
     $model = ichnm_theme_model();
     $ui = ichnm_chrome_strings();
-    $legal = $model['footer']['legal_links'] ?? [];
+    $identity = $model['identity'] ?? [];
+    $legal_name = (string) ($identity['legal_name'] ?? 'ИХНМ НАН Беларуси');
+    $nas = (string) ($identity['nas_portal_href'] ?? 'https://nasb.gov.by/rus/index.php');
     $nas_social = $model['footer']['nas_social'] ?? [];
     $icnm_social = array_values(array_filter(
         $model['footer']['icnm_social'] ?? [],
         static function ($row): bool {
-            return !empty($row['href']);
+            return is_array($row) && !empty($row['href']);
         }
     ));
-    $search = ichnm_translated_page('search');
-    $sitemap = ichnm_translated_page('sitemap');
-    $cookies = ichnm_translated_page('cookies');
-    $personal = ichnm_translated_page('personal-data');
-    echo '<div class="ichnm-footer-extra"><div class="wrap ichnm-footer-grid">';
+    $pictograms = $model['footer']['pictograms'] ?? [];
+    $contacts = ichnm_translated_page('contacts');
+    $contacts_href = $contacts instanceof WP_Post ? (string) get_permalink($contacts) : home_url('/contacts/');
+
+    echo '<footer class="ichnm-footer ichnm-footer-extra">';
+    echo '<div class="wrap footer-grid ichnm-footer-grid">';
+
     echo '<div class="ichnm-footer-col">';
+    echo '<p class="footer-heading">' . esc_html($ui['footer_institute']) . '</p>';
+    echo '<p class="ichnm-footer-identity"><strong>' . esc_html($legal_name) . '</strong></p>';
+    echo '<p>' . esc_html($ui['footer_address']) . '</p>';
+    echo '<p><a href="' . esc_url($nas) . '">' . esc_html($ui['nas']) . '</a></p>';
+    echo '</div>';
+
+    echo '<div class="ichnm-footer-col">';
+    echo '<p class="footer-heading">' . esc_html($ui['footer_on_site']) . '</p>';
     echo '<ul class="ichnm-footer-legal">';
-    foreach ($legal as $link) {
+    foreach (ichnm_footer_site_links($ui) as $link) {
         echo '<li><a href="' . esc_url($link['href']) . '">' . esc_html($link['title']) . '</a></li>';
     }
-    if ($search instanceof WP_Post) {
-        echo '<li><a href="' . esc_url(get_permalink($search)) . '">' . esc_html($ui['search']) . '</a></li>';
-    }
-    if ($sitemap instanceof WP_Post) {
-        echo '<li><a href="' . esc_url(get_permalink($sitemap)) . '">' . esc_html($ui['sitemap']) . '</a></li>';
-    }
-    if ($cookies instanceof WP_Post) {
-        echo '<li><a href="' . esc_url(get_permalink($cookies)) . '">' . esc_html($ui['cookies']) . '</a></li>';
-    }
-    if ($personal instanceof WP_Post) {
-        echo '<li><a href="' . esc_url(get_permalink($personal)) . '">' . esc_html($ui['personal']) . '</a></li>';
-    }
-    echo '</ul>';
+    echo '</ul></div>';
+
+    echo '<div class="ichnm-footer-col">';
+    echo '<p class="footer-heading">' . esc_html($ui['footer_nas_socials']) . '</p>';
     echo '<ul class="ichnm-footer-social">';
     foreach (array_merge($nas_social, $icnm_social) as $link) {
-        $label = $link['label'] ?? $link['network'] ?? '';
-        echo '<li><a href="' . esc_url($link['href']) . '">' . esc_html((string) $label) . '</a></li>';
+        if (!is_array($link) || empty($link['href'])) {
+            continue;
+        }
+        $label = (string) ($link['label'] ?? $link['network'] ?? '');
+        $network = (string) ($link['network'] ?? '');
+        echo '<li><a href="' . esc_url((string) $link['href']) . '" rel="noopener noreferrer">';
+        echo ichnm_footer_social_icon($network);
+        echo '<span>' . esc_html($label) . '</span></a></li>';
     }
-    echo '</ul></div>';
+    echo '</ul>';
+    echo '<p>' . esc_html($ui['footer_webmail']) . '</p>';
+    echo '</div>';
+
+    echo '<div class="footer-place ichnm-footer-col">';
+    echo '<p class="footer-heading">' . esc_html($ui['footer_find_us']) . '</p>';
+    echo '<a class="footer-map ichnm-footer-map" href="' . esc_url($contacts_href) . '" aria-label="' . esc_attr($ui['footer_map_alt']) . '">';
     if (function_exists('ichnm_minsk_map_html')) {
-        echo '<div class="ichnm-footer-map">' . ichnm_minsk_map_html() . '</div>';
+        echo ichnm_minsk_map_html();
     }
-    echo '</div></div>';
-}, 20);
+    echo '<span>' . esc_html($ui['footer_street']) . '</span></a>';
+    echo '</div>';
+
+    echo '</div>'; // .footer-grid
+
+    if (is_array($pictograms) && $pictograms) {
+        echo '<div class="footer-pictograms" aria-label="' . esc_attr($ui['footer_pictograms']) . '">';
+        echo '<div class="wrap">';
+        echo '<p class="footer-heading">' . esc_html($ui['footer_pictograms']) . '</p>';
+        echo '<ul class="picto-strip">';
+        foreach ($pictograms as $pic) {
+            if (!is_array($pic) || empty($pic['href'])) {
+                continue;
+            }
+            $title = (string) ($pic['title'] ?? '');
+            $mark = (string) ($pic['mark'] ?? '');
+            if ($mark === '') {
+                $mark = function_exists('mb_substr') ? (string) mb_substr($title, 0, 2) : substr($title, 0, 2);
+            }
+            $icon = (string) ($pic['icon'] ?? '');
+            $icon = preg_replace('#^media/#', '', $icon) ?? $icon;
+            echo '<li><a href="' . esc_url((string) $pic['href']) . '" rel="noopener noreferrer">';
+            $shown = false;
+            if ($icon !== '' && function_exists('ichnm_source_path') && function_exists('ichnm_source_url')) {
+                $path = ichnm_source_path($icon);
+                if (is_readable($path)) {
+                    echo '<img class="picto-img" src="' . esc_url(ichnm_source_url($icon)) . '" alt="" width="140" height="66" loading="lazy">';
+                    $shown = true;
+                }
+            }
+            if (!$shown) {
+                echo '<span class="picto-mark">' . esc_html($mark) . '</span>';
+            }
+            echo '<span class="picto-title">' . esc_html($title) . '</span></a></li>';
+        }
+        echo '</ul></div></div>';
+    }
+
+    echo '</footer>';
+}
+
+add_action('wp_footer', 'ichnm_render_footer', 5);
 
 /**
  * Language shells use slugs like news-en; map them onto dedicated hub templates.

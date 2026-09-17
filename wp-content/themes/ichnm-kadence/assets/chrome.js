@@ -2,6 +2,7 @@
   const doc = document.documentElement;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const bviOn = !!(document.body && (document.body.classList.contains("bvi-active") || document.body.classList.contains("bvi-body")));
+  const THEME_KEY = "ichnm-theme";
 
   if (!reduce && !bviOn) {
     doc.classList.add("js-motion");
@@ -12,8 +13,51 @@
     doc.classList.add("is-entered");
   }
 
+  const themeBtn = document.querySelector("[data-theme-toggle]");
+  const applyTheme = (night, persist) => {
+    doc.classList.toggle("theme-night", night);
+    if (themeBtn) {
+      themeBtn.setAttribute("aria-pressed", night ? "true" : "false");
+      themeBtn.textContent = night
+        ? themeBtn.getAttribute("data-label-day") || "Дневная тема"
+        : themeBtn.getAttribute("data-label-night") || "Ночная тема";
+    }
+    if (persist) {
+      try {
+        localStorage.setItem(THEME_KEY, night ? "night" : "day");
+      } catch (err) {
+        /* ignore quota / private mode */
+      }
+    }
+  };
+  const nightByClock = () => {
+    const h = new Date().getHours();
+    return h >= 21 || h < 7;
+  };
+  let savedTheme = null;
+  try {
+    savedTheme = localStorage.getItem(THEME_KEY);
+  } catch (err) {
+    savedTheme = null;
+  }
+  if (savedTheme === "night") applyTheme(true, false);
+  else if (savedTheme === "day") applyTheme(false, false);
+  else applyTheme(nightByClock(), false);
+  if (themeBtn) {
+    themeBtn.addEventListener("click", () => {
+      applyTheme(!doc.classList.contains("theme-night"), true);
+    });
+  }
+
   const root = document.querySelector(".ichnm-chrome");
   if (root) {
+    // Honest preview: paper chrome after ~24px scroll (home styles only).
+    const onScroll = () => {
+      root.classList.toggle("is-scrolled", window.scrollY > 24);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
     const toggle = root.querySelector(".ichnm-menu-toggle");
     const nav = root.querySelector("#ichnm-primary-nav");
     if (toggle && nav) {

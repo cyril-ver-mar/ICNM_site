@@ -178,39 +178,41 @@ $lang = function_exists('pll_current_language') ? (string) pll_current_language(
 $t = $home_ui[$lang] ?? $home_ui['ru'];
 ?>
 <main class="ichnm-home">
-  <section class="ichnm-hero" data-ichnm-block="official_intro">
+  <section class="ichnm-hero hero" data-ichnm-block="official_intro">
     <canvas class="hero-lattice bvi-hide" width="1290" height="720" aria-hidden="true"></canvas>
-    <div class="ichnm-hero-inner wrap">
-      <p class="ichnm-hero-kicker"><?php echo esc_html($t['kicker']); ?></p>
-      <h1 class="ichnm-hero-title"><?php echo esc_html($short); ?></h1>
-      <p class="ichnm-hero-lead"><?php echo esc_html($intro); ?></p>
-      <div class="ichnm-hero-pills">
-        <a class="ichnm-pill ichnm-pill-primary" href="<?php echo esc_url($href($about)); ?>"><?php echo esc_html($t['about']); ?></a>
-        <a class="ichnm-pill" href="<?php echo esc_url($href($structure)); ?>"><?php echo esc_html($t['structure']); ?></a>
-        <a class="ichnm-pill" href="<?php echo esc_url($href($developments)); ?>"><?php echo esc_html($t['developments']); ?></a>
-        <a class="ichnm-pill" href="<?php echo esc_url($href($feedback, home_url('/feedback/'))); ?>"><?php echo esc_html($t['write']); ?></a>
+    <div class="ichnm-hero-inner wrap hero-layout">
+      <div class="hero-copy">
+        <p class="ichnm-hero-kicker hero-kicker"><?php echo esc_html($t['kicker']); ?></p>
+        <h1 class="ichnm-hero-title"><?php echo esc_html($short); ?></h1>
+        <p class="ichnm-hero-lead hero-lead"><?php echo esc_html($intro); ?></p>
+        <div class="ichnm-hero-pills hero-entries">
+          <a class="ichnm-pill ichnm-pill-primary hero-pill hero-pill-primary" href="<?php echo esc_url($href($about)); ?>"><?php echo esc_html($t['about']); ?></a>
+          <a class="ichnm-pill hero-pill" href="<?php echo esc_url($href($structure)); ?>"><?php echo esc_html($t['structure']); ?></a>
+          <a class="ichnm-pill hero-pill" href="<?php echo esc_url($href($developments)); ?>"><?php echo esc_html($t['developments']); ?></a>
+          <a class="ichnm-pill hero-pill" href="<?php echo esc_url($href($feedback, home_url('/feedback/'))); ?>"><?php echo esc_html($t['write']); ?></a>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="ichnm-stats" aria-label="<?php echo esc_attr($t['stats']); ?>">
-    <div class="wrap ichnm-stats-grid">
-      <div class="ichnm-stat">
-        <span class="ichnm-stat-value"><?php echo esc_html((string) $years); ?></span>
+  <section class="ichnm-stats stats-band" aria-label="<?php echo esc_attr($t['stats']); ?>">
+    <div class="wrap ichnm-stats-grid stats-grid">
+      <div class="ichnm-stat stat">
+        <span class="ichnm-stat-value stat-value"><?php echo esc_html((string) $years); ?></span>
         <span class="ichnm-stat-label"><?php echo esc_html(sprintf($t['years'], (string) $founded)); ?></span>
       </div>
-      <div class="ichnm-stat">
-        <span class="ichnm-stat-value"><?php echo esc_html((string) $labs_count); ?></span>
+      <div class="ichnm-stat stat">
+        <span class="ichnm-stat-value stat-value"><?php echo esc_html((string) $labs_count); ?></span>
         <span class="ichnm-stat-label"><?php echo esc_html($t['labs']); ?></span>
       </div>
-      <div class="ichnm-stat">
-        <span class="ichnm-stat-value">4</span>
+      <div class="ichnm-stat stat">
+        <span class="ichnm-stat-value stat-value">4</span>
         <span class="ichnm-stat-label"><?php echo esc_html($t['langs']); ?></span>
       </div>
     </div>
   </section>
 
-  <section class="ichnm-home-band" data-ichnm-block="main_directions" aria-labelledby="ichnm-home-directions">
+  <section class="ichnm-home-band home-band" data-ichnm-block="main_directions" aria-labelledby="ichnm-home-directions">
     <div class="wrap">
       <h2 id="ichnm-home-directions"><?php echo esc_html($t['directions']); ?></h2>
       <ul class="dir-grid">
@@ -236,14 +238,14 @@ $t = $home_ui[$lang] ?? $home_ui['ru'];
     </div>
   </section>
 
-  <section class="ichnm-home-band" data-ichnm-block="news">
+  <section class="ichnm-home-band home-band band-muted" data-ichnm-block="news">
     <div class="wrap">
       <div class="ichnm-band-head">
         <h2><?php echo esc_html($t['news']); ?></h2>
-        <a class="ichnm-band-more" href="<?php echo esc_url($news_archive); ?>"><?php echo esc_html($t['all_news']); ?></a>
+        <a class="ichnm-band-more band-link" href="<?php echo esc_url($news_archive); ?>"><?php echo esc_html($t['all_news']); ?></a>
       </div>
       <?php if ($feed) : ?>
-        <div class="ichnm-news-grid">
+        <div class="ichnm-news-grid news-grid">
           <?php foreach ($feed as $item) : ?>
             <?php
             $permalink = (string) ($item['permalink'] ?? '');
@@ -251,8 +253,8 @@ $t = $home_ui[$lang] ?? $home_ui['ru'];
             $kind = (string) ($item['kind_label'] ?? '');
             $external = (($item['kind'] ?? '') === 'media' && $permalink !== '' && !str_contains($permalink, home_url()));
             ?>
-            <article class="ichnm-news-card">
-              <p class="ichnm-news-kind"><?php echo esc_html($kind !== '' ? $kind : $t['kind_fallback']); ?></p>
+            <article class="ichnm-news-card news-card">
+              <p class="ichnm-news-kind news-kicker"><?php echo esc_html($kind !== '' ? $kind : $t['kind_fallback']); ?></p>
               <time datetime="<?php echo esc_attr((string) ($item['date'] ?? '')); ?>">
                 <?php echo esc_html((string) ($item['date_label'] ?? $item['date'] ?? '')); ?>
               </time>
@@ -266,7 +268,7 @@ $t = $home_ui[$lang] ?? $home_ui['ru'];
                 <?php endif; ?>
               </h3>
               <?php if (!empty($item['outlet'])) : ?>
-                <p class="ichnm-news-outlet"><?php echo esc_html((string) $item['outlet']); ?></p>
+                <p class="ichnm-news-outlet news-source"><?php echo esc_html((string) $item['outlet']); ?></p>
               <?php endif; ?>
             </article>
           <?php endforeach; ?>
@@ -277,36 +279,37 @@ $t = $home_ui[$lang] ?? $home_ui['ru'];
     </div>
   </section>
 
-  <section class="ichnm-home-band ichnm-home-entries">
+  <section class="ichnm-home-band home-band ichnm-home-entries">
     <div class="wrap ichnm-entry-grid">
       <article class="ichnm-entry-card" data-ichnm-block="structure_entry">
         <h2><?php echo esc_html($t['structure_h']); ?></h2>
         <p><?php echo esc_html($structure_teaser !== '' ? $structure_teaser : $t['structure_teaser']); ?></p>
-        <a class="ichnm-pill" href="<?php echo esc_url($href($structure)); ?>"><?php echo esc_html($t['structure_cta']); ?></a>
+        <a class="ichnm-pill hero-pill" href="<?php echo esc_url($href($structure)); ?>"><?php echo esc_html($t['structure_cta']); ?></a>
       </article>
       <article class="ichnm-entry-card" data-ichnm-block="developments_entry">
         <h2><?php echo esc_html($t['developments_h']); ?></h2>
         <p><?php echo esc_html($developments_teaser !== '' ? $developments_teaser : $t['developments_teaser']); ?></p>
-        <a class="ichnm-pill" href="<?php echo esc_url($href($developments)); ?>"><?php echo esc_html($t['developments_cta']); ?></a>
+        <a class="ichnm-pill hero-pill" href="<?php echo esc_url($href($developments)); ?>"><?php echo esc_html($t['developments_cta']); ?></a>
       </article>
     </div>
   </section>
 
-  <section class="ichnm-home-band ichnm-next-event" data-ichnm-block="next_event">
+  <section class="ichnm-home-band home-band ichnm-next-event" data-ichnm-block="next_event">
     <div class="wrap">
-      <h2><?php echo esc_html($t['event_h']); ?></h2>
       <?php if ($event) : ?>
-        <div class="ichnm-event-banner">
-          <h3><?php echo esc_html((string) ($event['title'] ?? '')); ?></h3>
+        <div class="ichnm-event-banner event-banner">
+          <h2><?php echo esc_html($t['event_h']); ?></h2>
+          <p><strong><?php echo esc_html((string) ($event['title'] ?? '')); ?></strong></p>
           <p class="ichnm-event-when"><?php echo esc_html((string) ($event['when'] ?? '')); ?></p>
           <p class="ichnm-event-actions">
             <?php if (!empty($event['href'])) : ?>
-              <a class="ichnm-pill ichnm-pill-primary" href="<?php echo esc_url((string) $event['href']); ?>"><?php echo esc_html($t['event_register']); ?></a>
+              <a class="ichnm-pill ichnm-pill-primary hero-pill hero-pill-primary" href="<?php echo esc_url((string) $event['href']); ?>"><?php echo esc_html($t['event_register']); ?></a>
             <?php endif; ?>
-            <a class="ichnm-pill" href="<?php echo esc_url($events_archive); ?>"><?php echo esc_html($t['event_all']); ?></a>
+            <a class="ichnm-pill hero-pill" href="<?php echo esc_url($events_archive); ?>"><?php echo esc_html($t['event_all']); ?></a>
           </p>
         </div>
       <?php else : ?>
+        <h2><?php echo esc_html($t['event_h']); ?></h2>
         <p><?php echo esc_html($t['event_empty']); ?></p>
       <?php endif; ?>
     </div>

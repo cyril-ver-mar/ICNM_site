@@ -1305,6 +1305,22 @@ html.theme-night .world-map {
   stroke: none;
 }
 
+.city-green {
+  fill: color-mix(in srgb, var(--map-water) 35%, #3d6b4f);
+  fill-opacity: 0.85;
+  stroke: none;
+}
+
+.city-mkad,
+.city-mkad path {
+  fill: none;
+  stroke: var(--map-stroke);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.9;
+}
+
 .city-river,
 .city-river path {
   fill: none;
@@ -1317,6 +1333,49 @@ html.theme-night .world-map {
 .city-map .map-pop {
   left: auto;
   right: 1.2rem;
+}
+
+/* Minsk map variants picker */
+.map-variants {
+  display: grid;
+  gap: 2rem;
+}
+
+.map-variant-card h2,
+.map-variant-builder h2 {
+  margin: 0 0 0.35rem;
+  font-family: Montserrat, sans-serif;
+  font-size: 1.15rem;
+}
+
+.map-variant-file {
+  margin: 0 0 0.75rem;
+  color: var(--palette5);
+  font-size: 0.9rem;
+}
+
+.map-variant-frame {
+  max-width: 42rem;
+  margin: 0;
+}
+
+.map-variant-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin: 0 0 1rem;
+}
+
+.map-variant-toggles label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 500;
+}
+
+.map-variant-builder {
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
 }
 
 .world-map::after {

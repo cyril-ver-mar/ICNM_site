@@ -772,6 +772,13 @@ def _render_locale_tree(model: SiteModel, code: str) -> dict[str, str]:
         "home",
         extra_body_class="is-lattice-demo",
     )
+    put(
+        "minsk-map-variants.html",
+        "Варианты карты Минска",
+        _minsk_map_variants_body(),
+        "contacts",
+        extra_body_class="is-map-variants",
+    )
     files["cookies.html"] = _legal_page(model, "cookies", code)
     files["personal-data.html"] = _legal_page(model, "personal", code)
     for item in copy.get("conferences", []):
@@ -2452,6 +2459,85 @@ _MINSK_SVG = _HERE.parents[1] / "assets" / "maps" / "minsk.svg"
 def _world_outline() -> str:
     raw = _WORLD_SVG.read_text(encoding="utf-8")
     return re.sub(r"<\?xml[^?]*\?>", "", raw).strip()
+
+
+def _minsk_outline_from(path: Path) -> str:
+    raw = path.read_text(encoding="utf-8")
+    return re.sub(r"<\?xml[^?]*\?>", "", raw).strip()
+
+
+def _minsk_map_variants_body() -> str:
+    """Side-by-side Minsk map variants for visual picking (not a public IA page)."""
+    variants_dir = _HERE.parents[1] / "assets" / "maps" / "variants"
+    catalog = [
+        ("minsk-v1-admin.svg", "v1 — админ. граница (с восточными выносами)"),
+        ("minsk-v2-compact.svg", "v2 — компакт (восток обрезан) — текущий default"),
+        ("minsk-v3-mkad.svg", "v3 — компакт + контур МКАД"),
+        ("minsk-v4-green.svg", "v4 — компакт + парки / леса"),
+        ("minsk-v5-mkad-green.svg", "v5 — компакт + МКАД + зелень"),
+    ]
+    cards = []
+    for filename, label in catalog:
+        path = variants_dir / filename
+        if not path.is_file():
+            continue
+        outline = _minsk_outline_from(path)
+        left = re.search(r'data-pin-left="([\d.]+)"', outline)
+        top = re.search(r'data-pin-top="([\d.]+)"', outline)
+        pin_l = left.group(1) if left else "65.66"
+        pin_t = top.group(1) if top else "29.13"
+        cards.append(
+            '<article class="map-variant-card">'
+            f"<h2>{escape(label)}</h2>"
+            f'<p class="map-variant-file"><code>{escape(filename)}</code></p>'
+            '<figure class="world-map city-map map-variant-frame" aria-hidden="true">'
+            f"{outline}"
+            f'<div class="map-hotspot" style="left:{pin_l}%;top:{pin_t}%">'
+            '<span class="map-pin"></span></div>'
+            "</figure>"
+            "</article>"
+        )
+
+    builder_src = variants_dir / "minsk-v5-mkad-green.svg"
+    builder = ""
+    if builder_src.is_file():
+        outline = _minsk_outline_from(builder_src)
+        left = re.search(r'data-pin-left="([\d.]+)"', outline)
+        top = re.search(r'data-pin-top="([\d.]+)"', outline)
+        pin_l = left.group(1) if left else "65.66"
+        pin_t = top.group(1) if top else "29.13"
+        builder = (
+            '<section class="map-variant-builder" data-minsk-layer-builder>'
+            "<h2>Конструктор слоёв</h2>"
+            "<p>Включите или выключите МКАД и зелень на одном контуре — так проще выбрать набор.</p>"
+            '<div class="map-variant-toggles">'
+            '<label><input type="checkbox" data-layer="city-mkad" checked> МКАД</label>'
+            '<label><input type="checkbox" data-layer="city-green" checked> Парки / леса</label>'
+            '<label><input type="checkbox" data-layer="city-water" checked> Водоёмы</label>'
+            '<label><input type="checkbox" data-layer="city-river" checked> Река</label>'
+            "</div>"
+            '<figure class="world-map city-map map-variant-frame" aria-hidden="true">'
+            f"{outline}"
+            f'<div class="map-hotspot" style="left:{pin_l}%;top:{pin_t}%">'
+            '<span class="map-pin"></span></div>'
+            "</figure>"
+            "</section>"
+            "<script>(function(){var root=document.querySelector('[data-minsk-layer-builder]');"
+            "if(!root)return;root.querySelectorAll('[data-layer]').forEach(function(input){"
+            "input.addEventListener('change',function(){var sel='.'+input.getAttribute('data-layer');"
+            "root.querySelectorAll(sel).forEach(function(el){el.style.display=input.checked?'':'none';});});});})();</script>"
+        )
+
+    return (
+        '<header class="page-hero"><div class="wrap">'
+        "<h1>Варианты карты Минска</h1>"
+        "<p>Восточные админ-выносы убраны в v2+. Слои МКАД и зелени — на выбор. "
+        "Страница только для подбора; в контакты/подвал пойдёт выбранный файл.</p>"
+        "</div></header>"
+        f'<div class="page-body is-wide map-variants">{"".join(cards)}{builder}'
+        '<p><a href="contacts.html">К контактам</a> · <a href="index.html">На главную</a></p>'
+        "</div>"
+    )
 
 
 def _minsk_outline() -> str:

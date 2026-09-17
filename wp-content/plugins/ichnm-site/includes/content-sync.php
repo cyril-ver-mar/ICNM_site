@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-const ICHNM_CONTENT_SEED_VERSION = 30;
+const ICHNM_CONTENT_SEED_VERSION = 31;
 
 function ichnm_migrated_copy(): array
 {
@@ -664,7 +664,7 @@ function ichnm_catalogue_detail_html(string $parent, array $item): string
     }
 
     $parts = [];
-    $parts[] = ichnm_photo_slot_html($title);
+    $parts[] = '<div class="ichnm-detail-hero">' . ichnm_photo_slot_html($title) . '</div>';
     if ($lead !== '') {
         $parts[] = '<p>' . esc_html($lead) . '</p>';
     }
@@ -750,17 +750,19 @@ function ichnm_catalogue_cards_html(string $title, array $items, string $parent 
         return '';
     }
     $labs = ichnm_labs_by_id();
-    $parts = ['<h2>' . esc_html($title) . '</h2>', '<div class="ichnm-card-grid ichnm-catalogue-grid">'];
+    $parts = ['<h2>' . esc_html($title) . '</h2>', '<div class="ichnm-card-grid ichnm-catalogue-grid cover-grid is-3">'];
     foreach ($items as $item) {
         if (!is_array($item)) {
             continue;
         }
-        $parts[] = '<article class="ichnm-catalogue-card">';
         $slug = sanitize_title((string) ($item['slug'] ?? ''));
         $card_title = (string) ($item['title'] ?? '');
         $detail_href = ($parent !== '' && $slug !== '')
             ? ichnm_catalogue_detail_permalink($parent, $slug)
             : '';
+        // Preview cover-card rhythm: photo-slot + title/lead/meta (ticket 26).
+        $parts[] = '<article class="ichnm-catalogue-card cover-card">';
+        $parts[] = ichnm_photo_slot_html($card_title !== '' ? $card_title : $slug);
         if ($slug !== '' && $detail_href !== '') {
             $parts[] = '<h3 id="' . esc_attr($slug) . '"><a href="' . esc_url($detail_href) . '">'
                 . esc_html($card_title) . '</a></h3>';
@@ -808,7 +810,7 @@ function ichnm_catalogue_cards_html(string $title, array $items, string $parent 
         }
 
         if ($meta_bits) {
-            $parts[] = '<p class="ichnm-catalogue-meta">' . implode(' · ', $meta_bits) . '</p>';
+            $parts[] = '<p class="ichnm-catalogue-meta cover-meta">' . implode(' · ', $meta_bits) . '</p>';
         }
         $parts[] = '</article>';
     }
@@ -1316,7 +1318,37 @@ function ichnm_fill_contacts_pages(): void
     $copy = ichnm_migrated_copy();
     $contacts = get_page_by_path('contacts');
     if ($contacts instanceof WP_Post) {
-        $html = ichnm_blocks_html(is_array($copy['pages']['contacts'] ?? null) ? $copy['pages']['contacts'] : []);
+        $block = is_array($copy['pages']['contacts'] ?? null) ? $copy['pages']['contacts'] : [];
+        $html = '';
+        foreach ($block['paragraphs'] ?? [] as $para) {
+            $para = trim((string) $para);
+            if ($para === '') {
+                continue;
+            }
+            $html .= '<p>' . esc_html($para) . '</p>';
+        }
+        $list = is_array($block['list'] ?? null) ? $block['list'] : [];
+        if ($list) {
+            $html .= '<div class="info-grid">';
+            foreach ($list as $item) {
+                $item = trim((string) $item);
+                if ($item === '') {
+                    continue;
+                }
+                $role = '';
+                $body = $item;
+                if (preg_match('/^([^:]+):\s*(.+)$/u', $item, $m)) {
+                    $role = trim($m[1]);
+                    $body = trim($m[2]);
+                }
+                $html .= '<article class="info-card">';
+                if ($role !== '') {
+                    $html .= '<p class="leader-role">' . esc_html($role) . '</p>';
+                }
+                $html .= '<p>' . esc_html($body) . '</p></article>';
+            }
+            $html .= '</div>';
+        }
         $feedback = get_page_by_path('feedback');
         $requisites = get_page_by_path('requisites');
         $html .= '<p>';
@@ -1327,7 +1359,7 @@ function ichnm_fill_contacts_pages(): void
             $html .= '<a class="ichnm-pill" href="' . esc_url(get_permalink($requisites)) . '">Реквизиты</a>';
         }
         $html .= '</p>';
-        $html .= '<h2>Как нас найти</h2>[ichnm_minsk_map]';
+        $html .= '<h2>Как нас найти</h2><div class="map-slot is-filled">[ichnm_minsk_map]</div>';
         wp_update_post(['ID' => (int) $contacts->ID, 'post_content' => $html]);
     }
 
@@ -1871,15 +1903,14 @@ function ichnm_lab_pack_html(array $lab): string
     ];
 
     $parts = [];
+    if (!empty($lab['kicker'])) {
+        $parts[] = '<p class="lab-kicker">' . esc_html((string) $lab['kicker']) . '</p>';
+    }
     $parts[] = '<nav class="lab-local" aria-label="Разделы лаборатории">';
     foreach ($nav as $id => $label) {
         $parts[] = '<a href="#' . esc_attr($id) . '">' . esc_html($label) . '</a>';
     }
     $parts[] = '</nav>';
-
-    if (!empty($lab['kicker'])) {
-        $parts[] = '<p class="lab-kicker">' . esc_html((string) $lab['kicker']) . '</p>';
-    }
 
     // About
     $about = trim((string) ($lab['about'] ?? ''));
@@ -2231,38 +2262,61 @@ function ichnm_import_people(): void
         if ($id === '') {
             continue;
         }
-        $parts = [];
-        if (!empty($person['role'])) {
-            $parts[] = '<p><strong>' . esc_html((string) $person['role']) . '</strong></p>';
-        }
-        if (!empty($person['degree'])) {
-            $parts[] = '<p>' . esc_html((string) $person['degree']) . '</p>';
-        }
-        $parts[] = ichnm_blocks_html(['paragraphs' => $person['bio'] ?? []]);
-        $affiliations = $person['affiliations'] ?? [];
-        if (is_array($affiliations) && $affiliations) {
-            $aff_html = ichnm_person_affiliations_html($affiliations);
-            if ($aff_html !== '') {
-                $parts[] = $aff_html;
+        $name = (string) ($person['name'] ?? $id);
+        $initials = trim((string) ($person['initials'] ?? ''));
+        if ($initials === '' && $name !== '') {
+            $parts_name = preg_split('/\s+/u', $name) ?: [];
+            $initials = '';
+            foreach (array_slice($parts_name, 0, 2) as $chunk) {
+                $initials .= mb_strtoupper(mb_substr($chunk, 0, 1));
             }
         }
-        $parts[] = ichnm_person_metrics_html($person);
+
+        $copy = [];
+        if (!empty($person['role'])) {
+            $copy[] = '<p class="leader-role">' . esc_html((string) $person['role']) . '</p>';
+        }
+        if (!empty($person['degree'])) {
+            $copy[] = '<p>' . esc_html((string) $person['degree']) . '</p>';
+        }
         $contacts = [];
         if (!empty($person['phone'])) {
-            $contacts[] = esc_html((string) $person['phone']);
+            $contacts[] = 'Тел. ' . esc_html((string) $person['phone']);
         }
         if (!empty($person['email'])) {
             $email = (string) $person['email'];
             $contacts[] = '<a href="mailto:' . esc_attr($email) . '">' . esc_html($email) . '</a>';
         }
         if ($contacts) {
-            array_unshift($parts, '<p>' . implode(' · ', $contacts) . '</p>');
+            $copy[] = '<p>' . implode('</p><p>', $contacts) . '</p>';
         }
+        $affiliations = $person['affiliations'] ?? [];
+        if (is_array($affiliations) && $affiliations) {
+            $aff_html = ichnm_person_affiliations_html($affiliations);
+            if ($aff_html !== '') {
+                $copy[] = $aff_html;
+            }
+        }
+        $copy[] = ichnm_person_metrics_html($person);
+        $bio = ichnm_blocks_html(['paragraphs' => $person['bio'] ?? []]);
+        if ($bio !== '') {
+            $copy[] = '<h2>Биография</h2>' . $bio;
+        }
+
+        $parts = ['<div class="leader-profile">'];
+        $parts[] = '<div class="leader-photo leader-photo-lg" role="img" aria-label="'
+            . esc_attr('Место для официального фото: ' . $name) . '">';
+        if ($initials !== '') {
+            $parts[] = '<span>' . esc_html($initials) . '</span>';
+        }
+        $parts[] = '<p>Официальное фото появится после передачи файла Институтом</p></div>';
+        $parts[] = '<div class="leader-profile-copy">' . implode('', $copy) . '</div></div>';
+
         ichnm_upsert_post([
             'post_type' => 'person',
             'post_status' => 'publish',
             'post_name' => $id,
-            'post_title' => (string) ($person['name'] ?? $id),
+            'post_title' => $name,
             'post_content' => implode('', $parts),
         ], '_ichnm_person_id', $id);
     }
