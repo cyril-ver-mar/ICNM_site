@@ -17,6 +17,14 @@ Opens `preview/index.html` in the browser.
 
 ## Tests
 
+Model / pack-contract seam (no Docker):
+
+```bash
+.venv/bin/pytest -q
+```
+
+Full install + run:
+
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r requirements-dev.txt
@@ -30,3 +38,6 @@ python3 -m venv .venv
 ```
 
 http://localhost:8080 — admin / admin (change the password).
+
+Smoke (Docker up): `./scripts/wp-smoke.sh` — see `docs/work/smoke-checklist.md`.  
+Backup → `exports/`: `./scripts/wp-backup.sh` — handoff `docs/work/2026-09-02-hosting-handoff.md`.

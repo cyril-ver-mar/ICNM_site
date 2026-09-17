@@ -1,8 +1,10 @@
 # ИХНМ: публичный сайт v1
 
-Status: ready-for-agent
+Status: done (superseded)
 
-Tracker is local markdown (`docs/work/specs/`). The repo has not run `setup-engineering-workflow` yet; tickets can live under `docs/work/tickets/` when you say `to-tickets`.
+Superseded for remaining cutover work by `docs/work/specs/2026-09-17-wordpress-cutover-readiness.md` (tickets 01–07 done). First slice below remains historical.
+
+Tracker is local markdown (`docs/work/specs/`, `docs/work/tickets/`).
 
 ## Problem
 

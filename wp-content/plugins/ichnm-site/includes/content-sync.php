@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-const ICHNM_CONTENT_SEED_VERSION = 18;
+const ICHNM_CONTENT_SEED_VERSION = 30;
 
 function ichnm_migrated_copy(): array
 {
@@ -27,8 +27,27 @@ function ichnm_source_url(string $relative): string
     return content_url('uploads/ichnm-source/' . ltrim($relative, '/'));
 }
 
+function ichnm_source_path(string $relative): string
+{
+    return WP_CONTENT_DIR . '/uploads/ichnm-source/' . ltrim($relative, '/');
+}
+
 /**
- * @param array{paragraphs?:list<string>,list?:list<string>} $block
+ * Inline Natural Earth SVG (theme fills via .world-ocean / .world-land).
+ */
+function ichnm_world_outline_svg(): string
+{
+    $path = ichnm_source_path('maps/world-countries.svg');
+    if (!is_readable($path)) {
+        return '';
+    }
+    $raw = (string) file_get_contents($path);
+    $raw = preg_replace('/<\?xml[^?]*\?>/', '', $raw) ?? $raw;
+    return trim($raw);
+}
+
+/**
+ * @param array{paragraphs?:list<string>,list?:list<string>,file_slots?:list<string>,empty_slot?:string} $block
  */
 function ichnm_blocks_html(array $block): string
 {
@@ -52,7 +71,37 @@ function ichnm_blocks_html(array $block): string
         }
         $html .= '</ul>';
     }
+    $empty = trim((string) ($block['empty_slot'] ?? ''));
+    if ($empty !== '' && !$items) {
+        $html .= '<p class="ichnm-empty-slot">' . esc_html($empty) . '</p>';
+    }
+    $slots = $block['file_slots'] ?? [];
+    if (is_array($slots) && $slots) {
+        $html .= ichnm_file_slots_html($slots);
+    }
     return $html;
+}
+
+/**
+ * Honest PDF reception shelf — labels only, never mock downloads.
+ *
+ * @param list<string> $labels
+ */
+function ichnm_file_slots_html(array $labels): string
+{
+    $items = '';
+    foreach ($labels as $label) {
+        $label = trim((string) $label);
+        if ($label === '') {
+            continue;
+        }
+        $items .= '<li class="file-slot"><span>' . esc_html($label) . '</span>';
+        $items .= '<small>Файл не загружен</small></li>';
+    }
+    if ($items === '') {
+        return '';
+    }
+    return '<ul class="file-shelf" aria-label="Слоты для документов">' . $items . '</ul>';
 }
 
 function ichnm_find_by_slug(string $post_type, string $slug): ?WP_Post
@@ -218,44 +267,19 @@ function ichnm_sync_page_bodies(): void
         if (!$page instanceof WP_Post) {
             continue;
         }
-        $parts = [];
-        if (!empty($unit['phone'])) {
-            $parts[] = '<p>Телефон: ' . esc_html((string) $unit['phone']) . '</p>';
-        }
-        foreach ($unit['people'] ?? [] as $person) {
-            if (!is_array($person)) {
-                continue;
-            }
-            $line = trim((string) ($person['name'] ?? ''));
-            if ($line === '') {
-                continue;
-            }
-            if (!empty($person['role'])) {
-                $line .= ' — ' . (string) $person['role'];
-            }
-            $parts[] = '<p>' . esc_html($line) . '</p>';
-            $contacts = [];
-            if (!empty($person['phone'])) {
-                $contacts[] = esc_html((string) $person['phone']);
-            }
-            if (!empty($person['email'])) {
-                $email = (string) $person['email'];
-                $contacts[] = '<a href="mailto:' . esc_attr($email) . '">' . esc_html($email) . '</a>';
-            }
-            if ($contacts) {
-                $parts[] = '<p>' . implode(' · ', $contacts) . '</p>';
-            }
-        }
-        if (!$parts) {
+        $html = ichnm_admin_unit_html($unit);
+        if ($html === '') {
             continue;
         }
         wp_update_post([
             'ID' => (int) $page->ID,
-            'post_content' => implode('', $parts),
+            'post_title' => (string) ($unit['title'] ?? $page->post_title),
+            'post_content' => $html,
         ]);
     }
 
     ichnm_fill_leadership_page();
+    ichnm_import_catalogue_detail_pages();
     ichnm_fill_catalogue_pages();
     ichnm_fill_about_pages();
     ichnm_fill_council_page();
@@ -297,6 +321,106 @@ function ichnm_person_permalink(string $id): string
     return $post instanceof WP_Post ? (string) get_permalink($post) : home_url('/people/' . rawurlencode($id) . '/');
 }
 
+/**
+ * Admin / public unit page body matching preview/{hr|accounting|…}.html
+ */
+function ichnm_admin_unit_html(array $unit): string
+{
+    $structure = get_page_by_path('structure');
+    $structure_href = $structure instanceof WP_Post ? (string) get_permalink($structure) : home_url('/structure/');
+    $parts = [];
+    $parts[] = '<p class="unit-back"><a href="' . esc_url($structure_href) . '">Ко всем подразделениям</a></p>';
+    if (!empty($unit['phone'])) {
+        $parts[] = '<p>Тел. подразделения: ' . esc_html((string) $unit['phone']) . '</p>';
+    }
+
+    $people = is_array($unit['people'] ?? null) ? $unit['people'] : [];
+    if ($people) {
+        $parts[] = '<div class="people-list">';
+        foreach ($people as $person) {
+            if (!is_array($person)) {
+                continue;
+            }
+            $id = (string) ($person['id'] ?? '');
+            if ($id === '') {
+                continue;
+            }
+            $parts[] = ichnm_person_card_html($person, $id);
+        }
+        $parts[] = '</div>';
+    } else {
+        $parts[] = '<p class="ichnm-empty-slot">Состав подразделения появится после передачи материалов.</p>';
+    }
+    return implode('', $parts);
+}
+
+/**
+ * Import people listed only under admin_units / SMU placeholders.
+ */
+function ichnm_import_admin_unit_people(): void
+{
+    $rows = [];
+    foreach (ichnm_migrated_copy()['admin_units'] ?? [] as $unit) {
+        if (!is_array($unit)) {
+            continue;
+        }
+        $unit_title = (string) ($unit['title'] ?? $unit['id'] ?? '');
+        foreach ($unit['people'] ?? [] as $person) {
+            if (!is_array($person) || empty($person['id'])) {
+                continue;
+            }
+            $id = (string) $person['id'];
+            $rows[$id] = array_merge($rows[$id] ?? [], $person, [
+                '_unit_title' => $unit_title,
+            ]);
+        }
+    }
+    // Preview SMU seats (honest placeholders until names arrive).
+    foreach ([
+        ['id' => 'smu-chair', 'name' => 'Фамилия Имя Отчество', 'role' => 'Председатель совета молодых учёных', 'initials' => 'П'],
+        ['id' => 'smu-deputy', 'name' => 'Фамилия Имя Отчество', 'role' => 'Заместитель председателя', 'initials' => 'З'],
+        ['id' => 'smu-secretary', 'name' => 'Фамилия Имя Отчество', 'role' => 'Секретарь', 'initials' => 'С'],
+    ] as $person) {
+        $id = $person['id'];
+        if (!isset($rows[$id])) {
+            $rows[$id] = $person;
+        }
+    }
+
+    foreach ($rows as $person) {
+        $id = (string) ($person['id'] ?? '');
+        if ($id === '') {
+            continue;
+        }
+        $parts = [];
+        if (!empty($person['role'])) {
+            $parts[] = '<p><strong>' . esc_html((string) $person['role']) . '</strong></p>';
+        }
+        if (!empty($person['_unit_title'])) {
+            $parts[] = '<p>' . esc_html((string) $person['_unit_title']) . '</p>';
+        }
+        $contacts = [];
+        if (!empty($person['phone'])) {
+            $contacts[] = esc_html((string) $person['phone']);
+        }
+        if (!empty($person['email'])) {
+            $email = (string) $person['email'];
+            $contacts[] = '<a href="mailto:' . esc_attr($email) . '">' . esc_html($email) . '</a>';
+        }
+        if ($contacts) {
+            $parts[] = '<p>' . implode(' · ', $contacts) . '</p>';
+        }
+        $parts[] = '<p>Развёрнутая биография появится после передачи материалов Институтом.</p>';
+        ichnm_upsert_post([
+            'post_type' => 'person',
+            'post_status' => 'publish',
+            'post_name' => $id,
+            'post_title' => (string) ($person['name'] ?? $id),
+            'post_content' => implode('', $parts),
+        ], '_ichnm_person_id', $id);
+    }
+}
+
 function ichnm_fill_leadership_page(): void
 {
     $page = get_page_by_path('leadership');
@@ -314,20 +438,7 @@ function ichnm_fill_leadership_page(): void
         if (!$person) {
             continue;
         }
-        $href = ichnm_person_permalink($id);
-        $name = (string) ($person['name'] ?? $id);
-        $role = (string) ($person['role'] ?? '');
-        $degree = (string) ($person['degree'] ?? '');
-        $initials = (string) ($person['initials'] ?? mb_substr($name, 0, 1));
-        $cards[] = '<a class="ichnm-person-card" href="' . esc_url($href) . '">';
-        $cards[] = '<span class="ichnm-person-card-photo" aria-hidden="true">' . esc_html($initials) . '</span>';
-        $cards[] = '<span class="ichnm-person-card-body">';
-        $cards[] = '<span class="ichnm-person-card-role">' . esc_html($role) . '</span>';
-        $cards[] = '<span class="ichnm-person-card-name">' . esc_html($name) . '</span>';
-        if ($degree !== '') {
-            $cards[] = '<span class="ichnm-person-card-degree">' . esc_html($degree) . '</span>';
-        }
-        $cards[] = '</span></a>';
+        $cards[] = ichnm_person_card_html($person, $id);
     }
     $cards[] = '</div>';
     wp_update_post([
@@ -336,27 +447,328 @@ function ichnm_fill_leadership_page(): void
     ]);
 }
 
-function ichnm_catalogue_cards_html(string $title, array $items, string $lab_key = 'lab_id'): string
+/**
+ * Index labs by id and lab-{slug} for catalogue attribution.
+ *
+ * @return array<string, array>
+ */
+function ichnm_labs_by_id(): array
+{
+    $labs = [];
+    foreach (ichnm_migrated_copy()['labs'] ?? [] as $lab) {
+        if (!is_array($lab)) {
+            continue;
+        }
+        if (!empty($lab['id'])) {
+            $labs[(string) $lab['id']] = $lab;
+        }
+        if (!empty($lab['slug'])) {
+            $labs['lab-' . $lab['slug']] = $lab;
+        }
+    }
+    return $labs;
+}
+
+/**
+ * Contact line matching roster.person_contact_line (name · phone · email).
+ */
+function ichnm_person_contact_line(string $person_id): string
+{
+    if ($person_id === '') {
+        return '';
+    }
+    $people = ichnm_people_index();
+    if (!isset($people[$person_id]) || !is_array($people[$person_id])) {
+        return '';
+    }
+    $row = $people[$person_id];
+    $bits = [trim((string) ($row['name'] ?? ''))];
+    if (!empty($row['phone'])) {
+        $bits[] = (string) $row['phone'];
+    }
+    if (!empty($row['email'])) {
+        $bits[] = (string) $row['email'];
+    }
+    $bits = array_values(array_filter($bits, static function ($b) {
+        return $b !== '';
+    }));
+    return implode(' · ', $bits);
+}
+
+/**
+ * Lab-sourced catalogue rows (directions / developments / equipment), like roster.py.
+ *
+ * @return list<array>
+ */
+function ichnm_lab_catalogue_rows(string $field): array
+{
+    $rows = [];
+    foreach (ichnm_migrated_copy()['labs'] ?? [] as $lab) {
+        if (!is_array($lab)) {
+            continue;
+        }
+        $lab_id = (string) ($lab['id'] ?? '');
+        $lab_title = (string) ($lab['title'] ?? '');
+        $head_id = (string) ($lab['head_id'] ?? '');
+        foreach ($lab[$field] ?? [] as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $row = $item;
+            $row['lab_id'] = $lab_id;
+            $row['lab_title'] = $lab_title;
+            if ($field === 'directions') {
+                $row['head_id'] = $head_id;
+            } elseif ($field === 'developments' && empty($row['staff_id'])) {
+                $row['staff_id'] = $head_id;
+            }
+            $rows[] = $row;
+        }
+    }
+    return $rows;
+}
+
+/**
+ * Institute-level items not already present (by slug) in lab-sourced rows.
+ *
+ * @param list<array> $lab_rows
+ * @param list<array> $institute_items
+ * @return list<array>
+ */
+function ichnm_institute_catalogue_rows(array $lab_rows, array $institute_items): array
+{
+    $seen = [];
+    foreach ($lab_rows as $row) {
+        $slug = (string) ($row['slug'] ?? '');
+        if ($slug !== '') {
+            $seen[$slug] = true;
+        }
+    }
+    $rows = [];
+    foreach ($institute_items as $item) {
+        if (!is_array($item)) {
+            continue;
+        }
+        $slug = (string) ($item['slug'] ?? '');
+        if ($slug !== '' && isset($seen[$slug])) {
+            continue;
+        }
+        $rows[] = $item;
+    }
+    return $rows;
+}
+
+/**
+ * Hub titles for catalogue parents (mirrors catalogue_detail.PARENT_TITLES).
+ *
+ * @return array<string, string>
+ */
+function ichnm_catalogue_parent_titles(): array
+{
+    return [
+        'science' => 'Направления работы',
+        'developments' => 'Разработки',
+        'facilities' => 'Материальная база',
+    ];
+}
+
+/**
+ * Contact / attribution line like roster.catalog_meta.
+ */
+function ichnm_catalogue_meta(array $item): string
+{
+    $bits = [];
+    $lab_title = trim((string) ($item['lab_title'] ?? ''));
+    if ($lab_title === '') {
+        $lab_id = (string) ($item['lab_id'] ?? '');
+        $labs = ichnm_labs_by_id();
+        if ($lab_id !== '' && isset($labs[$lab_id])) {
+            $lab_title = trim((string) ($labs[$lab_id]['title'] ?? ''));
+        }
+    }
+    if ($lab_title !== '') {
+        $bits[] = $lab_title;
+    }
+    $staff_id = (string) ($item['staff_id'] ?? $item['head_id'] ?? '');
+    $contact = $staff_id !== '' ? ichnm_person_contact_line($staff_id) : '';
+    if ($contact !== '') {
+        $bits[] = $contact;
+    } elseif (!empty($item['contacts'])) {
+        $bits[] = (string) $item['contacts'];
+    }
+    return implode(' · ', $bits);
+}
+
+/**
+ * All catalogue rows for one hub parent (institute + lab-sourced).
+ *
+ * @return list<array>
+ */
+function ichnm_catalogue_rows_for_parent(string $parent): array
+{
+    $copy = ichnm_migrated_copy();
+    if ($parent === 'science') {
+        $institute = is_array($copy['science_topics'] ?? null) ? $copy['science_topics'] : [];
+        return array_merge($institute, ichnm_lab_catalogue_rows('directions'));
+    }
+    if ($parent === 'developments') {
+        $lab_rows = ichnm_lab_catalogue_rows('developments');
+        $institute = ichnm_institute_catalogue_rows(
+            $lab_rows,
+            is_array($copy['developments_items'] ?? null) ? $copy['developments_items'] : []
+        );
+        return array_merge($institute, $lab_rows);
+    }
+    if ($parent === 'facilities') {
+        $lab_rows = ichnm_lab_catalogue_rows('equipment');
+        $institute = ichnm_institute_catalogue_rows(
+            $lab_rows,
+            is_array($copy['facilities_items'] ?? null) ? $copy['facilities_items'] : []
+        );
+        return array_merge($institute, $lab_rows);
+    }
+    return [];
+}
+
+/**
+ * Detail permalink for a catalogue slug under science|developments|facilities.
+ */
+function ichnm_catalogue_detail_permalink(string $parent, string $slug): string
+{
+    $slug = sanitize_title($slug);
+    if ($slug === '' || !isset(ichnm_catalogue_parent_titles()[$parent])) {
+        return '';
+    }
+    $page = get_page_by_path($parent . '/' . $slug);
+    if ($page instanceof WP_Post) {
+        return (string) get_permalink($page);
+    }
+    return home_url('/' . $parent . '/' . rawurlencode($slug) . '/');
+}
+
+/**
+ * Honest catalogue detail body (mirrors catalogue_detail_html; theme renders h1).
+ */
+function ichnm_catalogue_detail_html(string $parent, array $item): string
+{
+    $title = (string) ($item['title'] ?? '');
+    $lead = trim((string) ($item['lead'] ?? ''));
+    $is_facilities = ($parent === 'facilities');
+    $detail_text = trim((string) ($item['spec'] ?? $item['product'] ?? ''));
+    $contacts = trim((string) ($item['contacts'] ?? ''));
+    if ($contacts === '') {
+        $contacts = ichnm_catalogue_meta($item);
+    }
+    if ($contacts === '') {
+        $contacts = 'ichnm@ichnm.by';
+    }
+
+    $parts = [];
+    $parts[] = ichnm_photo_slot_html($title);
+    if ($lead !== '') {
+        $parts[] = '<p>' . esc_html($lead) . '</p>';
+    }
+    $parts[] = '<h2>Описание и контакты</h2>';
+    $parts[] = '<p>' . esc_html($contacts) . '</p>';
+
+    $lab_id = (string) ($item['lab_id'] ?? '');
+    $labs = ichnm_labs_by_id();
+    if ($lab_id !== '' && isset($labs[$lab_id])) {
+        $lab = $labs[$lab_id];
+        $lab_slug = (string) ($lab['slug'] ?? '');
+        $lab_title = trim((string) ($item['lab_title'] ?? $lab['title'] ?? $lab_slug));
+        if ($lab_slug !== '' && $lab_title !== '') {
+            $href = home_url('/labs/' . rawurlencode($lab_slug) . '/');
+            $parts[] = '<p>Лаборатория: <a href="' . esc_url($href) . '">' . esc_html($lab_title) . '</a></p>';
+        }
+    }
+
+    $staff_id = (string) ($item['staff_id'] ?? $item['head_id'] ?? '');
+    if ($staff_id !== '') {
+        $label = ichnm_person_contact_line($staff_id);
+        if ($label !== '') {
+            $parts[] = '<p>Закреплено: <a href="' . esc_url(ichnm_person_permalink($staff_id)) . '">'
+                . esc_html($label) . '</a></p>';
+        }
+    }
+
+    $parts[] = '<h2>' . esc_html($is_facilities ? 'Спецификация' : 'Продукт / результат') . '</h2>';
+    if ($detail_text !== '') {
+        $parts[] = '<p>' . esc_html($detail_text) . '</p>';
+    }
+
+    $parent_titles = ichnm_catalogue_parent_titles();
+    $parent_page = get_page_by_path($parent);
+    $parent_href = $parent_page instanceof WP_Post
+        ? (string) get_permalink($parent_page)
+        : home_url('/' . $parent . '/');
+    $parent_title = $parent_titles[$parent] ?? $parent;
+    $parts[] = '<p><a href="' . esc_url($parent_href) . '">' . esc_html($parent_title) . '</a></p>';
+
+    return implode('', $parts);
+}
+
+/**
+ * Seed child pages at /science|developments|facilities/{slug}/ from migrated copy.
+ */
+function ichnm_import_catalogue_detail_pages(): void
+{
+    foreach (array_keys(ichnm_catalogue_parent_titles()) as $parent) {
+        $parent_page = get_page_by_path($parent);
+        if (!$parent_page instanceof WP_Post) {
+            continue;
+        }
+        $parent_id = (int) $parent_page->ID;
+        foreach (ichnm_catalogue_rows_for_parent($parent) as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $slug = sanitize_title((string) ($item['slug'] ?? ''));
+            if ($slug === '') {
+                continue;
+            }
+            $title = (string) ($item['title'] ?? $slug);
+            ichnm_upsert_post([
+                'post_type' => 'page',
+                'post_status' => 'publish',
+                'post_name' => $slug,
+                'post_title' => $title,
+                'post_content' => ichnm_catalogue_detail_html($parent, $item),
+                'post_parent' => $parent_id,
+            ], '_ichnm_catalogue_key', $parent . ':' . $slug);
+        }
+    }
+}
+
+/**
+ * Catalogue card grid with lab + staff attribution (links when ids known).
+ * When $parent is set, card titles link to /{parent}/{slug}/ detail pages.
+ */
+function ichnm_catalogue_cards_html(string $title, array $items, string $parent = '', string $lab_key = 'lab_id'): string
 {
     if (!$items) {
         return '';
     }
-    $labs = [];
-    foreach (ichnm_migrated_copy()['labs'] ?? [] as $lab) {
-        if (is_array($lab) && !empty($lab['id'])) {
-            $labs[(string) $lab['id']] = $lab;
-        }
-        if (is_array($lab) && !empty($lab['slug'])) {
-            $labs['lab-' . $lab['slug']] = $lab;
-        }
-    }
+    $labs = ichnm_labs_by_id();
     $parts = ['<h2>' . esc_html($title) . '</h2>', '<div class="ichnm-card-grid ichnm-catalogue-grid">'];
     foreach ($items as $item) {
         if (!is_array($item)) {
             continue;
         }
         $parts[] = '<article class="ichnm-catalogue-card">';
-        $parts[] = '<h3>' . esc_html((string) ($item['title'] ?? '')) . '</h3>';
+        $slug = sanitize_title((string) ($item['slug'] ?? ''));
+        $card_title = (string) ($item['title'] ?? '');
+        $detail_href = ($parent !== '' && $slug !== '')
+            ? ichnm_catalogue_detail_permalink($parent, $slug)
+            : '';
+        if ($slug !== '' && $detail_href !== '') {
+            $parts[] = '<h3 id="' . esc_attr($slug) . '"><a href="' . esc_url($detail_href) . '">'
+                . esc_html($card_title) . '</a></h3>';
+        } elseif ($slug !== '') {
+            $parts[] = '<h3 id="' . esc_attr($slug) . '">' . esc_html($card_title) . '</h3>';
+        } else {
+            $parts[] = '<h3>' . esc_html($card_title) . '</h3>';
+        }
         if (!empty($item['lead'])) {
             $parts[] = '<p>' . esc_html((string) $item['lead']) . '</p>';
         }
@@ -366,16 +778,37 @@ function ichnm_catalogue_cards_html(string $title, array $items, string $lab_key
         if (!empty($item['spec'])) {
             $parts[] = '<p>' . esc_html((string) $item['spec']) . '</p>';
         }
-        if (!empty($item['contacts'])) {
-            $parts[] = '<p class="ichnm-catalogue-meta">' . esc_html((string) $item['contacts']) . '</p>';
-        }
+
+        $meta_bits = [];
         $lab_id = (string) ($item[$lab_key] ?? '');
-        if ($lab_id !== '' && isset($labs[$lab_id])) {
-            $lab = $labs[$lab_id];
-            $slug = (string) ($lab['slug'] ?? '');
-            $lab_title = (string) ($lab['title'] ?? $slug);
-            $href = $slug !== '' ? home_url('/labs/' . rawurlencode($slug) . '/') : '#';
-            $parts[] = '<p class="ichnm-catalogue-meta"><a href="' . esc_url($href) . '">' . esc_html($lab_title) . '</a></p>';
+        $lab = ($lab_id !== '' && isset($labs[$lab_id])) ? $labs[$lab_id] : null;
+        $lab_title = (string) ($item['lab_title'] ?? '');
+        if ($lab !== null) {
+            $lab_slug = (string) ($lab['slug'] ?? '');
+            if ($lab_title === '') {
+                $lab_title = (string) ($lab['title'] ?? $lab_slug);
+            }
+            if ($lab_slug !== '' && $lab_title !== '') {
+                $href = home_url('/labs/' . rawurlencode($lab_slug) . '/');
+                $meta_bits[] = '<a href="' . esc_url($href) . '">' . esc_html($lab_title) . '</a>';
+            } elseif ($lab_title !== '') {
+                $meta_bits[] = esc_html($lab_title);
+            }
+        } elseif ($lab_title !== '') {
+            $meta_bits[] = esc_html($lab_title);
+        }
+
+        $staff_id = (string) ($item['staff_id'] ?? $item['head_id'] ?? '');
+        $contact_line = $staff_id !== '' ? ichnm_person_contact_line($staff_id) : '';
+        if ($contact_line !== '') {
+            $person_href = ichnm_person_permalink($staff_id);
+            $meta_bits[] = '<a href="' . esc_url($person_href) . '">' . esc_html($contact_line) . '</a>';
+        } elseif (!empty($item['contacts'])) {
+            $meta_bits[] = esc_html((string) $item['contacts']);
+        }
+
+        if ($meta_bits) {
+            $parts[] = '<p class="ichnm-catalogue-meta">' . implode(' · ', $meta_bits) . '</p>';
         }
         $parts[] = '</article>';
     }
@@ -390,21 +823,40 @@ function ichnm_fill_catalogue_pages(): void
     $science = get_page_by_path('science');
     if ($science instanceof WP_Post) {
         $html = ichnm_blocks_html(is_array($copy['pages']['science'] ?? null) ? $copy['pages']['science'] : []);
-        $html .= ichnm_catalogue_cards_html('Направления работы', is_array($copy['science_topics'] ?? null) ? $copy['science_topics'] : []);
+        $institute = is_array($copy['science_topics'] ?? null) ? $copy['science_topics'] : [];
+        $labs = ichnm_lab_catalogue_rows('directions');
+        $html .= ichnm_catalogue_cards_html('Общеинститутские направления', $institute, 'science');
+        $html .= ichnm_catalogue_cards_html('Направления лабораторий', $labs, 'science');
         wp_update_post(['ID' => (int) $science->ID, 'post_content' => $html]);
     }
 
     $developments = get_page_by_path('developments');
     if ($developments instanceof WP_Post) {
         $html = ichnm_blocks_html(is_array($copy['pages']['developments'] ?? null) ? $copy['pages']['developments'] : []);
-        $html .= ichnm_catalogue_cards_html('Разработки', is_array($copy['developments_items'] ?? null) ? $copy['developments_items'] : []);
+        $lab_rows = ichnm_lab_catalogue_rows('developments');
+        $institute = ichnm_institute_catalogue_rows(
+            $lab_rows,
+            is_array($copy['developments_items'] ?? null) ? $copy['developments_items'] : []
+        );
+        if ($institute) {
+            $html .= ichnm_catalogue_cards_html('Общеинститутские разработки', $institute, 'developments');
+        }
+        $html .= ichnm_catalogue_cards_html('Разработки лабораторий', $lab_rows, 'developments');
         wp_update_post(['ID' => (int) $developments->ID, 'post_content' => $html]);
     }
 
     $facilities = get_page_by_path('facilities');
     if ($facilities instanceof WP_Post) {
         $html = ichnm_blocks_html(is_array($copy['pages']['facilities'] ?? null) ? $copy['pages']['facilities'] : []);
-        $html .= ichnm_catalogue_cards_html('Материальная база', is_array($copy['facilities_items'] ?? null) ? $copy['facilities_items'] : []);
+        $lab_rows = ichnm_lab_catalogue_rows('equipment');
+        $institute = ichnm_institute_catalogue_rows(
+            $lab_rows,
+            is_array($copy['facilities_items'] ?? null) ? $copy['facilities_items'] : []
+        );
+        if ($institute) {
+            $html .= ichnm_catalogue_cards_html('Общеинститутское оснащение', $institute, 'facilities');
+        }
+        $html .= ichnm_catalogue_cards_html('Оборудование лабораторий', $lab_rows, 'facilities');
         wp_update_post(['ID' => (int) $facilities->ID, 'post_content' => $html]);
     }
 
@@ -430,6 +882,14 @@ function ichnm_fill_catalogue_pages(): void
             }
             $href = home_url('/' . rawurlencode((string) $unit['id']) . '/');
             $html .= '<li><a href="' . esc_url($href) . '">' . esc_html((string) ($unit['title'] ?? $unit['id'])) . '</a></li>';
+        }
+        $html .= '</ul>';
+        // Community after admin (DECISIONS); links only — no staff dump on the hub.
+        $html .= '<h2>Общественные объединения</h2><ul>';
+        foreach (['union' => 'Профсоюз', 'young-scientists' => 'Совет молодых учёных'] as $slug => $title) {
+            $page = get_page_by_path($slug);
+            $href = $page instanceof WP_Post ? get_permalink($page) : home_url('/' . $slug . '/');
+            $html .= '<li><a href="' . esc_url((string) $href) . '">' . esc_html($title) . '</a></li>';
         }
         $html .= '</ul>';
         wp_update_post(['ID' => (int) $structure->ID, 'post_content' => $html]);
@@ -464,10 +924,12 @@ function ichnm_ensure_news_hub_page(): void
 
 function ichnm_person_card_html(array $person, string $id): string
 {
+    // Whole card is the hyperlink — no «Биография и публикации» caption (DECISIONS).
     $href = ichnm_person_permalink($id);
     $name = (string) ($person['name'] ?? $id);
     $role = (string) ($person['role'] ?? '');
     $degree = (string) ($person['degree'] ?? '');
+    $phone = (string) ($person['phone'] ?? '');
     $initials = (string) ($person['initials'] ?? mb_substr($name, 0, 1));
     $html = '<a class="ichnm-person-card" href="' . esc_url($href) . '">';
     $html .= '<span class="ichnm-person-card-photo" aria-hidden="true">' . esc_html($initials) . '</span>';
@@ -477,8 +939,179 @@ function ichnm_person_card_html(array $person, string $id): string
     if ($degree !== '') {
         $html .= '<span class="ichnm-person-card-degree">' . esc_html($degree) . '</span>';
     }
+    if ($phone !== '') {
+        $html .= '<span class="ichnm-person-card-phone">Тел. ' . esc_html($phone) . '</span>';
+    }
     $html .= '</span></a>';
     return $html;
+}
+
+/**
+ * Locked scientific-metric field order (DECISIONS / site_model.staff.metric_fields).
+ *
+ * @return list<string>
+ */
+function ichnm_staff_metric_fields(): array
+{
+    return ['orcid', 'google_scholar', 'scopus_author', 'elibrary', 'researchgate'];
+}
+
+/**
+ * @return array{0:string,1:string} href, title
+ */
+function ichnm_unit_link(string $unit_id): array
+{
+    $unit_id = trim($unit_id);
+    if ($unit_id === '') {
+        return ['#', ''];
+    }
+
+    $copy = ichnm_migrated_copy();
+    foreach ($copy['labs'] ?? [] as $lab) {
+        if (!is_array($lab)) {
+            continue;
+        }
+        $lab_id = (string) ($lab['id'] ?? '');
+        $slug = (string) ($lab['slug'] ?? '');
+        if ($lab_id === $unit_id || ($slug !== '' && ('lab-' . $slug) === $unit_id)) {
+            $href = $slug !== '' ? home_url('/labs/' . rawurlencode($slug) . '/') : home_url('/structure/');
+            $title = (string) ($lab['title'] ?? ($slug !== '' ? $slug : $unit_id));
+            return [$href, $title];
+        }
+    }
+
+    $titles = [
+        'leadership' => 'Руководство',
+        'scientific-council' => 'Учёный совет',
+        'hr' => 'Отдел кадров',
+        'labor-protection' => 'Охрана труда',
+        'engineering' => 'Главный инженер',
+        'accounting' => 'Бухгалтерия',
+        'union' => 'Профсоюз',
+        'young-scientists' => 'Совет молодых учёных',
+        'structure' => 'Структура',
+    ];
+    foreach ($copy['admin_units'] ?? [] as $unit) {
+        if (!is_array($unit) || empty($unit['id'])) {
+            continue;
+        }
+        if ((string) $unit['id'] === $unit_id) {
+            $titles[$unit_id] = (string) ($unit['title'] ?? $unit_id);
+            break;
+        }
+    }
+
+    $page = get_page_by_path($unit_id);
+    $href = $page instanceof WP_Post
+        ? (string) get_permalink($page)
+        : home_url('/' . rawurlencode($unit_id) . '/');
+    $title = $titles[$unit_id] ?? $unit_id;
+    return [$href, $title];
+}
+
+/**
+ * @param list<mixed> $affiliations
+ */
+function ichnm_person_affiliations_html(array $affiliations): string
+{
+    $items = [];
+    foreach ($affiliations as $aff) {
+        if (!is_array($aff)) {
+            continue;
+        }
+        $unit_id = trim((string) ($aff['unit_id'] ?? ''));
+        if ($unit_id === '') {
+            continue;
+        }
+        [$href, $title] = ichnm_unit_link($unit_id);
+        $role = trim((string) ($aff['role'] ?? ''));
+        $label = $title;
+        if ($role !== '') {
+            $label = $title . ' — ' . $role;
+        }
+        $items[] = '<li><a href="' . esc_url($href) . '">' . esc_html($label) . '</a></li>';
+    }
+    if (!$items) {
+        return '';
+    }
+    return '<h2>Подразделения</h2><ul class="plain-list">' . implode('', $items) . '</ul>';
+}
+
+function ichnm_profile_href(string $field, string $raw): string
+{
+    $value = trim($raw);
+    if ($value === '') {
+        return '';
+    }
+    $lower = strtolower($value);
+    if (str_starts_with($lower, 'http://') || str_starts_with($lower, 'https://')) {
+        return $value;
+    }
+    if ($field === 'orcid') {
+        return 'https://orcid.org/' . $value;
+    }
+    return '';
+}
+
+/**
+ * Metrics block in locked network order; omit empty networks.
+ */
+function ichnm_person_metrics_html(array $person): string
+{
+    $labels = [
+        'orcid' => 'ORCID',
+        'google_scholar' => 'Google Scholar',
+        'scopus_author' => 'Scopus Author',
+        'elibrary' => 'eLIBRARY / РИНЦ',
+        'researchgate' => 'ResearchGate',
+    ];
+    $profiles = is_array($person['profiles'] ?? null) ? $person['profiles'] : [];
+    if (!empty($person['orcid']) && empty($profiles['orcid'])) {
+        $profiles['orcid'] = (string) $person['orcid'];
+    }
+    $bibliometrics = is_array($person['bibliometrics'] ?? null) ? $person['bibliometrics'] : [];
+
+    $rows = [];
+    foreach (ichnm_staff_metric_fields() as $field) {
+        $raw = (string) ($profiles[$field] ?? $person[$field] ?? '');
+        $href = ichnm_profile_href($field, $raw);
+        $stats = is_array($bibliometrics[$field] ?? null) ? $bibliometrics[$field] : [];
+        $h_index = array_key_exists('h_index', $stats) ? $stats['h_index'] : null;
+        $citations = array_key_exists('citations', $stats) ? $stats['citations'] : null;
+        if ($h_index === '') {
+            $h_index = null;
+        }
+        if ($citations === '') {
+            $citations = null;
+        }
+        if ($href === '' && $h_index === null && $citations === null) {
+            continue;
+        }
+        $bits = [];
+        if ($h_index !== null) {
+            $bits[] = 'h-индекс ' . esc_html((string) $h_index);
+        }
+        if ($citations !== null) {
+            $bits[] = 'цитирований ' . esc_html((string) $citations);
+        }
+        if ($href !== '') {
+            $bits[] = '<a href="' . esc_url($href) . '" rel="noopener noreferrer">профиль</a>';
+        }
+        $label = $labels[$field] ?? $field;
+        $rows[] = '<dt>' . esc_html($label) . '</dt><dd>' . ($bits ? implode(' · ', $bits) : '—') . '</dd>';
+    }
+
+    if (!$rows) {
+        return '<div class="empty-state"><h2>Профили и показатели ещё не указаны</h2>'
+            . '<p>ORCID, Google Scholar, Scopus, eLIBRARY/РИНЦ и ResearchGate появятся '
+            . 'после передачи ссылок. Индекс Хирша и число цитирований вносит '
+            . 'сотрудник или редактор — сайт базы сам не опрашивает.</p></div>';
+    }
+
+    return '<h2>Наукометрия</h2>'
+        . '<p class="metrics-note">Цифры и ссылки вносит сотрудник или редактор. '
+        . 'Сайт не подтягивает базы автоматически.</p>'
+        . '<dl class="metrics-list">' . implode('', $rows) . '</dl>';
 }
 
 function ichnm_import_council_people(): void
@@ -530,7 +1163,8 @@ function ichnm_fill_council_page(): void
     $copy = ichnm_migrated_copy();
     $intro = ichnm_blocks_html(is_array($copy['pages']['scientific-council'] ?? null) ? $copy['pages']['scientific-council'] : []);
     $people = ichnm_people_index();
-    $cards = ['<div class="ichnm-card-grid ichnm-leadership-grid">'];
+    // Same whole-card pattern as Руководство (photo slot, role, contacts → people/{id}/).
+    $cards = ['<div class="people-list ichnm-card-grid ichnm-leadership-grid">'];
     foreach ($copy['council_people'] ?? [] as $row) {
         if (!is_array($row) || empty($row['id'])) {
             continue;
@@ -552,9 +1186,13 @@ function ichnm_world_map_html(): string
     if (!is_array($partners) || !$partners) {
         return '';
     }
-    $src = ichnm_source_url('maps/world-countries.svg');
+    $outline = ichnm_world_outline_svg();
+    if ($outline === '') {
+        return '';
+    }
     $html = '<figure class="ichnm-world-map" aria-label="Карта научного сотрудничества">';
-    $html .= '<img class="ichnm-world-map-bg" src="' . esc_url($src) . '" alt="" width="1000" height="500" loading="lazy">';
+    // Natural Earth outlines — CSS fills (white land / light ocean), not a raster atlas.
+    $html .= $outline;
     foreach ($partners as $partner) {
         if (!is_array($partner)) {
             continue;
@@ -565,10 +1203,13 @@ function ichnm_world_map_html(): string
         $title = (string) ($partner['title'] ?? '');
         $place = (string) ($partner['place'] ?? '');
         $note = (string) ($partner['note'] ?? '');
-        $html .= '<div class="ichnm-map-hotspot" style="left:' . esc_attr((string) $x) . '%;top:' . esc_attr((string) $y) . '%">';
+        $html .= '<div class="ichnm-map-hotspot"'
+            . ($y < 42.0 ? ' data-pop="below"' : '')
+            . ' style="left:' . esc_attr((string) $x) . '%;top:' . esc_attr((string) $y) . '%">';
         $html .= '<button type="button" class="ichnm-map-pin" aria-describedby="ichnm-pop-' . esc_attr($slug) . '">';
         $html .= '<span class="screen-reader-text">' . esc_html($title) . '</span></button>';
         $html .= '<div class="ichnm-map-pop" id="ichnm-pop-' . esc_attr($slug) . '">';
+        $html .= ichnm_photo_slot_html($title !== '' ? $title : $slug);
         if ($place !== '') {
             $html .= '<p class="ichnm-map-place">' . esc_html($place) . '</p>';
         }
@@ -584,11 +1225,23 @@ function ichnm_world_map_html(): string
 
 function ichnm_minsk_map_html(): string
 {
-    $path = WP_CONTENT_DIR . '/uploads/ichnm-source/maps/minsk.svg';
-    $left = '62';
-    $top = '48';
-    if (is_readable($path)) {
-        $raw = (string) file_get_contents($path);
+    // Prefer repo assets path (Docker mounts assets → uploads/ichnm-source).
+    $candidates = [
+        WP_CONTENT_DIR . '/uploads/ichnm-source/maps/minsk.svg',
+        dirname(__DIR__, 4) . '/assets/maps/minsk.svg',
+    ];
+    $path = '';
+    $raw = '';
+    foreach ($candidates as $candidate) {
+        if (is_readable($candidate)) {
+            $path = $candidate;
+            $raw = (string) file_get_contents($candidate);
+            break;
+        }
+    }
+    $left = '65.66';
+    $top = '29.13';
+    if ($raw !== '') {
         if (preg_match('/data-pin-left="([\d.]+)"/', $raw, $m)) {
             $left = $m[1];
         }
@@ -596,10 +1249,21 @@ function ichnm_minsk_map_html(): string
             $top = $m[1];
         }
     }
-    $src = ichnm_source_url('maps/minsk.svg');
+    // Inline SVG so theme CSS can paint .world-ocean / .world-land (img cannot).
+    $svg = '';
+    if ($raw !== '') {
+        $svg = preg_replace('/^<\?xml[^>]*>\s*/', '', $raw) ?? $raw;
+        $svg = preg_replace('/\saria-hidden="[^"]*"/', '', $svg) ?? $svg;
+    }
     $html = '<figure class="ichnm-world-map ichnm-city-map" aria-label="Минск, ул. Ф. Скорины, 36">';
-    $html .= '<img class="ichnm-world-map-bg" src="' . esc_url($src) . '" alt="" width="800" height="500" loading="lazy">';
-    $html .= '<div class="ichnm-map-hotspot" style="left:' . esc_attr($left) . '%;top:' . esc_attr($top) . '%">';
+    if ($svg !== '') {
+        $html .= $svg;
+    } elseif ($path !== '') {
+        $html .= '<img class="ichnm-world-map-bg" src="' . esc_url(ichnm_source_url('maps/minsk.svg')) . '" alt="" width="800" height="500" loading="lazy">';
+    }
+    $html .= '<div class="ichnm-map-hotspot"'
+        . ((float) $top < 42.0 ? ' data-pop="below"' : '')
+        . ' style="left:' . esc_attr($left) . '%;top:' . esc_attr($top) . '%">';
     $html .= '<span class="ichnm-map-pin" title="ул. Ф. Скорины, 36"></span>';
     $html .= '<div class="ichnm-map-pop is-open">';
     $html .= '<p class="ichnm-map-place">Минск</p>';
@@ -636,7 +1300,11 @@ function ichnm_fill_cooperation_page(): void
         }
         $html .= '</div>';
     }
-    $html .= '<h2>Карта сотрудничества</h2>' . ichnm_world_map_html();
+    $html .= '<section class="ichnm-coop-map" aria-labelledby="ichnm-coop-map-title">';
+    $html .= '<h2 id="ichnm-coop-map-title">Карта сотрудничества</h2>';
+    // Shortcode renders inline Natural Earth SVG at runtime (avoids kses stripping <svg>).
+    $html .= '[ichnm_world_map]';
+    $html .= '</section>';
     wp_update_post([
         'ID' => (int) $page->ID,
         'post_content' => $html,
@@ -659,7 +1327,7 @@ function ichnm_fill_contacts_pages(): void
             $html .= '<a class="ichnm-pill" href="' . esc_url(get_permalink($requisites)) . '">Реквизиты</a>';
         }
         $html .= '</p>';
-        $html .= '<h2>Как нас найти</h2>' . ichnm_minsk_map_html();
+        $html .= '<h2>Как нас найти</h2>[ichnm_minsk_map]';
         wp_update_post(['ID' => (int) $contacts->ID, 'post_content' => $html]);
     }
 
@@ -724,16 +1392,69 @@ function ichnm_ensure_publications_hub_page(): void
     ]);
 }
 
-function ichnm_import_publications(): void
+/**
+ * True when a DOI/cite is preview fish (not honest starter catalogue).
+ */
+function ichnm_publication_row_is_mock(array $row): bool
 {
-    foreach (ichnm_migrated_copy()['labs'] ?? [] as $lab) {
+    $doi = strtolower(trim((string) ($row['doi'] ?? '')));
+    if ($doi !== '' && str_contains($doi, 'ichnm.mock')) {
+        return true;
+    }
+    $cite = (string) ($row['cite'] ?? '');
+    return str_contains(mb_strtolower($cite), 'макет');
+}
+
+/**
+ * Institute hub rows: top-level publications_items, then non-mock lab pack rows.
+ *
+ * @return list<array{row: array, lab_slug: string, lab_title: string, index: int}>
+ */
+function ichnm_publication_import_rows(): array
+{
+    $copy = ichnm_migrated_copy();
+    $out = [];
+    $seen = [];
+
+    $top = $copy['publications_items'] ?? $copy['publications'] ?? [];
+    if (is_array($top)) {
+        foreach (array_values($top) as $index => $row) {
+            if (!is_array($row) || ichnm_publication_row_is_mock($row)) {
+                continue;
+            }
+            $cite = trim((string) ($row['cite'] ?? ''));
+            if ($cite === '') {
+                continue;
+            }
+            $lab_slug = trim((string) ($row['lab_slug'] ?? ''));
+            if ($lab_slug === '' && !empty($row['lab_id'])) {
+                $lab_id = (string) $row['lab_id'];
+                $lab_slug = str_starts_with($lab_id, 'lab-') ? substr($lab_id, 4) : $lab_id;
+            }
+            $lab_title = trim((string) ($row['laboratory'] ?? $row['lab_title'] ?? $lab_slug));
+            $doi = trim((string) ($row['doi'] ?? ''));
+            $key = strtolower($lab_slug . '|' . $cite . '|' . $doi);
+            if (isset($seen[$key])) {
+                continue;
+            }
+            $seen[$key] = true;
+            $out[] = [
+                'row' => $row,
+                'lab_slug' => $lab_slug,
+                'lab_title' => $lab_title,
+                'index' => (int) $index,
+            ];
+        }
+    }
+
+    foreach ($copy['labs'] ?? [] as $lab) {
         if (!is_array($lab)) {
             continue;
         }
         $lab_slug = (string) ($lab['slug'] ?? '');
         $lab_title = (string) ($lab['title'] ?? $lab_slug);
-        foreach ($lab['publications'] ?? [] as $index => $row) {
-            if (!is_array($row)) {
+        foreach (array_values($lab['publications'] ?? []) as $index => $row) {
+            if (!is_array($row) || ichnm_publication_row_is_mock($row)) {
                 continue;
             }
             $cite = trim((string) ($row['cite'] ?? ''));
@@ -741,40 +1462,75 @@ function ichnm_import_publications(): void
                 continue;
             }
             $doi = trim((string) ($row['doi'] ?? ''));
-            $year = (int) ($row['year'] ?? 0);
-            $key = 'pub-' . md5($lab_slug . '|' . $cite . '|' . $doi);
-            $html = '<p class="ichnm-pub-cite">' . esc_html($cite) . '</p>';
-            if ($doi !== '') {
-                $href = str_starts_with(strtolower($doi), 'http') ? $doi : ('https://doi.org/' . $doi);
-                $html .= '<p class="ichnm-pub-doi"><a href="' . esc_url($href) . '" rel="noopener noreferrer">DOI: ' . esc_html($doi) . '</a></p>';
+            $key = strtolower($lab_slug . '|' . $cite . '|' . $doi);
+            if (isset($seen[$key])) {
+                continue;
             }
-            if ($lab_slug !== '') {
-                $html .= '<p class="ichnm-pub-lab"><a href="' . esc_url(home_url('/labs/' . rawurlencode($lab_slug) . '/')) . '">' . esc_html($lab_title) . '</a></p>';
-            }
-            $post_date = ($year > 1990 ? (string) $year : '2024') . '-06-15 12:00:00';
-            $title = mb_substr($cite, 0, 120);
-            ichnm_upsert_post([
-                'post_type' => 'publication',
-                'post_status' => 'publish',
-                'post_name' => sanitize_title($lab_slug . '-pub-' . ($index + 1) . '-' . substr(md5($cite), 0, 6)),
-                'post_title' => $title,
-                'post_content' => $html,
-                'post_date' => $post_date,
-                'post_date_gmt' => get_gmt_from_date($post_date),
-            ], '_ichnm_source_slug', $key);
-            $post = get_posts([
-                'post_type' => 'publication',
-                'meta_key' => '_ichnm_source_slug',
-                'meta_value' => $key,
-                'posts_per_page' => 1,
-                'post_status' => 'any',
-            ]);
-            if ($post) {
-                update_post_meta((int) $post[0]->ID, '_ichnm_lab_slug', $lab_slug);
-                update_post_meta((int) $post[0]->ID, '_ichnm_doi', $doi);
-                if ($year > 0) {
-                    update_post_meta((int) $post[0]->ID, '_ichnm_year', $year);
+            $seen[$key] = true;
+            $out[] = [
+                'row' => $row,
+                'lab_slug' => $lab_slug,
+                'lab_title' => $lab_title,
+                'index' => (int) $index,
+            ];
+        }
+    }
+
+    return $out;
+}
+
+function ichnm_import_publications(): void
+{
+    foreach (ichnm_publication_import_rows() as $entry) {
+        $row = $entry['row'];
+        $lab_slug = (string) $entry['lab_slug'];
+        $lab_title = (string) $entry['lab_title'];
+        $index = (int) $entry['index'];
+        $cite = trim((string) ($row['cite'] ?? ''));
+        $doi = trim((string) ($row['doi'] ?? ''));
+        $year = (int) ($row['year'] ?? 0);
+        $key = 'pub-' . md5($lab_slug . '|' . $cite . '|' . $doi);
+        $html = '<p class="ichnm-pub-cite">' . esc_html($cite) . '</p>';
+        if ($doi !== '') {
+            $href = str_starts_with(strtolower($doi), 'http') ? $doi : ('https://doi.org/' . $doi);
+            $label = $doi;
+            foreach (['https://doi.org/', 'http://doi.org/', 'doi:'] as $prefix) {
+                if (str_starts_with(strtolower($label), $prefix)) {
+                    $label = substr($label, strlen($prefix));
+                    break;
                 }
+            }
+            $html .= '<p class="ichnm-pub-doi"><a href="' . esc_url($href) . '" rel="noopener noreferrer">DOI: ' . esc_html($label) . '</a></p>';
+        }
+        if ($lab_slug !== '') {
+            $html .= '<p class="ichnm-pub-lab"><a href="' . esc_url(home_url('/labs/' . rawurlencode($lab_slug) . '/')) . '">' . esc_html($lab_title !== '' ? $lab_title : $lab_slug) . '</a></p>';
+        } elseif ($lab_title !== '') {
+            $html .= '<p class="ichnm-pub-lab">' . esc_html($lab_title) . '</p>';
+        }
+        $post_date = ($year > 1990 ? (string) $year : '2024') . '-06-15 12:00:00';
+        $title = mb_substr($cite, 0, 120);
+        $slug_base = $lab_slug !== '' ? $lab_slug : 'institute';
+        ichnm_upsert_post([
+            'post_type' => 'publication',
+            'post_status' => 'publish',
+            'post_name' => sanitize_title($slug_base . '-pub-' . ($index + 1) . '-' . substr(md5($cite), 0, 6)),
+            'post_title' => $title,
+            'post_content' => $html,
+            'post_date' => $post_date,
+            'post_date_gmt' => get_gmt_from_date($post_date),
+        ], '_ichnm_source_slug', $key);
+        $post = get_posts([
+            'post_type' => 'publication',
+            'meta_key' => '_ichnm_source_slug',
+            'meta_value' => $key,
+            'posts_per_page' => 1,
+            'post_status' => 'any',
+        ]);
+        if ($post) {
+            update_post_meta((int) $post[0]->ID, '_ichnm_lab_slug', $lab_slug);
+            update_post_meta((int) $post[0]->ID, '_ichnm_doi', $doi);
+            if ($year > 0) {
+                update_post_meta((int) $post[0]->ID, '_ichnm_year', $year);
             }
         }
     }
@@ -799,7 +1555,10 @@ function ichnm_publication_chart_html(): string
     if ($note !== '') {
         $html .= '<p class="ichnm-chart-note" role="note">' . esc_html($note) . '</p>';
     }
-    $html .= '<figure class="ichnm-pub-chart"><figcaption>Статьи по годам</figcaption>';
+    $caption = function_exists('ichnm_hub_strings')
+        ? (string) (ichnm_hub_strings()['articles_by_year'] ?? 'Статьи по годам')
+        : 'Статьи по годам';
+    $html .= '<figure class="ichnm-pub-chart"><figcaption>' . esc_html($caption) . '</figcaption>';
     $html .= '<ul class="ichnm-chart-bars">';
     foreach ($series as $row) {
         $year = (int) ($row['year'] ?? 0);
@@ -815,19 +1574,25 @@ function ichnm_publication_chart_html(): string
 
 function ichnm_fill_education_and_documents_hubs(): void
 {
+    $copy = ichnm_migrated_copy();
+    $pages = is_array($copy['pages'] ?? null) ? $copy['pages'] : [];
+
+    $education_children = [
+        'aspirantura' => 'Аспирантура',
+        'doctorate' => 'Докторантура',
+        'defense-council' => 'Совет по защитам',
+        'internships' => 'Стажировки',
+        'courses' => 'Курсы',
+    ];
+    foreach ($education_children as $slug => $_title) {
+        ichnm_fill_vitrine_page_from_copy($slug, is_array($pages[$slug] ?? null) ? $pages[$slug] : []);
+    }
+
     $education = get_page_by_path('education');
     if ($education instanceof WP_Post) {
-        $copy = ichnm_migrated_copy();
-        $html = ichnm_blocks_html(is_array($copy['pages']['education'] ?? null) ? $copy['pages']['education'] : []);
-        $children = [
-            'aspirantura' => 'Аспирантура',
-            'doctorate' => 'Докторантура',
-            'defense-council' => 'Совет по защитам',
-            'internships' => 'Стажировки',
-            'courses' => 'Курсы',
-        ];
+        $html = ichnm_blocks_html(is_array($pages['education'] ?? null) ? $pages['education'] : []);
         $html .= '<h2>Разделы</h2><ul class="ichnm-hub-links">';
-        foreach ($children as $slug => $title) {
+        foreach ($education_children as $slug => $title) {
             $page = get_page_by_path($slug);
             $href = $page instanceof WP_Post ? get_permalink($page) : home_url('/' . $slug . '/');
             $html .= '<li><a href="' . esc_url($href) . '">' . esc_html($title) . '</a></li>';
@@ -836,48 +1601,90 @@ function ichnm_fill_education_and_documents_hubs(): void
         wp_update_post(['ID' => (int) $education->ID, 'post_content' => $html]);
     }
 
+    $document_children = [
+        'charter' => 'Устав',
+        'anti-corruption' => 'Антикоррупция',
+        'e-appeals' => 'Электронные обращения',
+    ];
+    foreach ($document_children as $slug => $_title) {
+        ichnm_fill_vitrine_page_from_copy($slug, is_array($pages[$slug] ?? null) ? $pages[$slug] : []);
+    }
+
     $documents = get_page_by_path('documents');
     if ($documents instanceof WP_Post) {
-        $copy = ichnm_migrated_copy();
-        $html = ichnm_blocks_html(is_array($copy['pages']['documents'] ?? null) ? $copy['pages']['documents'] : []);
-        $children = [
-            'charter' => 'Устав',
-            'anti-corruption' => 'Антикоррупция',
-            'e-appeals' => 'Электронные обращения',
-        ];
+        $html = ichnm_blocks_html(is_array($pages['documents'] ?? null) ? $pages['documents'] : []);
         $html .= '<h2>Документы</h2><ul class="ichnm-hub-links">';
-        foreach ($children as $slug => $title) {
+        foreach ($document_children as $slug => $title) {
             $page = get_page_by_path($slug);
             $href = $page instanceof WP_Post ? get_permalink($page) : home_url('/' . $slug . '/');
             $html .= '<li><a href="' . esc_url($href) . '">' . esc_html($title) . '</a></li>';
         }
         $html .= '</ul>';
-        $html .= '<p class="ichnm-chart-note">Реквизиты института — в разделе <a href="' . esc_url(home_url('/requisites/')) . '">Контакты → Реквизиты</a>, не здесь.</p>';
+        $requisites = get_page_by_path('requisites');
+        $requisites_href = $requisites instanceof WP_Post
+            ? (string) get_permalink($requisites)
+            : home_url('/requisites/');
+        $html .= '<p class="ichnm-chart-note">Реквизиты института — в разделе <a href="'
+            . esc_url($requisites_href)
+            . '">Контакты → Реквизиты</a>, не здесь.</p>';
         wp_update_post(['ID' => (int) $documents->ID, 'post_content' => $html]);
     }
 
     $union = get_page_by_path('union');
     if ($union instanceof WP_Post) {
-        $html = ichnm_blocks_html(is_array(ichnm_migrated_copy()['pages']['union'] ?? null) ? ichnm_migrated_copy()['pages']['union'] : []);
+        $structure = get_page_by_path('structure');
+        $structure_href = $structure instanceof WP_Post ? (string) get_permalink($structure) : home_url('/structure/');
+        $html = '<p class="unit-back"><a href="' . esc_url($structure_href) . '">Ко всем подразделениям</a></p>';
+        $html .= ichnm_blocks_html(is_array($pages['union'] ?? null) ? $pages['union'] : []);
         $html .= '<p class="ichnm-chart-note">Это страница первичной организации института, а не ссылка на общеакадемический сайт <a href="https://profnan.by/">profnan.by</a>.</p>';
         wp_update_post(['ID' => (int) $union->ID, 'post_content' => $html]);
     }
 
     $smu = get_page_by_path('young-scientists');
     if ($smu instanceof WP_Post) {
-        $html = ichnm_blocks_html(is_array(ichnm_migrated_copy()['pages']['young-scientists'] ?? null) ? ichnm_migrated_copy()['pages']['young-scientists'] : []);
+        $structure = get_page_by_path('structure');
+        $structure_href = $structure instanceof WP_Post ? (string) get_permalink($structure) : home_url('/structure/');
+        $html = '<p class="unit-back"><a href="' . esc_url($structure_href) . '">Ко всем подразделениям</a></p>';
+        $html .= ichnm_blocks_html(is_array($pages['young-scientists'] ?? null) ? $pages['young-scientists'] : []);
+        // Honest photo-slot cards (same helper as leadership / council) until names arrive.
+        $smu_people = [
+            ['id' => 'smu-chair', 'name' => 'Фамилия Имя Отчество', 'role' => 'Председатель совета молодых учёных', 'initials' => 'П'],
+            ['id' => 'smu-deputy', 'name' => 'Фамилия Имя Отчество', 'role' => 'Заместитель председателя', 'initials' => 'З'],
+            ['id' => 'smu-secretary', 'name' => 'Фамилия Имя Отчество', 'role' => 'Секретарь', 'initials' => 'С'],
+        ];
+        $html .= '<div class="people-list ichnm-card-grid ichnm-leadership-grid">';
+        foreach ($smu_people as $person) {
+            $html .= ichnm_person_card_html($person, (string) $person['id']);
+        }
+        $html .= '</div>';
         wp_update_post(['ID' => (int) $smu->ID, 'post_content' => $html]);
     }
 
     $vacancies = get_page_by_path('vacancies');
     if ($vacancies instanceof WP_Post) {
-        $html = ichnm_blocks_html(is_array(ichnm_migrated_copy()['pages']['vacancies'] ?? null) ? ichnm_migrated_copy()['pages']['vacancies'] : []);
+        $html = ichnm_blocks_html(is_array($pages['vacancies'] ?? null) ? $pages['vacancies'] : []);
         $feedback = get_page_by_path('feedback');
         if ($feedback instanceof WP_Post) {
             $html .= '<p><a class="ichnm-pill ichnm-pill-primary" href="' . esc_url(get_permalink($feedback)) . '">Написать нам</a></p>';
         }
         wp_update_post(['ID' => (int) $vacancies->ID, 'post_content' => $html]);
     }
+}
+
+/**
+ * @param array{paragraphs?:list<string>,list?:list<string>,file_slots?:list<string>,empty_slot?:string} $block
+ */
+function ichnm_fill_vitrine_page_from_copy(string $slug, array $block): void
+{
+    $page = get_page_by_path($slug);
+    if (!$page instanceof WP_Post) {
+        return;
+    }
+    $html = ichnm_blocks_html($block);
+    if ($html === '') {
+        return;
+    }
+    wp_update_post(['ID' => (int) $page->ID, 'post_content' => $html]);
 }
 
 function ichnm_import_news(): void
@@ -947,13 +1754,43 @@ function ichnm_import_media_about(): void
     }
 }
 
+/**
+ * Home / events banners read next_event from migrated_copy.
+ * Do not seed a separate CPT row that collides with conference aist-2025
+ * (previously produced /event/aist-2025-2/). Trash any stale duplicate.
+ */
 function ichnm_import_next_event(): void
 {
+    $conference_slugs = [];
+    foreach (ichnm_migrated_copy()['conferences'] ?? [] as $conf) {
+        if (is_array($conf) && !empty($conf['slug'])) {
+            $conference_slugs[(string) $conf['slug']] = true;
+        }
+    }
+
+    $stale = get_posts([
+        'post_type' => 'event',
+        'post_status' => 'any',
+        'posts_per_page' => 50,
+        'meta_key' => '_ichnm_source_slug',
+        'meta_value' => 'aist-2025',
+        'suppress_filters' => true,
+    ]);
+    foreach ($stale as $post) {
+        if ($post instanceof WP_Post) {
+            wp_trash_post((int) $post->ID);
+        }
+    }
+
     $event = ichnm_migrated_copy()['next_event'] ?? null;
     if (!is_array($event) || empty($event['title'])) {
         return;
     }
     $slug = 'aist-2025';
+    if (isset($conference_slugs[$slug])) {
+        // Conference import owns /conferences/aist-2025/ with materials.
+        return;
+    }
     $html = '<p>' . esc_html((string) ($event['when'] ?? '')) . '</p>';
     if (!empty($event['href'])) {
         $html .= '<p><a href="' . esc_url((string) $event['href']) . '">Регистрация / сайт серии</a></p>';
@@ -970,32 +1807,28 @@ function ichnm_import_next_event(): void
     ], '_ichnm_source_slug', $slug);
 }
 
+function ichnm_photo_slot_html(string $label, string $initials = ''): string
+{
+    $html = '<div class="photo-slot" role="img" aria-label="' . esc_attr('Место для фото: ' . $label) . '">';
+    if ($initials !== '') {
+        $html .= '<span>' . esc_html($initials) . '</span>';
+    } else {
+        $html .= '<span aria-hidden="true">На</span><p>Фото появится после передачи файла</p>';
+    }
+    $html .= '</div>';
+    return $html;
+}
+
 function ichnm_lab_pack_html(array $lab): string
 {
-    $parts = [];
-    $about = trim((string) ($lab['about'] ?? ''));
-    if ($about !== '') {
-        $parts[] = '<p>' . esc_html($about) . '</p>';
-    }
-    if (!empty($lab['kicker'])) {
-        $parts[] = '<p><em>' . esc_html((string) $lab['kicker']) . '</em></p>';
-    }
-    $contacts = [];
-    if (!empty($lab['phone'])) {
-        $contacts[] = esc_html((string) $lab['phone']);
-    }
-    if (!empty($lab['email'])) {
-        $email = (string) $lab['email'];
-        $contacts[] = '<a href="mailto:' . esc_attr($email) . '">' . esc_html($email) . '</a>';
-    }
-    if ($contacts) {
-        $parts[] = '<p>' . implode(' · ', $contacts) . '</p>';
-    }
-
+    $title = (string) ($lab['title'] ?? 'Лаборатория');
+    $slug = (string) ($lab['slug'] ?? '');
     $people_index = function_exists('ichnm_people_index') ? ichnm_people_index() : [];
+    $head_id = (string) ($lab['head_id'] ?? '');
+
     $staff_ids = [];
-    if (!empty($lab['head_id'])) {
-        $staff_ids[] = (string) $lab['head_id'];
+    if ($head_id !== '') {
+        $staff_ids[] = $head_id;
     }
     foreach ($lab['staff_ids'] ?? [] as $sid) {
         $sid = (string) $sid;
@@ -1003,90 +1836,288 @@ function ichnm_lab_pack_html(array $lab): string
             $staff_ids[] = $sid;
         }
     }
-    if ($staff_ids) {
-        $parts[] = '<h2>Сотрудники</h2><div class="ichnm-card-grid ichnm-leadership-grid">';
-        foreach ($staff_ids as $sid) {
-            $person = $people_index[$sid] ?? null;
-            if (!$person) {
-                $post = ichnm_find_by_slug('person', $sid);
-                if ($post instanceof WP_Post) {
-                    $person = [
-                        'id' => $sid,
-                        'name' => get_the_title($post),
-                        'role' => ($sid === (string) ($lab['head_id'] ?? '')) ? 'Заведующий лабораторией' : 'Сотрудник',
-                        'initials' => mb_substr(get_the_title($post), 0, 1),
-                    ];
-                }
+
+    $resolve_person = static function (string $sid) use ($people_index, $head_id): ?array {
+        $person = $people_index[$sid] ?? null;
+        if (!$person) {
+            $post = ichnm_find_by_slug('person', $sid);
+            if ($post instanceof WP_Post) {
+                $person = [
+                    'id' => $sid,
+                    'name' => get_the_title($post),
+                    'role' => ($sid === $head_id) ? 'Заведующий лабораторией' : 'Сотрудник',
+                    'initials' => mb_substr(get_the_title($post), 0, 1),
+                ];
             }
-            if (!$person) {
+        }
+        if (!$person) {
+            return null;
+        }
+        if ($sid === $head_id && empty($person['role'])) {
+            $person['role'] = 'Заведующий лабораторией';
+        }
+        return $person;
+    };
+
+    $nav = [
+        'about' => 'О лаборатории',
+        'directions' => 'Направления',
+        'projects' => 'Действующие и завершённые научные проекты',
+        'equipment' => 'Оборудование',
+        'services' => 'Услуги и разработки',
+        'staff' => 'Команда',
+        'pubs' => 'Публикации',
+        'contacts' => 'Контакты',
+    ];
+
+    $parts = [];
+    $parts[] = '<nav class="lab-local" aria-label="Разделы лаборатории">';
+    foreach ($nav as $id => $label) {
+        $parts[] = '<a href="#' . esc_attr($id) . '">' . esc_html($label) . '</a>';
+    }
+    $parts[] = '</nav>';
+
+    if (!empty($lab['kicker'])) {
+        $parts[] = '<p class="lab-kicker">' . esc_html((string) $lab['kicker']) . '</p>';
+    }
+
+    // About
+    $about = trim((string) ($lab['about'] ?? ''));
+    $parts[] = '<section id="about" class="lab-split">';
+    $parts[] = ichnm_photo_slot_html($title);
+    $parts[] = '<div><h2>О лаборатории</h2>';
+    if ($about !== '') {
+        $parts[] = '<p>' . esc_html($about) . '</p>';
+    } else {
+        $parts[] = '<p class="ichnm-empty-slot">Текст о лаборатории появится после передачи материалов.</p>';
+    }
+    $parts[] = '</div></section>';
+
+    // Directions
+    $directions = is_array($lab['directions'] ?? null) ? $lab['directions'] : [];
+    $parts[] = '<section id="directions"><h2>Направления</h2>';
+    if ($directions) {
+        $parts[] = '<ul class="ichnm-lab-dir-list">';
+        foreach ($directions as $row) {
+            if (is_string($row)) {
+                $parts[] = '<li><strong>' . esc_html($row) . '</strong></li>';
                 continue;
             }
-            if ($sid === (string) ($lab['head_id'] ?? '') && empty($person['role'])) {
-                $person['role'] = 'Заведующий лабораторией';
+            if (!is_array($row)) {
+                continue;
+            }
+            $d_title = (string) ($row['title'] ?? $row['name'] ?? '');
+            $lead = (string) ($row['lead'] ?? '');
+            if ($d_title === '') {
+                continue;
+            }
+            $parts[] = '<li><strong>' . esc_html($d_title) . '</strong>';
+            if ($lead !== '') {
+                $parts[] = '<p>' . esc_html($lead) . '</p>';
+            }
+            $parts[] = '</li>';
+        }
+        $parts[] = '</ul>';
+    } else {
+        $parts[] = '<p class="ichnm-empty-slot">Направления появятся после передачи перечня.</p>';
+    }
+    $parts[] = '</section>';
+
+    // Projects
+    $projects = is_array($lab['projects'] ?? null) ? $lab['projects'] : [];
+    $active = [];
+    $done = [];
+    foreach ($projects as $project) {
+        if (!is_array($project)) {
+            continue;
+        }
+        $line = trim((string) ($project['title'] ?? ''));
+        if ($line === '') {
+            continue;
+        }
+        $meta = [];
+        if (!empty($project['years'])) {
+            $meta[] = (string) $project['years'];
+        }
+        if (!empty($project['lead'])) {
+            $meta[] = (string) $project['lead'];
+        }
+        $item = '<li><strong>' . esc_html($line) . '</strong>';
+        if ($meta) {
+            $item .= '<p>' . esc_html(implode(' · ', $meta)) . '</p>';
+        }
+        $item .= '</li>';
+        if (($project['status'] ?? '') === 'completed') {
+            $done[] = $item;
+        } else {
+            $active[] = $item;
+        }
+    }
+    $parts[] = '<section id="projects"><h2>Действующие и завершённые научные проекты</h2>';
+    if ($active || $done) {
+        if ($active) {
+            $parts[] = '<h3>Действующие</h3><ul class="ichnm-lab-project-list">' . implode('', $active) . '</ul>';
+        }
+        if ($done) {
+            $parts[] = '<h3>Завершённые</h3><ul class="ichnm-lab-project-list">' . implode('', $done) . '</ul>';
+        }
+    } else {
+        $parts[] = '<p class="ichnm-empty-slot">Перечень проектов появится после передачи материалов Институтом.</p>';
+    }
+    $parts[] = '</section>';
+
+    // Equipment
+    $equipment = is_array($lab['equipment'] ?? null) ? $lab['equipment'] : [];
+    $parts[] = '<section id="equipment"><h2>Оборудование</h2>';
+    if ($equipment) {
+        $parts[] = '<ul class="lab-equip">';
+        foreach ($equipment as $row) {
+            if (!is_array($row) && !is_string($row)) {
+                continue;
+            }
+            $e_title = is_string($row) ? $row : (string) ($row['title'] ?? $row['name'] ?? '');
+            if ($e_title === '') {
+                continue;
+            }
+            $e_slug = is_array($row) ? (string) ($row['slug'] ?? '') : '';
+            $lead = is_array($row) ? (string) ($row['lead'] ?? $row['spec'] ?? '') : '';
+            $href = $e_slug !== '' ? home_url('/facilities/#' . sanitize_title($e_slug)) : '';
+            $parts[] = '<li class="lab-equip-item">';
+            if ($href !== '') {
+                $parts[] = '<a class="lab-equip-card" href="' . esc_url($href) . '">';
+            } else {
+                $parts[] = '<div class="lab-equip-card">';
+            }
+            $parts[] = ichnm_photo_slot_html($e_title);
+            $parts[] = '<h3>' . esc_html($e_title) . '</h3>';
+            if ($lead !== '') {
+                $parts[] = '<p>' . esc_html($lead) . '</p>';
+            }
+            $parts[] = $href !== '' ? '</a>' : '</div>';
+            $parts[] = '</li>';
+        }
+        $parts[] = '</ul>';
+    } else {
+        $parts[] = '<p class="ichnm-empty-slot">Список приборов появится из материальной базы.</p>';
+    }
+    $parts[] = '</section>';
+
+    // Services / developments
+    $developments = is_array($lab['developments'] ?? null) ? $lab['developments'] : [];
+    $parts[] = '<section id="services"><h2>Услуги и разработки</h2>';
+    if ($developments) {
+        $parts[] = '<ul class="lab-equip">';
+        foreach ($developments as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $d_title = (string) ($row['title'] ?? '');
+            if ($d_title === '') {
+                continue;
+            }
+            $d_slug = (string) ($row['slug'] ?? '');
+            $lead = (string) ($row['lead'] ?? '');
+            $href = $d_slug !== '' ? home_url('/developments/#' . sanitize_title($d_slug)) : '';
+            $parts[] = '<li class="lab-equip-item">';
+            if ($href !== '') {
+                $parts[] = '<a class="lab-equip-card" href="' . esc_url($href) . '">';
+            } else {
+                $parts[] = '<div class="lab-equip-card">';
+            }
+            $parts[] = ichnm_photo_slot_html($d_title);
+            $parts[] = '<h3>' . esc_html($d_title) . '</h3>';
+            if ($lead !== '') {
+                $parts[] = '<p>' . esc_html($lead) . '</p>';
+            }
+            $parts[] = $href !== '' ? '</a>' : '</div>';
+            $parts[] = '</li>';
+        }
+        $parts[] = '</ul>';
+    } else {
+        $parts[] = '<p class="ichnm-empty-slot">Разработки лаборатории появятся после передачи каталога.</p>';
+    }
+    $parts[] = '</section>';
+
+    // Staff
+    $parts[] = '<section id="staff"><h2>Наша команда</h2><div class="staff-tab">';
+    $parts[] = '<p>Карточка ведёт на персональную страницу. У человека может быть несколько подразделений. Индекс Хирша и профили баз — на персональной странице.</p>';
+    if ($staff_ids) {
+        $parts[] = '<div class="people-list">';
+        foreach ($staff_ids as $sid) {
+            $person = $resolve_person($sid);
+            if (!$person) {
+                continue;
             }
             $parts[] = ichnm_person_card_html($person, $sid);
         }
         $parts[] = '</div>';
+    } else {
+        $parts[] = '<p class="ichnm-empty-slot">Состав появится после передачи списка лабораторией.</p>';
     }
+    $parts[] = '</div></section>';
 
-    $directions = $lab['directions'] ?? [];
-    if (is_array($directions) && $directions) {
-        $parts[] = '<h2>Направления</h2><ul>';
-        foreach ($directions as $row) {
-            $parts[] = '<li>' . esc_html(is_string($row) ? $row : (string) ($row['title'] ?? $row['name'] ?? '')) . '</li>';
-        }
-        $parts[] = '</ul>';
-    }
-
-    $projects = $lab['projects'] ?? [];
-    if (is_array($projects) && $projects) {
-        $active = [];
-        $done = [];
-        foreach ($projects as $project) {
-            if (!is_array($project)) {
+    // Publications
+    $publications = is_array($lab['publications'] ?? null) ? $lab['publications'] : [];
+    $parts[] = '<section id="pubs"><h2>Избранные публикации</h2>';
+    if ($publications) {
+        $by_year = [];
+        foreach ($publications as $pub) {
+            if (!is_array($pub)) {
                 continue;
             }
-            $line = trim((string) ($project['title'] ?? ''));
-            if ($line === '') {
-                continue;
-            }
-            if (!empty($project['years'])) {
-                $line .= ' (' . (string) $project['years'] . ')';
-            }
-            if (($project['status'] ?? '') === 'completed') {
-                $done[] = $line;
-            } else {
-                $active[] = $line;
-            }
+            $year = (string) ($pub['year'] ?? '—');
+            $by_year[$year][] = $pub;
         }
-        $parts[] = '<h2 id="projects">Действующие и завершённые научные проекты</h2>';
-        if ($active) {
-            $parts[] = '<h3>Действующие</h3><ul>';
-            foreach ($active as $line) {
-                $parts[] = '<li>' . esc_html($line) . '</li>';
+        krsort($by_year);
+        foreach ($by_year as $year => $rows) {
+            $parts[] = '<h3 id="pub-year-' . esc_attr(sanitize_title($year)) . '">' . esc_html($year) . '</h3><ul class="ichnm-lab-pub-list">';
+            foreach ($rows as $pub) {
+                $cite = (string) ($pub['cite'] ?? $pub['title'] ?? '');
+                if ($cite === '') {
+                    continue;
+                }
+                $doi = trim((string) ($pub['doi'] ?? ''));
+                $parts[] = '<li>' . esc_html($cite);
+                if ($doi !== '') {
+                    $parts[] = ' · <a href="' . esc_url('https://doi.org/' . ltrim($doi, '/')) . '" rel="noopener noreferrer">DOI</a>';
+                }
+                $parts[] = '</li>';
             }
             $parts[] = '</ul>';
         }
-        if ($done) {
-            $parts[] = '<h3>Завершённые</h3><ul>';
-            foreach ($done as $line) {
-                $parts[] = '<li>' . esc_html($line) . '</li>';
-            }
-            $parts[] = '</ul>';
-        }
+    } else {
+        $parts[] = '<p class="ichnm-empty-slot">Избранные публикации появятся после передачи списка.</p>';
     }
+    $parts[] = '</section>';
 
-    $equipment = $lab['equipment'] ?? [];
-    if (is_array($equipment) && $equipment) {
-        $parts[] = '<h2>Оборудование</h2><ul>';
-        foreach ($equipment as $row) {
-            $label = is_string($row) ? $row : (string) ($row['title'] ?? $row['name'] ?? '');
-            if ($label !== '') {
-                $parts[] = '<li>' . esc_html($label) . '</li>';
-            }
-        }
-        $parts[] = '</ul>';
+    // Contacts
+    $parts[] = '<section id="contacts" class="lab-contacts"><h2>Контакты</h2>';
+    $parts[] = '<p>Адрес: 220084, г. Минск, ул. Ф. Скорины, 36</p>';
+    if (!empty($lab['phone'])) {
+        $parts[] = '<p>Тел. ' . esc_html((string) $lab['phone']) . '</p>';
     }
+    if (!empty($lab['email'])) {
+        $email = (string) $lab['email'];
+        $parts[] = '<p>E-mail: <a href="mailto:' . esc_attr($email) . '">' . esc_html($email) . '</a></p>';
+    }
+    if ($head_id !== '') {
+        $head = $resolve_person($head_id);
+        if ($head) {
+            $line = 'Заведующий: ' . (string) ($head['name'] ?? '');
+            $bits = [];
+            if (!empty($lab['phone'])) {
+                $bits[] = (string) $lab['phone'];
+            }
+            if (!empty($lab['email'])) {
+                $bits[] = (string) $lab['email'];
+            }
+            if ($bits) {
+                $line .= ' · ' . implode(' · ', $bits);
+            }
+            $parts[] = '<p>' . esc_html($line) . '</p>';
+        }
+    }
+    $parts[] = '</section>';
 
     return implode('', $parts);
 }
@@ -1210,16 +2241,12 @@ function ichnm_import_people(): void
         $parts[] = ichnm_blocks_html(['paragraphs' => $person['bio'] ?? []]);
         $affiliations = $person['affiliations'] ?? [];
         if (is_array($affiliations) && $affiliations) {
-            $parts[] = '<h2>Аффилиации</h2><ul>';
-            foreach ($affiliations as $aff) {
-                if (!is_array($aff)) {
-                    continue;
-                }
-                $line = trim((string) ($aff['role'] ?? '') . ' · ' . (string) ($aff['unit_id'] ?? ''));
-                $parts[] = '<li>' . esc_html(trim($line, ' ·')) . '</li>';
+            $aff_html = ichnm_person_affiliations_html($affiliations);
+            if ($aff_html !== '') {
+                $parts[] = $aff_html;
             }
-            $parts[] = '</ul>';
         }
+        $parts[] = ichnm_person_metrics_html($person);
         $contacts = [];
         if (!empty($person['phone'])) {
             $contacts[] = esc_html((string) $person['phone']);
@@ -1239,6 +2266,31 @@ function ichnm_import_people(): void
             'post_content' => implode('', $parts),
         ], '_ichnm_person_id', $id);
     }
+}
+
+/**
+ * One archive card: title links to /conferences/{slug}/ (preview parity).
+ *
+ * @param array<string,mixed> $conf
+ */
+function ichnm_conference_archive_card_html(array $conf): string
+{
+    $slug = (string) ($conf['slug'] ?? '');
+    $title = (string) ($conf['title'] ?? $slug);
+    if ($slug === '' || $title === '') {
+        return '';
+    }
+    $href = home_url('/conferences/' . rawurlencode($slug) . '/');
+    $html = '<article class="ichnm-catalogue-card conf-card">';
+    if (!empty($conf['series'])) {
+        $html .= '<p class="ichnm-catalogue-meta">' . esc_html((string) $conf['series']) . '</p>';
+    }
+    $html .= '<h3><a href="' . esc_url($href) . '">' . esc_html($title) . '</a></h3>';
+    if (!empty($conf['when'])) {
+        $html .= '<p>' . esc_html((string) $conf['when']) . '</p>';
+    }
+    $html .= '</article>';
+    return $html;
 }
 
 function ichnm_fill_aist_page(): void
@@ -1268,19 +2320,17 @@ function ichnm_fill_aist_page(): void
 
     $conferences = $copy['conferences'] ?? [];
     if (is_array($conferences) && $conferences) {
-        $parts[] = '<h2>Материалы конференций</h2>';
+        // Current cycle files stay on the hub; archive titles link to /conferences/{slug}/.
+        $current = null;
         foreach ($conferences as $conf) {
-            if (!is_array($conf)) {
-                continue;
+            if (is_array($conf) && ($conf['slug'] ?? '') === 'aist-2025') {
+                $current = $conf;
+                break;
             }
-            $parts[] = '<h3>' . esc_html((string) ($conf['title'] ?? $conf['slug'] ?? '')) . '</h3>';
-            if (!empty($conf['when'])) {
-                $parts[] = '<p>' . esc_html((string) $conf['when']) . '</p>';
-            }
-            foreach ($conf['paragraphs'] ?? [] as $para) {
-                $parts[] = '<p>' . esc_html((string) $para) . '</p>';
-            }
-            $files = $conf['files'] ?? [];
+        }
+        if (is_array($current)) {
+            $parts[] = '<h2>Материалы текущего цикла</h2>';
+            $files = $current['files'] ?? [];
             if (is_array($files) && $files) {
                 $parts[] = '<ul>';
                 foreach ($files as $file) {
@@ -1297,6 +2347,36 @@ function ichnm_fill_aist_page(): void
                 }
                 $parts[] = '</ul>';
             }
+            $curr_slug = (string) ($current['slug'] ?? 'aist-2025');
+            $parts[] = '<p><a href="' . esc_url(home_url('/conferences/' . rawurlencode($curr_slug) . '/')) . '">'
+                . esc_html((string) ($current['title'] ?? $curr_slug)) . '</a> — страница цикла.</p>';
+        }
+
+        $aist_rows = [];
+        $other_rows = [];
+        foreach ($conferences as $conf) {
+            if (!is_array($conf) || empty($conf['slug'])) {
+                continue;
+            }
+            if (($conf['kind'] ?? '') === 'aist') {
+                $aist_rows[] = $conf;
+            } else {
+                $other_rows[] = $conf;
+            }
+        }
+        if ($aist_rows) {
+            $parts[] = '<h2>Архив AIST</h2><div class="ichnm-card-grid">';
+            foreach ($aist_rows as $conf) {
+                $parts[] = ichnm_conference_archive_card_html($conf);
+            }
+            $parts[] = '</div>';
+        }
+        if ($other_rows) {
+            $parts[] = '<h2>Другие конференции Института</h2><div class="ichnm-card-grid">';
+            foreach ($other_rows as $conf) {
+                $parts[] = ichnm_conference_archive_card_html($conf);
+            }
+            $parts[] = '</div>';
         }
     }
 
@@ -1634,10 +2714,13 @@ function ichnm_search_catalog(): array
         if (!is_array($item)) {
             continue;
         }
+        $f_slug = sanitize_title((string) ($item['slug'] ?? ''));
         $rows[] = [
             'type' => 'facility',
             'title' => (string) ($item['title'] ?? ''),
-            'href' => home_url('/facilities/#' . sanitize_title((string) ($item['slug'] ?? ''))),
+            'href' => $f_slug !== ''
+                ? ichnm_catalogue_detail_permalink('facilities', $f_slug)
+                : home_url('/facilities/'),
             'meta' => (string) ($item['lead'] ?? $item['spec'] ?? 'Прибор'),
         ];
     }
@@ -1645,10 +2728,13 @@ function ichnm_search_catalog(): array
         if (!is_array($item)) {
             continue;
         }
+        $d_slug = sanitize_title((string) ($item['slug'] ?? ''));
         $rows[] = [
             'type' => 'development',
             'title' => (string) ($item['title'] ?? ''),
-            'href' => home_url('/developments/#' . sanitize_title((string) ($item['slug'] ?? ''))),
+            'href' => $d_slug !== ''
+                ? ichnm_catalogue_detail_permalink('developments', $d_slug)
+                : home_url('/developments/'),
             'meta' => (string) ($item['lead'] ?? $item['product'] ?? 'Разработка'),
         ];
     }
@@ -1684,8 +2770,18 @@ function ichnm_sitemap_html(): string
     $tree = function_exists('ichnm_menu_with_labs')
         ? ichnm_menu_with_labs(ichnm_site_model()['menu'] ?? [])
         : (ichnm_site_model()['menu'] ?? []);
+    $hub = function_exists('ichnm_hub_strings') ? ichnm_hub_strings() : [];
+    $page_for = static function (string $slug): ?WP_Post {
+        if (function_exists('ichnm_translated_page')) {
+            $page = ichnm_translated_page($slug);
+            if ($page instanceof WP_Post) {
+                return $page;
+            }
+        }
+        return get_page_by_path($slug);
+    };
 
-    $render = static function (array $items) use (&$render): string {
+    $render = static function (array $items) use (&$render, $page_for): string {
         if (!$items) {
             return '';
         }
@@ -1703,19 +2799,10 @@ function ichnm_sitemap_html(): string
                 $slug = (string) ($item['slug'] ?? '');
                 $html .= '<li><a href="' . esc_url(home_url('/labs/' . rawurlencode($slug) . '/')) . '">' . esc_html($title) . '</a>';
             } else {
-                $page = get_page_by_path($id);
+                $page = $page_for($id);
                 $href = $page instanceof WP_Post ? get_permalink($page) : home_url('/' . rawurlencode($id) . '/');
-                if ($id === 'news') {
-                    $news = get_page_by_path('news');
-                    $href = $news instanceof WP_Post ? get_permalink($news) : $href;
-                }
-                if ($id === 'events') {
-                    $events = get_page_by_path('events');
-                    $href = $events instanceof WP_Post ? get_permalink($events) : $href;
-                }
-                if ($id === 'publications') {
-                    $pubs = get_page_by_path('publications');
-                    $href = $pubs instanceof WP_Post ? get_permalink($pubs) : $href;
+                if ($page instanceof WP_Post && $page->post_title !== '') {
+                    $title = (string) $page->post_title;
                 }
                 $html .= '<li><a href="' . esc_url((string) $href) . '">' . esc_html($title) . '</a>';
             }
@@ -1728,8 +2815,9 @@ function ichnm_sitemap_html(): string
         return $html;
     };
 
-    $html = '<nav class="ichnm-sitemap" aria-label="Карта сайта">' . $render($tree) . '</nav>';
-    $html .= '<h2>Руководство</h2><ul class="ichnm-hub-links">';
+    $aria = (string) ($hub['sitemap_aria'] ?? 'Карта сайта');
+    $html = '<nav class="ichnm-sitemap" aria-label="' . esc_attr($aria) . '">' . $render($tree) . '</nav>';
+    $html .= '<h2>' . esc_html((string) ($hub['leadership'] ?? 'Руководство')) . '</h2><ul class="ichnm-hub-links">';
     foreach (ichnm_migrated_copy()['leadership_order'] ?? [] as $id) {
         $person = ichnm_find_by_slug('person', (string) $id);
         if (!$person instanceof WP_Post) {
@@ -1738,9 +2826,9 @@ function ichnm_sitemap_html(): string
         $html .= '<li><a href="' . esc_url(get_permalink($person)) . '">' . esc_html(get_the_title($person)) . '</a></li>';
     }
     $html .= '</ul>';
-    $search = get_page_by_path('search');
+    $search = $page_for('search');
     if ($search instanceof WP_Post) {
-        $html .= '<p><a href="' . esc_url(get_permalink($search)) . '">Открыть поиск</a></p>';
+        $html .= '<p><a href="' . esc_url(get_permalink($search)) . '">' . esc_html((string) ($hub['open_search'] ?? 'Открыть поиск')) . '</a></p>';
     }
     return $html;
 }
@@ -1756,6 +2844,7 @@ function ichnm_sync_content(bool $force = false): void
     ichnm_ensure_pages();
     ichnm_import_people();
     ichnm_import_council_people();
+    ichnm_import_admin_unit_people();
     ichnm_import_labs();
     ichnm_import_news();
     ichnm_import_media_about();

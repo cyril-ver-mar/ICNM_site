@@ -97,6 +97,14 @@ class SiteModel:
         return tuple(self._data["roles"]["editor_may_publish"])
 
     @cached_property
+    def forbidden_feeds(self) -> frozenset[str]:
+        """Feed ids that must not appear as separate top-level IA (e.g. announcements)."""
+        raw = self._data.get("forbidden_feeds")
+        if raw is None:
+            return frozenset({"announcement"})
+        return frozenset(raw)
+
+    @cached_property
     def short_name(self) -> str:
         return str(self._data["identity"].get("short_name", "ИХНМ НАН Беларуси"))
 

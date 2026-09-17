@@ -6,11 +6,13 @@ get_header();
 
 $q = isset($_GET['q']) ? sanitize_text_field(wp_unslash((string) $_GET['q'])) : '';
 $hits = ($q !== '' && function_exists('ichnm_search_query')) ? ichnm_search_query($q) : [];
+$hub = function_exists('ichnm_hub_strings') ? ichnm_hub_strings() : [];
+$ui = function_exists('ichnm_chrome_strings') ? ichnm_chrome_strings() : [];
 $labels = [
-    'person' => 'Персоналии',
-    'unit' => 'Подразделения',
-    'facility' => 'Приборы',
-    'development' => 'Разработки',
+    'person' => $hub['search_kind_person'] ?? 'Персоналии',
+    'unit' => $hub['search_kind_unit'] ?? 'Подразделения',
+    'facility' => $hub['search_kind_facility'] ?? 'Приборы',
+    'development' => $hub['search_kind_development'] ?? 'Разработки',
 ];
 
 while (have_posts()) {
@@ -29,16 +31,16 @@ while (have_posts()) {
       </header>
 
       <form class="ichnm-search-form is-page" action="<?php echo esc_url(get_permalink()); ?>" method="get" role="search">
-        <label class="screen-reader-text" for="ichnm-q-page">Запрос</label>
-        <input id="ichnm-q-page" name="q" type="search" value="<?php echo esc_attr($q); ?>" placeholder="Фамилия, лаборатория, прибор, разработка" required minlength="2">
-        <button type="submit" class="ichnm-pill ichnm-pill-primary">Найти</button>
+        <label class="screen-reader-text" for="ichnm-q-page"><?php echo esc_html($hub['search_query'] ?? 'Запрос'); ?></label>
+        <input id="ichnm-q-page" name="q" type="search" value="<?php echo esc_attr($q); ?>" placeholder="<?php echo esc_attr($hub['search_placeholder'] ?? 'Фамилия, лаборатория, прибор, разработка'); ?>" required minlength="2">
+        <button type="submit" class="ichnm-pill ichnm-pill-primary"><?php echo esc_html($ui['find'] ?? 'Найти'); ?></button>
       </form>
 
       <div class="ichnm-search-results">
         <?php if ($q !== '' && mb_strlen($q) < 2) : ?>
-          <p>Введите не меньше двух букв.</p>
+          <p><?php echo esc_html($hub['search_min'] ?? 'Введите не меньше двух букв.'); ?></p>
         <?php elseif ($q !== '' && !$hits) : ?>
-          <p>Ничего не найдено. Попробуйте фамилию, лабораторию, прибор или разработку.</p>
+          <p><?php echo esc_html($hub['search_empty'] ?? 'Ничего не найдено. Попробуйте фамилию, лабораторию, прибор или разработку.'); ?></p>
         <?php elseif ($hits) : ?>
           <?php
           $grouped = [];

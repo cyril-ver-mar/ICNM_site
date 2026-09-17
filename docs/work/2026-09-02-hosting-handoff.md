@@ -2,6 +2,68 @@
 
 Для разговора со студией **Forever** (ООО «Форэва Бай»), которая ведёт старый [ichnm.by](https://ichnm.by/). Новый сайт — **WordPress + Kadence на PHP + MySQL**, не Java. Старый сайт не выключаем, пока руководство не примет новый. Домен не меняется.
 
+---
+
+## Текущий контур 2026-09-17
+
+Операционный снимок **локального / будущего PHP**-контура (не Forever Java). DNS `ichnm.by` здесь **не** переключаем: сначала test URL → sign-off → смена только A/`www`.
+
+### Стек
+
+| Слой | Что |
+| --- | --- |
+| CMS | WordPress 6.x + PHP 8.3 + MySQL 8 |
+| Тема | Kadence + child **`ichnm-kadence`** (`wp-content/themes/ichnm-kadence`) |
+| Плагин контента | **`ichnm-site`** (`wp-content/plugins/ichnm-site`) |
+| Языки | **Polylang** (без Pro): структура RU / EN / BE / ZH |
+| Docker | `docker-compose.yml`: сервисы `db`, `wordpress` (:8080), `wpcli` |
+
+### Языки и slug’и
+
+- Префиксы путей: `/`, `/en/`, `/be/`, `/zh/`.
+- Без Polylang Pro slug’и оболочек с суффиксом языка: `about-en`, `structure-en`, `home-en`, … (аналогично `-be` / `-zh`).
+- Тела институтских страниц остаются на русском до официального перевода; переключатель ведёт на эквивалентные страницы структуры.
+
+### Сид контента
+
+- Константа `ICHNM_CONTENT_SEED_VERSION` в `wp-content/plugins/ichnm-site/includes/content-sync.php` — сейчас **30** (единственный авторитетный номер; preview-parity catalogue/conference сид).
+- Опция WP: `ichnm_content_seed_version`. После деплоя на PHP при необходимости форс-ресід: `wp eval 'ichnm_sync_content(true);'` (или `scripts/local-setup.sh`).
+
+### Docker volumes (данные не в git)
+
+Имена на машине разработчика обычно:
+
+- `icnm_site_db_data` — MySQL (БД WordPress)
+- `icnm_site_wp_data` — файлы ядра WP в контейнере
+
+Тема/плагин монтируются с диска репозитория; медиа и БД живут в volumes. Потерять volume = потерять локальную БД и uploads.
+
+### Роль редактора лент
+
+- Роль `ichnm_feed_editor` («Редактор лент ИХНМ»): новости, мероприятия, «СМИ о нас», публикации.
+- Не даёт править шапку/подвал/витрины. Памятка: `docs/work/notes/feed-editor-role.md`.
+
+### Smoke и бэкап
+
+| Действие | Команда / файл |
+| --- | --- |
+| Чеклист приёмки | `docs/work/smoke-checklist.md` |
+| HTTP smoke | `./scripts/wp-smoke.sh` (или `BASE_URL=https://… ./scripts/wp-smoke.sh`) |
+| Снимок для PHP-хостинга | `./scripts/wp-backup.sh` → `exports/wp-backup-YYYYMMDD-HHMM/` |
+
+`exports/` в `.gitignore`. В архиве: `wordpress.sql`, `wp-content-overlay.tgz` (тема + плагин), `uploads.tgz` (если есть), `README.txt`.
+
+### Cutover (напоминание)
+
+1. Test URL на PHP-тарифе (**Active.by** или **Hoster.by**), не на Java Forever.
+2. Smoke + sign-off руководства.
+3. Смена только A/`www`; MX / `aist.ichnm.by` не трогать.
+4. Старый Java остаётся до приказа; откат = вернуть A на старый IP.
+
+Подробный опросник Forever — ниже (без изменений по смыслу с 2026-08/09).
+
+---
+
 Факты, которые уже известны (2026-08-30), не как спор, а как проверка их ответов:
 
 - DNS-серверы домена: `ns1.activeby.net` / `ns2.activeby.net` (регистратор **Active.by / ActiveCloud**).

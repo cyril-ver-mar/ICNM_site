@@ -4,6 +4,8 @@
  */
 get_header();
 
+$hub = function_exists('ichnm_hub_strings') ? ichnm_hub_strings() : [];
+
 while (have_posts()) {
     the_post();
     ?>
@@ -21,8 +23,8 @@ while (have_posts()) {
 
       <section class="ichnm-home-band" aria-labelledby="ichnm-news-institute">
         <div class="ichnm-band-head">
-          <h2 id="ichnm-news-institute">Новости Института</h2>
-          <a class="ichnm-band-more" href="#ichnm-news-institute">К ленте</a>
+          <h2 id="ichnm-news-institute"><?php echo esc_html($hub['institute_news'] ?? 'Новости Института'); ?></h2>
+          <a class="ichnm-band-more" href="#ichnm-news-institute"><?php echo esc_html($hub['to_feed'] ?? 'К ленте'); ?></a>
         </div>
         <?php
         $institute = new WP_Query([
@@ -42,15 +44,15 @@ while (have_posts()) {
             echo '</div>';
             wp_reset_postdata();
         else :
-            echo '<p>Новости Института появятся после публикации ленты.</p>';
+            echo '<p>' . esc_html($hub['news_empty'] ?? 'Новости Института появятся после публикации ленты.') . '</p>';
         endif;
         ?>
       </section>
 
       <section class="ichnm-home-band" aria-labelledby="ichnm-news-media">
         <div class="ichnm-band-head">
-          <h2 id="ichnm-news-media">СМИ о нас</h2>
-          <a class="ichnm-band-more" href="<?php echo esc_url(get_post_type_archive_link('media_about') ?: home_url('/media-about/')); ?>">Все материалы</a>
+          <h2 id="ichnm-news-media"><?php echo esc_html($hub['media_about'] ?? 'СМИ о нас'); ?></h2>
+          <a class="ichnm-band-more" href="<?php echo esc_url(get_post_type_archive_link('media_about') ?: home_url('/media-about/')); ?>"><?php echo esc_html($hub['all_media'] ?? 'Все материалы'); ?></a>
         </div>
         <?php
         $media = new WP_Query([
@@ -70,7 +72,7 @@ while (have_posts()) {
             echo '</div>';
             wp_reset_postdata();
         else :
-            echo '<p>Публикации СМИ появятся после переноса карточек.</p>';
+            echo '<p>' . esc_html($hub['media_empty'] ?? 'Публикации СМИ появятся после переноса карточек.') . '</p>';
         endif;
         ?>
       </section>

@@ -11,6 +11,7 @@ from pathlib import Path
 from src.core import i18n, roster
 from src.core.copy import is_filled_copy, load_migrated_copy, page_copy
 from src.core.filled import fish_svg, letter_for_lab
+from src.core.ia_vitrines import PAGE_FILE_SLOTS
 from src.core.search_index import build_search_index
 from src.core.site_model import MenuItem, SiteModel
 
@@ -520,16 +521,16 @@ _HUB_BLURB = {
 _LIST_AS_CARDS = frozenset({"about"})
 
 _FISH_FILE_PAGES = {
-    "charter": ["Устав ГНУ «ИХНМ НАН Беларуси».pdf"],
-    "anti-corruption": ["Положение о противодействии коррупции.pdf", "План мероприятий.pdf"],
+    "charter": list(PAGE_FILE_SLOTS["charter"]),
+    "anti-corruption": list(PAGE_FILE_SLOTS["anti-corruption"]),
     "scientific-council": ["Состав учёного совета.pdf", "Регламент.pdf"],
-    "defense-council": ["Состав совета по защитам.pdf", "Специальности.pdf"],
-    "internships": ["Положение о стажировках.pdf"],
-    "courses": ["Программы курсов.pdf"],
-    "doctorate": ["Правила приёма в докторантуру.pdf"],
+    "defense-council": list(PAGE_FILE_SLOTS["defense-council"]),
+    "internships": list(PAGE_FILE_SLOTS["internships"]),
+    "courses": list(PAGE_FILE_SLOTS["courses"]),
+    "doctorate": list(PAGE_FILE_SLOTS["doctorate"]),
     "requisites": ["Банковские реквизиты.pdf"],
     "union": ["Положение первичной организации.pdf"],
-    "aspirantura": ["Правила приёма в аспирантуру.pdf", "Перечень специальностей.pdf"],
+    "aspirantura": list(PAGE_FILE_SLOTS["aspirantura"]),
 }
 
 _NBSP = "\u00a0"
@@ -2025,9 +2026,15 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
                 )
             )
         chunks.append("</div>")
-    if item.id in _FISH_FILE_PAGES:
+    if item.id in _FISH_FILE_PAGES or page_copy(item.id).get("file_slots"):
+        labels = list(page_copy(item.id).get("file_slots") or []) or list(
+            _FISH_FILE_PAGES.get(item.id) or []
+        )
         chunks.insert(0, _fish_banner())
-        chunks.append(_file_slots(_FISH_FILE_PAGES[item.id]))
+        chunks.append(_file_slots(labels))
+    empty_slot = str(page_copy(item.id).get("empty_slot") or "").strip()
+    if empty_slot and item.id != "vacancies":
+        chunks.append(f'<p class="empty-state">{escape(empty_slot)}</p>')
     if item.children and item.id != "structure":
         chunks.append(_hub_cards(item.children))
     if not chunks:
@@ -2635,7 +2642,7 @@ def _publications_inner() -> str:
         )
     payload = json.dumps(data, ensure_ascii=False)
     note = escape(str(data.get("note", "")))
-    catalog = _publications_grouped(roster.lab_publications(), 0, show_lab=True)
+    catalog = _publications_grouped(roster.institute_publications(), 0, show_lab=True)
     if not catalog:
         catalog = f"<p>{escape(_st('pub_list_pending'))}</p>"
     return (

@@ -53,6 +53,7 @@ function ichnm_migrated_copy_path(): string
 
 require_once __DIR__ . '/includes/content-sync.php';
 require_once __DIR__ . '/includes/polylang-setup.php';
+require_once __DIR__ . '/includes/roles.php';
 
 /**
  * Honest home copy for the local theme (same source as HTML preview).
@@ -135,7 +136,8 @@ function ichnm_register_post_types(): void
 {
     $types = [
         'news' => ['Новости', 'Новость', 'news', false],
-        'event' => ['Мероприятия', 'Мероприятие', 'event', false],
+        // Public URLs match honest preview: /conferences/{slug}/ (not /event/).
+        'event' => ['Мероприятия', 'Мероприятие', 'conferences', false],
         'media_about' => ['СМИ о нас', 'Публикация СМИ', 'media-about', true],
         'publication' => ['Публикации', 'Публикация', 'publication', false],
         'department' => ['Подразделения', 'Подразделение', 'labs', true],
@@ -159,39 +161,6 @@ function ichnm_register_post_types(): void
     }
 }
 add_action('init', 'ichnm_register_post_types');
-
-function ichnm_register_feed_editor_role(): void
-{
-    add_role('ichnm_feed_editor', 'Редактор лент ИХНМ', [
-        'read' => true,
-        'upload_files' => true,
-        'edit_posts' => true,
-        'edit_published_posts' => true,
-        'publish_posts' => true,
-        'delete_posts' => true,
-        'delete_published_posts' => true,
-    ]);
-}
-
-add_filter('user_has_cap', static function (array $allcaps, array $caps, array $args, WP_User $user): array {
-    if (!in_array('ichnm_feed_editor', (array) $user->roles, true)) {
-        return $allcaps;
-    }
-    $blocked = ['edit_pages', 'edit_theme_options', 'switch_themes', 'customize', 'install_themes', 'edit_themes'];
-    foreach ($blocked as $cap) {
-        $allcaps[$cap] = false;
-    }
-    return $allcaps;
-}, 10, 4);
-
-add_action('admin_menu', static function (): void {
-    if (!current_user_can('publish_posts') || current_user_can('manage_options')) {
-        return;
-    }
-    remove_menu_page('edit.php');
-    remove_menu_page('edit.php?post_type=page');
-    remove_menu_page('themes.php');
-});
 
 function ichnm_placeholder_body(string $id): string
 {
@@ -338,9 +307,7 @@ function ichnm_sync_nav_menu(bool $force = false): void
 function ichnm_activate(): void
 {
     ichnm_register_post_types();
-    if (get_role('ichnm_feed_editor') === null) {
-        ichnm_register_feed_editor_role();
-    }
+    ichnm_register_feed_editor_role();
     ichnm_ensure_pages();
     ichnm_sync_content(true);
     flush_rewrite_rules();
@@ -349,9 +316,7 @@ register_activation_hook(__FILE__, 'ichnm_activate');
 
 add_action('init', static function (): void {
     register_nav_menu('ichnm-primary', 'Главное меню ИХНМ');
-    if (get_role('ichnm_feed_editor') === null) {
-        ichnm_register_feed_editor_role();
-    }
+    ichnm_register_feed_editor_role();
     if (!get_option('ichnm_pages_seeded')) {
         ichnm_ensure_pages();
         update_option('ichnm_pages_seeded', 1);
@@ -388,6 +353,21 @@ function ichnm_feedback_form_shortcode(): string
     return $html;
 }
 add_shortcode('ichnm_feedback_form', 'ichnm_feedback_form_shortcode');
+
+/**
+ * Cooperation world map: Natural Earth outlines + partner pins (ticket 12).
+ */
+function ichnm_world_map_shortcode(): string
+{
+    return function_exists('ichnm_world_map_html') ? ichnm_world_map_html() : '';
+}
+add_shortcode('ichnm_world_map', 'ichnm_world_map_shortcode');
+
+function ichnm_minsk_map_shortcode(): string
+{
+    return function_exists('ichnm_minsk_map_html') ? ichnm_minsk_map_html() : '';
+}
+add_shortcode('ichnm_minsk_map', 'ichnm_minsk_map_shortcode');
 
 function ichnm_handle_feedback(): void
 {

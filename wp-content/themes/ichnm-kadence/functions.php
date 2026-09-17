@@ -23,13 +23,14 @@ add_action('wp_enqueue_scripts', static function (): void {
         is_readable($parent_style) ? ['kadence'] : [],
         wp_get_theme()->get('Version')
     );
+    $ver = (string) wp_get_theme()->get('Version');
     $chrome_js = get_stylesheet_directory() . '/assets/chrome.js';
     if (is_readable($chrome_js)) {
         wp_enqueue_script(
             'ichnm-chrome',
             get_stylesheet_directory_uri() . '/assets/chrome.js',
             [],
-            wp_get_theme()->get('Version'),
+            $ver,
             true
         );
         if (function_exists('ichnm_search_catalog')) {
@@ -39,6 +40,16 @@ add_action('wp_enqueue_scripts', static function (): void {
                 'before'
             );
         }
+    }
+    $lattice_js = get_stylesheet_directory() . '/assets/lattice.js';
+    if (is_front_page() && is_readable($lattice_js)) {
+        wp_enqueue_script(
+            'ichnm-lattice',
+            get_stylesheet_directory_uri() . '/assets/lattice.js',
+            [],
+            $ver,
+            true
+        );
     }
 });
 
@@ -136,6 +147,130 @@ function ichnm_chrome_strings(?string $lang = null): array
 }
 
 /**
+ * Structural UI strings for feed hubs and catalogue shells (body copy stays RU).
+ *
+ * @return array<string, string>
+ */
+function ichnm_hub_strings(?string $lang = null): array
+{
+    $lang = $lang ?: (function_exists('pll_current_language') ? (string) pll_current_language('slug') : 'ru');
+    if ($lang === '') {
+        $lang = 'ru';
+    }
+    $pack = [
+        'ru' => [
+            'institute_news' => 'Новости Института',
+            'to_feed' => 'К ленте',
+            'news_empty' => 'Новости Института появятся после публикации ленты.',
+            'media_about' => 'СМИ о нас',
+            'all_media' => 'Все материалы',
+            'media_empty' => 'Публикации СМИ появятся после переноса карточек.',
+            'next_event' => 'Ближайшее мероприятие',
+            'event_register' => 'Регистрация / сайт серии',
+            'aist_section' => 'Раздел AIST',
+            'events_calendar' => 'Календарь и архив',
+            'events_empty' => 'Мероприятия появятся после публикации календаря.',
+            'pubs_labs' => 'Публикации лабораторий',
+            'pubs_empty' => 'Стартовый список ещё не засеян. После sync появятся записи, снятые с ichnm.by, либо таблица коллег.',
+            'articles_by_year' => 'Статьи по годам',
+            'search_query' => 'Запрос',
+            'search_placeholder' => 'Фамилия, лаборатория, прибор, разработка',
+            'search_min' => 'Введите не меньше двух букв.',
+            'search_empty' => 'Ничего не найдено. Попробуйте фамилию, лабораторию, прибор или разработку.',
+            'search_kind_person' => 'Персоналии',
+            'search_kind_unit' => 'Подразделения',
+            'search_kind_facility' => 'Приборы',
+            'search_kind_development' => 'Разработки',
+            'sitemap_aria' => 'Карта сайта',
+            'leadership' => 'Руководство',
+            'open_search' => 'Открыть поиск',
+        ],
+        'en' => [
+            'institute_news' => 'Institute news',
+            'to_feed' => 'To the feed',
+            'news_empty' => 'Institute news will appear after the feed is published.',
+            'media_about' => 'Media about us',
+            'all_media' => 'All items',
+            'media_empty' => 'Media items will appear after the cards are migrated.',
+            'next_event' => 'Next event',
+            'event_register' => 'Registration / series site',
+            'aist_section' => 'AIST section',
+            'events_calendar' => 'Calendar and archive',
+            'events_empty' => 'Events will appear after the calendar is published.',
+            'pubs_labs' => 'Laboratory publications',
+            'pubs_empty' => 'The starter list is not seeded yet. After sync, rows scraped from ichnm.by or the colleague spreadsheet will appear.',
+            'articles_by_year' => 'Papers by year',
+            'search_query' => 'Query',
+            'search_placeholder' => 'Surname, laboratory, instrument, development',
+            'search_min' => 'Enter at least two characters.',
+            'search_empty' => 'Nothing found. Try a surname, laboratory, instrument or development.',
+            'search_kind_person' => 'People',
+            'search_kind_unit' => 'Units',
+            'search_kind_facility' => 'Instruments',
+            'search_kind_development' => 'Developments',
+            'sitemap_aria' => 'Sitemap',
+            'leadership' => 'Leadership',
+            'open_search' => 'Open search',
+        ],
+        'be' => [
+            'institute_news' => 'Навіны Інстытута',
+            'to_feed' => 'Да стужкі',
+            'news_empty' => 'Навіны Інстытута з’явяцца пасля публікацыі стужкі.',
+            'media_about' => 'СМІ пра нас',
+            'all_media' => 'Усе матэрыялы',
+            'media_empty' => 'Публікацыі СМІ з’явяцца пасля пераносу картак.',
+            'next_event' => 'Бліжэйшае мерапрыемства',
+            'event_register' => 'Рэгістрацыя / сайт серыі',
+            'aist_section' => 'Раздзел AIST',
+            'events_calendar' => 'Календар і архіў',
+            'events_empty' => 'Мерапрыемствы з’явяцца пасля публікацыі календара.',
+            'pubs_labs' => 'Публікацыі лабараторый',
+            'pubs_empty' => 'Стартавы спіс яшчэ не засеяны. Пасля sync з’явяцца запісы з ichnm.by або табліцы калег.',
+            'articles_by_year' => 'Артыкулы па гадах',
+            'search_query' => 'Запыт',
+            'search_placeholder' => 'Прозвішча, лабараторыя, прыбор, распрацоўка',
+            'search_min' => 'Увядзіце не менш за дзве літары.',
+            'search_empty' => 'Нічога не знойдзена. Паспрабуйце прозвішча, лабараторыю, прыбор або распрацоўку.',
+            'search_kind_person' => 'Персаналіі',
+            'search_kind_unit' => 'Падраздзяленні',
+            'search_kind_facility' => 'Прыборы',
+            'search_kind_development' => 'Распрацоўкі',
+            'sitemap_aria' => 'Карта сайта',
+            'leadership' => 'Кіраўніцтва',
+            'open_search' => 'Адкрыць пошук',
+        ],
+        'zh' => [
+            'institute_news' => '研究所新闻',
+            'to_feed' => '查看资讯',
+            'news_empty' => '研究所新闻将在发布资讯流后显示。',
+            'media_about' => '媒体报道',
+            'all_media' => '全部内容',
+            'media_empty' => '媒体报道将在卡片迁入后显示。',
+            'next_event' => '近期活动',
+            'event_register' => '注册 / 系列网站',
+            'aist_section' => 'AIST 栏目',
+            'events_calendar' => '日历与档案',
+            'events_empty' => '活动将在日历发布后显示。',
+            'pubs_labs' => '各实验室论文',
+            'pubs_empty' => '起始列表尚未导入。同步后将显示从 ichnm.by 抓取的条目或同事表格。',
+            'articles_by_year' => '按年论文数',
+            'search_query' => '查询',
+            'search_placeholder' => '姓氏、实验室、仪器、成果',
+            'search_min' => '请至少输入两个字符。',
+            'search_empty' => '没有结果。请尝试姓氏、实验室、仪器或成果。',
+            'search_kind_person' => '人员',
+            'search_kind_unit' => '单位',
+            'search_kind_facility' => '仪器',
+            'search_kind_development' => '成果',
+            'sitemap_aria' => '网站地图',
+            'leadership' => '领导班子',
+            'open_search' => '打开搜索',
+        ],
+    ];
+    return $pack[$lang] ?? $pack['ru'];
+}
+
+/**
  * Hub kicker labels for CPT singles.
  *
  * @return array{label:string,href:string}
@@ -163,6 +298,63 @@ function ichnm_hub_kicker(string $hub_slug): array
     return ['label' => $label, 'href' => $href];
 }
 
+/**
+ * Canonical RU hub slug for a page (handles news-en shells and Polylang links).
+ */
+function ichnm_page_hub_base(?WP_Post $page = null): string
+{
+    if (!$page instanceof WP_Post) {
+        $page = get_queried_object();
+    }
+    if (!$page instanceof WP_Post) {
+        return '';
+    }
+    $base = (string) $page->post_name;
+    if (function_exists('pll_get_post_language') && function_exists('pll_get_post')) {
+        $lang = (string) pll_get_post_language((int) $page->ID);
+        if ($lang && $lang !== 'ru') {
+            $ru_id = (int) pll_get_post((int) $page->ID, 'ru');
+            if ($ru_id > 0) {
+                $ru = get_post($ru_id);
+                if ($ru instanceof WP_Post) {
+                    $base = (string) $ru->post_name;
+                }
+            }
+        }
+    }
+    $stripped = preg_replace('/-(en|be|zh)$/', '', $base);
+    return is_string($stripped) && $stripped !== '' ? $stripped : $base;
+}
+
+/**
+ * Page by exact slug, ignoring Polylang language filters (any language shell).
+ */
+function ichnm_find_page_by_slug(string $slug): ?WP_Post
+{
+    if ($slug === '') {
+        return null;
+    }
+    if (function_exists('ichnm_find_ru_page') && !preg_match('/-(en|be|zh)$/', $slug)) {
+        $ru = ichnm_find_ru_page($slug);
+        if ($ru instanceof WP_Post) {
+            return $ru;
+        }
+    }
+    $posts = get_posts([
+        'name' => $slug,
+        'post_type' => 'page',
+        'post_status' => ['publish', 'draft', 'private'],
+        'posts_per_page' => 5,
+        'suppress_filters' => true,
+    ]);
+    foreach ($posts as $post) {
+        if ($post instanceof WP_Post && $post->post_name === $slug) {
+            return $post;
+        }
+    }
+    return null;
+}
+
 function ichnm_translated_page(string $slug): ?WP_Post
 {
     $ru = null;
@@ -170,7 +362,7 @@ function ichnm_translated_page(string $slug): ?WP_Post
         $ru = ichnm_find_ru_page($slug);
     }
     if (!$ru instanceof WP_Post) {
-        $ru = get_page_by_path($slug);
+        $ru = ichnm_find_page_by_slug($slug) ?: get_page_by_path($slug);
     }
     if (!$ru instanceof WP_Post) {
         return null;
@@ -185,6 +377,10 @@ function ichnm_translated_page(string $slug): ?WP_Post
         if ($post instanceof WP_Post && $post->post_status === 'publish') {
             return $post;
         }
+    }
+    $shell = ichnm_find_page_by_slug($slug . '-' . $lang);
+    if ($shell instanceof WP_Post && $shell->post_status === 'publish') {
+        return $shell;
     }
     return $ru;
 }
@@ -267,6 +463,10 @@ function ichnm_render_language_switch(): void
     $current_lang = function_exists('pll_current_language') ? (string) pll_current_language('slug') : 'ru';
 
     echo '<div class="ichnm-chrome-tools">';
+    echo '<button type="button" class="ichnm-menu-toggle" aria-expanded="false" aria-controls="ichnm-primary-nav">' . esc_html($ui['menu']) . '</button>';
+    echo '</div>';
+    echo '<div class="ichnm-header-panel">';
+    echo '<div class="ichnm-header-utilities">';
     if ($langs) {
         echo '<nav class="ichnm-lang-switch" aria-label="' . esc_attr($ui['lang_aria']) . '">';
         foreach ($langs as $lang) {
@@ -277,9 +477,19 @@ function ichnm_render_language_switch(): void
                 $href = (string) pll_home_url($code);
             }
             if ($current_id > 0 && function_exists('pll_get_post')) {
-                $translated = pll_get_post($current_id, $code);
-                if ($translated) {
+                $translated = (int) pll_get_post($current_id, $code);
+                if ($translated > 0) {
                     $href = (string) get_permalink($translated);
+                } elseif (is_singular('page')) {
+                    // Fallback for hub shells if Polylang link is missing: news → news-en.
+                    $base = ichnm_page_hub_base();
+                    if ($base !== '') {
+                        $shell_slug = $code === 'ru' ? $base : $base . '-' . $code;
+                        $shell = ichnm_find_page_by_slug($shell_slug);
+                        if ($shell instanceof WP_Post && $shell->post_status === 'publish') {
+                            $href = (string) get_permalink($shell);
+                        }
+                    }
                 }
             }
             $class = ($code === $current_lang || ($current_lang === '' && $code === 'ru')) ? 'is-current' : '';
@@ -295,24 +505,33 @@ function ichnm_render_language_switch(): void
     $feedback = ichnm_translated_page('feedback');
     $feedback_href = $feedback instanceof WP_Post ? get_permalink($feedback) : home_url('/feedback/');
     echo '<a class="ichnm-write-btn" href="' . esc_url($feedback_href) . '">' . esc_html($ui['write']) . '</a>';
-    echo '<button type="button" class="ichnm-menu-toggle" aria-expanded="false" aria-controls="ichnm-primary-nav">' . esc_html($ui['menu']) . '</button>';
-    echo '</div>';
+    echo '</div>'; // .ichnm-header-utilities
 }
 
 function ichnm_render_primary_menu(): void
 {
-    if (!has_nav_menu('ichnm-primary')) {
+    // Resolve by menu name — Polylang can strip custom theme_location assignments
+    // from theme_mod_nav_menu_locations on the front, so has_nav_menu() may lie.
+    $menu = wp_get_nav_menu_object('Главное меню ИХНМ');
+    if (!$menu && !has_nav_menu('ichnm-primary')) {
+        echo '</div>'; // close .ichnm-header-panel opened in language_switch
         return;
     }
     echo '<nav id="ichnm-primary-nav" class="ichnm-menu" aria-label="' . esc_attr(ichnm_chrome_strings()['sections']) . '">';
-    wp_nav_menu([
-        'theme_location' => 'ichnm-primary',
+    $args = [
         'container' => false,
         'fallback_cb' => false,
         'depth' => 3,
         'menu_class' => 'ichnm-menu-list',
-    ]);
+    ];
+    if ($menu) {
+        $args['menu'] = (int) $menu->term_id;
+    } else {
+        $args['theme_location'] = 'ichnm-primary';
+    }
+    wp_nav_menu($args);
     echo '</nav>';
+    echo '</div>'; // .ichnm-header-panel
 }
 
 function ichnm_render_chrome_close(): void
@@ -403,26 +622,19 @@ add_filter('template_include', static function (string $template): string {
     if (!$page instanceof WP_Post) {
         return $template;
     }
-    $base = (string) $page->post_name;
-    if (function_exists('pll_get_post_language') && function_exists('pll_get_post')) {
-        $lang = (string) pll_get_post_language((int) $page->ID);
-        if ($lang && $lang !== 'ru') {
-            $ru_id = (int) pll_get_post((int) $page->ID, 'ru');
-            if ($ru_id > 0) {
-                $ru = get_post($ru_id);
-                if ($ru instanceof WP_Post) {
-                    $base = (string) $ru->post_name;
-                }
-            }
-        }
-    }
-    $base = preg_replace('/-(en|be|zh)$/', '', $base) ?: $base;
+    $base = ichnm_page_hub_base($page);
     $map = [
         'news' => 'page-news.php',
         'events' => 'page-events.php',
         'publications' => 'page-publications.php',
         'search' => 'page-search.php',
         'sitemap' => 'page-sitemap.php',
+        'hr' => 'page-unit.php',
+        'labor-protection' => 'page-unit.php',
+        'engineering' => 'page-unit.php',
+        'accounting' => 'page-unit.php',
+        'union' => 'page-unit.php',
+        'young-scientists' => 'page-unit.php',
     ];
     if (!isset($map[$base])) {
         return $template;

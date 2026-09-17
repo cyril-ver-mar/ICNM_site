@@ -1,0 +1,1510 @@
+{
+  "source_note": "Scraped 2026-09-17 from ichnm.by lab packs (tab «Публикации»). Honest starter catalogue; not complete. Mock DOIs excluded.",
+  "source_urls": [
+    "https://ichnm.by/c.eco?q=lab:l:selected_lab:v:13",
+    "https://ichnm.by/c.eco?q=lab:l:selected_lab:v:75",
+    "https://ichnm.by/c.eco?q=lab:l:selected_lab:v:79",
+    "https://ichnm.by/c.eco?q=lab:l:selected_lab:v:191",
+    "https://ichnm.by/c.eco?q=lab:l:selected_lab:v:195"
+  ],
+  "items": [
+    {
+      "cite": "The characteristics of polysaccharide from Gracilaria chouae and its application in food packaging with carboxymethyl cellulose and lysozyme / Shiyuan Chang, Xinyuan Zou, Biyang Zhu, Lijun You, Zhengang Zhao, Kseniya Hileuskaya // Food Hydrocolloids Volume 135, February 2023, 108109",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2023,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Contact guidance of mesenchymal stem cells by flagellin-modified substrates: Aspects of cell-surface interaction from the point of view of liquid crystal theory / K. Hileuskaya, B. Kakasi, V. Kulikouskaya, F. Vonderviszt, V. Nikalaichuk, K. Dubatouka, I. Chyshankou, A. Kraskouski, A. Muravsky, A. Murauski, S. Pinchuk, I. Vasilevich, I. Volotovski, V. Agabekov // Colloids and Surfaces A: Physicochemical and Engineering Aspects. 2023. V. 663. 131113",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2023,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Aspects of the interaction of pectin-coated Ag nanoparticles with methylene blue with regard to photodynamic applications K. Hileuskaya, A. Ihnatsyeu-Kachan, A. Kraskouski, A. Saichuk, A. Hileuskaya, V. Nikalaichuk, V. Kulikouskaya, S. Kim // Materials Today Communications. 2023. V. 35, 105597",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2023,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Structural characterization and anti-photoaging activity of a polysaccharide from Sargassum fusiforme / Jinhong Hu, Wanzi Yao, Shiyuan Chang, Lijun You, Mouming Zhao, Peter Chi-Keung Cheung, Kseniya Hileuskaya // Food Research International, 2022. V. 157, 111267",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2022,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Green synthesis of pectin-silver nanocomposite: Parameter optimization and physico-chemical characterization / Tran Thi Y Nhi , Do Truong Thien , Trinh Duc Cong , Ngo Trinh Tung , Lai Thi Thuy , Nguyen Thi Thuc, Tran Thi Nu, Nguyen Dang Dat, Kseniya Hileuskaya, Joanna Kalatskaja, Viktoryia Kulikouskaya // Vietnam J. Chem., 2022, 60 (special issue), 66-71",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2022,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Multifunctional Biocompatible Films Based on Pectin-Ag Nanocomposites and PVA: Design, Characterization and Antimicrobial Potential / A. Kraskouski, K. Hileuskaya, A. Ladutska, V. Kabanava, A. Liubimau, G. Novik, Tran Thi Y Nhi, V. Agabekov / Journal of Applied Polymer Science. 2022. 139 (42)",
+      "doi": "https://doi.org/10.1002/app.53023",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2022,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Chitosan-capped silver nanoparticles: A comprehensive study of polymer molecular weight effect on the reaction kinetic, physicochemical properties, and synergetic antibacterial potential / V. Kulikouskaya, K. Hileuskaya, A. Kraskouski, I. Kozerozhets, E. Stepanova, I. Kuzminski, L. You, V. Agabekov // SPE Polymers. 2022. 3(2). P. 77-90",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2022,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Honeycomb-structured porous films from poly(3-hydroxybutyrate) and poly(3-hydroxybutyrate-co-3-hydroxyvalerate): physicochemical characterization and mesenchymal stem cells behavior / V. Kulikouskaya, V. Nikalaichuk, A. Bonartsev, E. Akoulina, N. Belishev , I Demianova, D. Chesnokova, T. Makhina, G. Bonartseva, K. Hileuskaya, V. Voinova // Polymers. 2022. Jun 30;14(13):2671",
+      "doi": "https://doi.org/10.3390/polym14132671",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2022,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Preparation and Properties of Complexes Based on Chitosan-Ag Nanocomposite and Cephalosporin Antibiotics / Kraskouski, A.N., Nikalaichuk, V.V., Hileuskaya, K.S. et al. // Appl Biochem Microbiol. 2022. V. 58. P. 136–142",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2022,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Growth Parameters and Antioxidant Activity in Cucumber Seedlings with the Application of Chitosan and Hydroxycinnamic Acids Conjugates under Salt Stress / Nedved, E.L., Kalatskaja, J.N., Ovchinnikov, I.A, E. I. Rybinskaya, A. N. Kraskouski, V. V. Nikalaichuk, K. S. Hileuskaya, V. I. Kulikouskaya, V. E. Agabekov & N. A. Laman // Appl Biochem Microbiol. 2022. V. 58. P. 69–76",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2022,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Hydrothermal Synthesis and Properties of Chitosan–Silver Nanocomposites / Hileuskaya K. et al, // Russian Journal of Inorganic Chemistry. 2022. 66(8). P. 1128-1134",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2022,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Formation of biomimetic structures of poly(3-hydroxybutyrate) films / Kulikouskaya V, Bonartsev A, Akoulina E, Hileuskaya K, Chyshankou I, Zharkova I, Demyanova I, Dudun A, Makhina T, Bonartseva G, Shaitan K, Voinova V. // The International Journal of Artificial Organs. 2021. Volume 44 Number 9. P. 615-616",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2021,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Polyvinyl alcohol and pectin blended films: preparation, characterization and mesenchymal stem cells behavior / A. Kraskouski, K. Hileuskaya, V. Kulikouskaya, S. Pinchuk, I. Vasilevich, V. Kabanava, T. Kuznetsova, V. Lapitskaya, V. Agabekov, I. Volotovski // Journal of Biomedical Materials Research: Part A. 2021. V. 109 (8). P. 1379-1392",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2021,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Physicochemical aspects of design of ultrathin films based on chitosan, pectin, and their silver nanocomposites with antiadhesive and bactericidal potential / Kulikouskaya V., Zhdanko T., Hileuskaya K., Kraskouski A., Zhura A., Skorohod G., Agabekov V. // Journal of Biomedical Materials Research Part A. (2021). P. 1-12",
+      "doi": "https://doi.org/10.1002/jbm.a.37278",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2021,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Synthesis and properties of hydrogel particles based on chitosan-ferulic acid conjugates / Aliaksandr Kraskouski, Viktoryia Nikalaichuk, Viktoryia Kulikouskaya, Kseniya Hileuskaya, Joanna Kalatskaja, Helen Nedved, Nikolai Laman, Vladimir Agabekov // Soft Materials. 2021. V. 19 (4). P. 495-502",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2021,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "LbL films and microcapsules based on protamine and pectin-Ag nanocomposite / A. Hileuskaya, K. Hileuskaya, A. Kraskouski, A. Salamianski, V. Nikalaichuk, A. Ihnatsyeu-Kachan, Sehoon Kim // Materials Today: Proceedings. 2021. https://doi.org/10.1016/j.matpr.2021.07.327",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2021,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Chitosan-hydroxycinnamic acid conjugates: Synthesis, photostability and phytotoxicity to seed germination of barley / V. Nikalaichuk, K. Hileuskaya, A. Kraskouski, V. Kulikouskaya, H. Nedved, J. Kalatskaja, E. Rybinskaya, K. Herasimovich, N. Laman, V. Agabekov // Journal of Applied Polymer Science. 2021. Article 51884. https://doi.org/10.1002/app.51884",
+      "doi": "https://doi.org/10.1002/app.51884",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2021,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Regulation effects of indigestible dietary polysaccharides on intestinal microflora: An overview / Ge Y, Ahmed S, Yao W, You L, Zheng J, Hileuskaya K. // J Food Biochem. 2021 Jan;45(1):e13564. Epub 2020 Nov 20. PMID: 33219555",
+      "doi": "https://doi.org/10.1111/jfbc.13564",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2021,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Изучение токсичности и особенностей биологического действия нанокомпозита пектин-Ag: результаты субхронического эксперимента / В.М. Василькевич, Р.В. Богданов, К.С. Гилевская,В. И. Куликовская // Токсикологический вестник. 2021; 29(5) 25-33",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2021,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Preparation of novel poly (vinyl alcohol)/chitosan lactate-based phase-separated composite films for UV-shielding and drug delivery applications / Dilshad Qureshi, Srusti Pattanaik, Biswaranjan Mohanty, Arfat Anis, Viktoryia Kulikouskaya, Kseniya Hileuskaya, Vladimir Agabekov, Preetam Sarkar, Samarendra Maji, Kunal Pal // Polymer bulletin. 2021. 79. P. 3253–3290",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2021,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Fabrication and characterization of novel poly (vinyl alcohol) and chitosan oligosaccharide films / Dilshad Qureshi, Ayasharani Sahoo, Biswaranjan Mohanty, Samarendra Maji, Arfat Anis, Viktoryia Kulikouskaya, Kseniya Hileuskaya, Vladimir Agabekov, Preetam Sarkar, Kunal Pal // Gels. 2021. V. 7(2), 55",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2021,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "‘Green’ approach for obtaining stable pectin-capped silver nanoparticles: physico-chemical characterization and antibacterial activity / K. Hileuskaya, A. Ladutska, V. Kulikouskaya, A. Kraskouskia, G. Novik, I. Kozerozhetsc, A. Kozlovskiy, V. Agabekov // Colloids and Surfaces A: Physicochemical and Engineering Aspects. 2020. V. 585. 124141",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2020,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Antimicrobial ultrathin film based on well-defined silver nanoparticles and polylactide / Mai Ha Hoang, Hop Tran Thi Thanh, Duc Nghia Nguyen, Tuyen Van Nguyen, Ihnat Chyshankou, Aliaksandr Liubimau, Uladzimir Dobysh, Viktorya Kulikouskaya // Advances in Natural Sciences: Nanoscience and Nanotechnology. 2020. Vol. 11 (2). 025014 (7pp)",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2020,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Fabrication and characterization of ultrathin spin-coated poly(L-lactic acid) films suitable for cell attachment and curcumin loading / V. Kulikouskaya, I. Chyshankou, S. Pinchuk, I. Volotovski, V. Agabekov // Biomedical materials. 2020. 15(6). 065022",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2020,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Preparation and properties of hydrogel microparticles based on chitosan / A. N. Kraskouski, V. V. Nikalaichuk, V. I. Kulikouskaya, K. S. Hileuskaya, J. N. Kalatskaja, E. L. Nedved, N. A. Laman,V. E. Agabekov // Theoretical and Experimental Chemistry. 2020. Vol. 56, No. 4. P. 243-256",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2020,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Polysaccharide from Gracilaria Lemaneiformis prevents colitis in Balb/c mice via enhancing intestinal barrier function and attenuating intestinal inflammation / Rui Han, Li Wang, Zhengang Zhao, LijunYou, Sandra Pedisić, Viktoryia Kulikouskaya, Zhiqi Lin // Food Hydrocolloids. 2020. V. 109. 106048",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2020,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Degradation of polysaccharides from Sargassum fusiforme using UV/H 2 O 2 and its effects on structural characteristics / X. Chen, R. Zhang, Yi. Li, X. Li, L. You, V. Kulikouskaya, K. Hileuskaya // Carbohydrate polymers. 2020. V. 230. 115647",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2020,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "In vitro digestibility and prebiotic activities of a sulfated polysaccharide from Gracilaria Lemaneiformis / Rui Han , Daorui Pang , Lingrong Wen , Lijun You, Riming Huang , Viktoryia Kulikouskaya // Journal of Functional Foods. 2020. V. 64. 103652",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2020,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Fabrication and characterization of pectin-based 3D porous scaffolds suitable for treatment of peritoneal adhesions / V. Kulikouskaya, A. Kraskouski, K. Hileuskaya, A. Zhura, S. Tratsyak, V. Agabekov // Journal of Biomedical Materials Research A. 2019; V.107A. P. 1814–1823",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2019,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Hydrogel nanoparticles of chitosan-folic acid conjugate with imatinib methanesulfonate / M. É. Lozovskaya, V. I. Kulikovskaya, Zh. V. Ignatovich, E. V. Koroleva, V. E. Agabekov // Pharmaceutical Chemistry Journal, 2018, Vol. 52, No. 2, P. 127-132",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2018,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Formation and Properties of Multilayer Films Based on Polyethyleneimine and Bovine Serum Albumin / V. I. Kulikouskaya, M. E. Lazouskaya, A. N. Kraskouski, V. E. Agabekov // Russian Journal of Physical Chemistry A, 2018, Vol. 92, No. 1, pp. 146–152",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2018,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Tailoring a Tyrosine-Rich Peptide into Size- and Thickness-Controllable Nanofilms / I.V. Paribok, Yo.O Kim, S. K. Choi, B.Y. Jung, J. Lee, Ki T. Nam , V. E. Agabekov, Yoon-Sik Lee // ACS Omega, 2018, 3 (4), pp 3901–3907",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2018,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Layer by Layer Buildup of Polysaccharide-containing Films: Physico-Chemical Properties and Mesenchymal Stem Cells Adhesion / V.I. Kulikouskaya, S.V. Pinchuk, K.S. Hileuskaya, A.N. Kraskousk1, I.B. Vasilevich, K.A. Matievski, V.E. Agabekov, I.D. Volotovski // Journal of Biomedical Materials Research Part A. 2018. №8. V. 106A. P. 2093-2104",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2018,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Polydimethylsiloxane Films Modified with Chitosan/Pectin Multilayers as Scaffolds for Mesenchymal Stem Cells / V. I. Kulikouskaya, I. V. Paribok, S. V. Pinchuk, A. N. Kraskouski, I. B. Vasilevich, K. A. Matievski, V. E. Agabekov, I. D. Volotovski // Applied Biochemistry and Microbiology, 2018, Vol. 54, No. 5, pp. 468–473",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2018,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Fabrication and physico-chemical properties of pectin/chitosan scaffolds / V. Kulikouskaya, M. Lazouskaya, V. Agabekov // Engineering of biomaterials. 2018. V. 146. P. 2-7",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2018,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Hydrogel nanoparticles of folic acid conjugated chitosan with imatinib methanesulfonate / M. Lazouskaya, V. Kulikouskaya, V. Agabekov // Pharmaceutical Chemistry Journal. 2018. V.52. № 2. P. 22-27",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2018,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Formation and properties of LbL films based on pectin and pectin-Ag nanocomposite / K.S. Hileuskaya, A.N. Kraskouski, V.E. Agabekov // Protection of Metals and Physical Chemistry of Surfaces, 2018, V. 54 (1), P. 27-32,",
+      "doi": "https://doi.org/10.1134/S2070205118010070",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2018,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "Preparation and Properties of Protamine/Pectin-Ag Biopolymer Microcapsules Containing a 2-Arylaminopyrimidine Derivative / K.S. Hileuskaya, Zh. V. Ihnatovich, M.B. Golubeva, E.V. Koroleva, V.E. Agabekov // Pharmaceutical Chemistry Journal, 2018, V. 51 (10), P. 922-927",
+      "lab_id": "lab-nano",
+      "laboratory": "Лаборатория микро- и наноструктурированных систем",
+      "year": 2018,
+      "lab_slug": "nano"
+    },
+    {
+      "cite": "V.Agabekov, N.Ivanova, V.Dlugunovich, I.Vostchula. Optical properties of polyvinyl alcohol films modified with silver nanoparticles // Journal of Nanomaterials. &ndash; Vol. 2012 (Synthesis, Properties, and Applications of Polymeric Nanocomposites). &ndash; Article ID 206384, 5 p",
+      "lab_id": "lab-films",
+      "laboratory": "Лаборатория оптических многофункциональных плёнок",
+      "year": 2012,
+      "lab_slug": "films"
+    },
+    {
+      "cite": "Ал.Ан. Муравский, Ан.Ал. Муравский, В.Е. Агабеков, О.О.Чувашева, Н.А.Иванова. Разработка ахроматического циркулярного поляризатора // ЖПС. &ndash; 2012. &ndash; Т.79, №5. &ndash; С.825-829",
+      "lab_id": "lab-films",
+      "laboratory": "Лаборатория оптических многофункциональных плёнок",
+      "year": 2012,
+      "lab_slug": "films"
+    },
+    {
+      "cite": "А.Л. Потапов, Н.А. Иванова, В.Е. Агабеков. Морфология серебряных наночастиц, сформированных в поливинилспиртовой пленке &laquo;Полимерные материалы и технологии&raquo;, Т.2 (2016), № 3, 24-29&nbsp",
+      "lab_id": "lab-films",
+      "laboratory": "Лаборатория оптических многофункциональных плёнок",
+      "year": 2016,
+      "lab_slug": "films"
+    },
+    {
+      "cite": "Siyamak Shahab, Liudmila Filippovich, Masoome Sheikhi Thermostable Polarizing Film on the Basic of Poly (vinyl alcohol) and New Dichroic Synthesized Azo Dye for Optical Applications: Theoretical and Experimental Investigations. Chemical Methodologies 2 (2017). 170-1845. Thermostable Broad Band Polarizing PVA-Film: Theoretical and Experimental Investigations. SIYAMAK Shahab, LIUDMILA Filippovich, HORA A. Almodarresiyeh, MASOOME Sheikhi, RAKESH Kumar. Chinese J. Struct. Chem. 2018. 2 Vol. 37, No. 2. С. 186─197",
+      "lab_id": "lab-films",
+      "laboratory": "Лаборатория оптических многофункциональных плёнок",
+      "year": 2017,
+      "lab_slug": "films"
+    },
+    {
+      "cite": "Rogachev, A. V., Liu, Y., Li, Z., Rogachev, A. A., Tan, X., Jiang, X., Pyzh, A.E., Yarmolenko, V.A., Rudenkov, A.S., Yarmolenko, M.A., Gorbachev, D. L. // Low-energy electron beam deposition of drug coatings intended for burn treatment. Applied Surface Science – 2025. – 687, P.162211. 2. Супергидрофобные и олеофобные композиционные покрытия на основе наночастиц диоксида кремния и полиэтилцианоакрилата / А.Е. Соломянский, В. М. Акулова, Г. Б. Мельникова, З. С. Гурина, Ю. В. Синькевич, Агабеков В.Е. // Весці Нацыянальнай акадэміі навук Беларусі. Серыя хімічных навук. – 2025. – Т. 61, № 1. – С. 41–45. 3. D.L. Gorbachev, M.A Yarmolenko, A.V. Rogachev, A.E. Salamianski, A.A. Rogachev Synthesis of polymers-based nanocomposite thin coatings and their surface functional properties/Proceedings of the VIII INTERNATIONAL SYMPOSIUM ON TRIBO-FATIGUE 11-16 August 2025, Harbin, China – P. 43-47. 4. Anti-mold properties of hydrophobic and superhydrophobic coatings based on cyanoacrylate adhesive, zinc and silicon oxides nanoparticles / Kieu Anh Thi Vo, Cuong Van Bui, Anh Son Nguyen, An Quan Vo, Thu Trang Thi Nguyen, Viktoryia Akulova, Ignat Chishankov, Dai Lam Tran, The Tam Le, Tuan Anh Nguyen, Aliaksandr Salamianski and Quang Le Dang // Main Group Chemistry. 2025. – P. 1-10. 5. Ж. В. Игнатович, C. Н. Лемешонок, Е. В. Авдеева, А. В. Петкевич, Л. Н. Филиппович, Ю. В. Матвеенко, Ж.З. Жалилов, М.М. Мирхолисов, А.А. Сарымсаков, Х.Э. Юнусов, Н.В. Дудчик, О.А. Емельянова, А.А. Рогачев Влияние поверхностного модифицирования раневых повязок на основе углеродного сорбента и целлюлозы на их сорбционную и антимикробную активность // Полимерные материалы и технологии– 2025.– Т.11, №1. – 26-33. 6. Turakulov F. M. U., Yunusov K. E., Sarymsakov A. A., Аtakhanov A. A. U., Guohua J., Rui W., Yi W., Somia Y. H. A., Xakimov Z. Z., Raxmanov A. X., Turakulov M., Ignatovich Z. V., Rogachev A. A. Synthesis, characterization, and cytotoxic activity of stable selenium nanoparticles-incorporated carboxymethylcellulose solution // Polymers for advanced technologies. – 2025; 36:e70232. 7. Mirkholisov Mirafzal Muzaffar O'g'li, Yunusov Khaydar Ergashovich, Sarymsakov Abdushkur Abdukhalilovich, Аtakhanov Abdumutolib Abdupatto Ugli, Ashurov Nurbek Shodievich, Ihnatovich Zhanna Vladimirovna, Rogachev Alexander Alexandrovich, Guohua Jiang, Jiawen Wang, Buhua Wang, Yi Wan, Somia Yassin Hussain Abdalkarim, Houyong Yu, Amorn Chaiyasat, M. Bychkovsky Pavel / Physicochemical characteristics of nanocomposite hydrogels based on carboxymethylcellulose and zinc oxide nanoparticles and study its sun protection properties and antibacterial activity // Polymers for Advanced Technologies. 2025. – 36:e70434. https://doi.org/10.1002/pat.70434 . 8. Long-term stable quasi-solid-state complementary WO3–NiO electrochromic devices with ultra-fast response / Bin Cheng, Zhenhu Cao, Li Liao, Wentao Chen, Hongtao Cao, A.A. Rogachev, M.A. Yarmolenko, Hongliang Zhang // Materials Today Chemistry.–2025.–Vol. 43.–P.102471. 9. Advances in the formation and properties of nanofiber biomaterials from polyvinyl alcohol/carboxymethylcellulose/nanosilver systems for medical applications / Yunusov K.E., Mirkholisov M.M., Azizova M.A., Jalilov J.Z., Yarmatov S.S., Todjiyev J.N., Sarimsakov A.A., Atakhanov A.A., Guohua J., Rogachev A.A. //Chemical Review and Letters.–2025.– №8.– P.20 – 38. 10. Fang, L., Zhang, Y., Xie, W., Rogachev, A. A., Yarmolenko, M. A., & Zhang, H. Enhanced Cyclic Stability and Performance of Electrochromic Energy Storage Devices with In-Situ Solid Electrolyte Interphase. // Chemical Engineering Journal. – 2025. – Т. 511. – С. 162050. 11. Xiaoxue Tan, Yixuan Huang, Xin Liu, D.G. Piliptsou, M.A. Yarmolenko, A.A. Rogachev, Xiaohong Jiang / Magnesium + coral hydroxyapatite/tannin dual-functional composite film for suppressing bone tumors and promoting ossification // International Journal of Biological Macromolecules.–2025.–№ 321.– P.146456. 12. Xia, X., Ge, L., Rogachev, A., Wang, Z., Wang, H. Recent Advances in Antioxidant Cerium-Based Nanozymes: Catalytic Mechanisms and Bioanalysis/Biomedical Applications //Chinese Journal of Analytical Chemistry. – 2025. – С. 100640",
+      "doi": "https://doi.org/10.1002/pat.70434",
+      "lab_id": "lab-films",
+      "laboratory": "Лаборатория оптических многофункциональных плёнок",
+      "year": 2025,
+      "lab_slug": "films"
+    },
+    {
+      "cite": "Melnikova E., Pantsialeyeva K., Tolstik A., Stanevich V., Dashkevich D., Murauski A., Karabchevsky A. Pancharatnam–Berry Phase Driven by Electrical Restructuring of Liquid Crystal Polarization Grating Period // Laser & Photonics Reviews. – 2026. – Art. e03023",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2026,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Chiral liquid crystal dopants based on terpenoid acids /Bei M. P., Yuvchenko A. P., Muravskii A. A., Dashkevich D. S., Muravskii A. A. // Proceedings of the National Academy of Sciences of Belarus, Chemical Series. – 2026. – Vol. 62, № 1. – Р. 78 88",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2026,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Potapovich A., Kostyuk T., Shutava T., Kostyuk V. Cytoprotective and Genoprotective Effects of Gelatin-Encapsulated Quercetin Against Oxidative Cell Damage // Molecules. – 2026. – Vol. 31. – Art. 1472",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2026,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Потапович А. И., Костюк Т. В., Шутова Т. Г., Костюк В. А Защитное действие кверцетина, инкапсулированного в желатиновые наночастицы, при инициировании клеточного окислительного стресса // Доклады Национальной академии наук Беларуси. – 2026. – Т. 70, № 1. – С. 45–53",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2026,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Бурть Е. С., Плиско Т. В., Ливонович К. С., Шутова Т. Г., Праценко С. А., Бильдюкевич А. В. Нанокомпозитные мембраны для гидрофильной первапорации // Полимерные материалы и технологии. – 2026. – Т.12, № 1. – С. 23–31",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2026,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Yubin Luo, Liu Zhong, Shengyong Yang, Kanstantsin S. Livanovich, Haoqun Hong, Dong Xie Regulation of vinyl acetate polymer stereoregularity through Solvent–Monomer hydrogen bonding // Polymer. – 2026. – Vol. 350. – Art 129787",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2026,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "New concept of liquid crystals photoalignment with high photosensitivity and strong anchoring / Muravsky A., Stanevich V., Dashkevich D., Kukhta I., Murauski A // Журнал Белорусского государственного университета. Физика. – 2026. – № 2",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2026,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Дымар Д. О., Шутова Т. Г., Паньков В. В. Свойства полимерных композитов на основе металл-органического каркаса фумарата алюминия // Свиридовские чтения – 2026 : материалы 11-й Междунар. конф. по химии и хим. образованию, Минск, 14–17 апр. 2026 г. – Минск : БГУ, 2026. – С. 303-306",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2026,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Кренть А. А., Шутова Т. Г., Паньков В. В. Взаимодействие привитых сополимеров хитозана с поливинипирролидоном и поливиниловым спиртом и модельного белка альбумина // Свиридовские чтения – 2026 : материалы 11-й Междунар. конф. по химии и хим. образованию, Минск, 14–17 апр. 2026 г. – Минск : БГУ, 2026. – С.313-316",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2026,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Jiang X., Shutava T., Liu L., Song S., Zhang H., Wang X. Advanced rare earth oxide-based catalysts for thermal/electrocatalytic purification of gaseous pollutants // Journal of Rare Earths. – 2026. – Vol. 44, №2. – P. 538-568",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2026,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Liu H., Zhao Y., Wang F., Li F., Li C., Zhang L., Huang X., Fang D., Li Y., Lai J., Long B., Livanovich K. S., Xie D. Gas Permeability Changes in Biodegradable Films and Litchi Preservation Performance // Polymers for Advanced Technologies. – 2025. – Vol. 36, №10. – Art. e70360",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2025,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Li Q., Li F., Liu H., Li C., Xie D., Livanovich K., Livanovich Z. Functionalized MXene as a multifunctional crosslinker for reinforced novel waste PET-depolymerized monomer-based polyurethane composites with electrical conductivity and electromagnetic shielding effect // Composites Communications. – 2025. – Vol. 59. – Art. 102598",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2025,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Shutava T.G., Tsimanenkava A.S., Martsinkevich D.S., Livanovich K.S., Pankov V.V. Water Vapor Uptake and Microwave Heating of Magnetite / Aluminum Fumarate Composites // Open Chem. Eng. J. – 2025. – Vol. 19. – Art. e18741231366263",
+      "doi": "https://doi.org/10.2174/0118741231366263250214112601",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2025,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Muravsky, A. A.; Stanevich, V. Y.; Dashkevich, D. S.; Kukhta, I. N.; Murauski, A. A. New Concept of Liquid Crystals Photoalignment with High Photosensitivity and Strong Anchoring // Phys.Chem. – 2025 (preprint.org). – P. 1-9",
+      "doi": "https://doi.org/10.20944/preprints202508.1833.v1",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2025,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Шутова Т.Г., Ливонович К.С., Самойленко М.О Тушение собственной флуоресценции альбумина привитыми сополимерами хитозана и их N-карбоксиметилированными производными // Свиридовские чтения: сб. ст. Минск, 2025. – Вып. 21. – C.158-164",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2025,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "К.С. Ливонович, А.С. Келер, З.С. Ливонович Диффузия ибупрофена в гидрогелях на основе хитозана и карбоксиметилцеллюлозы // Свиридовские чтения: сб.ст. Минск, 2025. – Вып. 21. – С. 73-81",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2025,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Потапович А.И., Костюк Т.В., Шутова Т.Г., Романовская Т.В., Костюк В.А. Цитопротекторное и антиоксидантное действие свободного и наноструктурированного кверцетина при трет-бутилгидропероксид-индуцированном повреждении клеток // Экспериментальная биология и биотехнология. – 2025. – Т.2. – С. 16–24",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2025,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Шутова Т. Г., Тимоненкова А. С., Мартинкевич Д. С., Ливонович К. С., Паньков В. В. Адсорбция водяного пара и микроволновой нагрев фумарата алюминия с наночастицами магнетита // Актуальные проблемы физики твердого тела: сб. докл. XI Междунар. науч. конф., Минск, 19–23 мая 2025 г. Минск, 2025. – С. 286-288",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2025,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Драгун Р.С., Тимоненкова А.С., Ковбаса М.А., Шутова Т.Г., Паньков В.В. Магнитный композит нового типа на основе фумарата алюминия для процессов адсорбции // Прикладные проблемы оптики, информатики, радиофизики, аэрокосмических технологий и физики конденсированного состояния : материалы VIII Междунар. науч.-практ. конф., 22–23 мая 2025 г. Минск. Минск: «СтройМедиаПроект», 2025. – С. 422-424",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2025,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Диковицкая К. Д., Шутова Т. Г., Потапович А. И. Цитотоксическая активность микро- и наноформ куркумина и кверцетина в отношении клеток аденокарциномы молочной железы // Материалы республиканской научно-практической конференции «Актуальные проблемы общей и клинической биохимии 2025», посвященной 100-летию со дня рождения академика Ю. М. Островского, 27 июня 2025 года. Гродно, 2025. – C. 208-211",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2025,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Потапович А. И., Костюк Т. В., Шутова Т. Г., Костюк В. А Защитное действие свободного и нанокверцетина при инициировании окислительного стресса в кератиноцитах человека // Материалы республиканской научно-практической конференции «Актуальные проблемы общей и клинической биохимии 2025», посвященной 100-летию со дня рождения академика Ю. М. Островского, 27 июня 2025 года. Гродно, 2025. – C. 261-263",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2025,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Efremov A. A., Zhitkeyev R., Livanovich K. S., Poryvaev A. S., Fedin M.V. // MOF-based paramagnetic oxygen gas sensor / Anal Chem. – 2025. – Vol. 97, №49. – P. 27375-27382",
+      "doi": "https://doi.org/10.1021/acs.analchem.5c05516",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2025,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Yazikova A.A., Tomilov A.S., Livanovich K.S., Smirnova K.A., Kirilyuk I.A., Poryvaev A.S., Fedin M.V. Guest molecules release from MOF-808 and MOF-based hydrogel: an EPR study // J. Phys. Chem. C. – 2025. – Vol.129, № 49. – P. 21878–21886 https://doi.org/10.1021/acs.jpcc.5c06713",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2025,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Muravsky A., Murauski A. Q&A of liquid crystal alignment: theory and practice // Frontiers in Soft Matter. – 2024. – Vol. 4. – Art. 1382925",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2024,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Murauski A., Muravsky A. Tunable liquid crystal prism for differential interference contrast microscopy // In Liquid Crystals Optics and Photonic Devices, SPIE. 2024. – Vol. 13016. – P. 108-112",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2024,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Stanevich V., Murauski A., Chepeleva D., Muravsky A. Electrically switchable focus liquid crystal polarization hologram lens // In Liquid Crystals Optics and Photonic Devices SPIE. – 2024. – Vol. 13016. – P. 33-40",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2024,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Muravsky A., Stanevich V., Kukhta I., Chepeleva D., Yakovleva A., Murauski A. Absorption Problem of Multilayer Optical Structures Based on High Anchoring Azo-dye Photoalignment of Polymerizable Liquid Crystals (44-1: Invited Paper|) // In SID Symposium Digest of Technical Papers. – 2024. – Vol. 55. – P. 377-380",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2024,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Шутова Т.Г., Потапович А.И., Костюк Т.В., Ливонович К.С., Костюк В.А. Получение, морфология, антирадикальная и биологическая активность кверцетин-содержащих наночастиц зеина и их субмикронных агрегатов // Вес. Нац. акад. навук Беларусi. Сер. хiм. навук. – 2024. – Т. 60, № 4. – Р. 300-313",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2024,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Ишутина О.В., Шутова Т. Г., Костюк В. А. Защитное действие нативного и микроструктурированного кверцетина при инициировании окислительного стресса в кераноцитах человека // Межвузовский научный симпозиум с международным участием, посвященный 110-летию со дня рождения члена-корреспондента НАН Беларуси Н. И. Аринчина: сборник материалов, 28 февраля 2024 г. – Гродно : ГрГМУ, 2024. – С. 98-100",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2024,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Самойленко М. О., Ливонович К. С., Паньков В. В., Шутова Т.Г. Тушение собственной флуоресценции альбумина привитыми сополимерами полиаллиламина и наночастицами феррита с мультислойной оболочкой на их основе // Свиридовские чтения – 2024. Материалы Х Международной конференции. – Минск : Государственное предприятие «СтройМедиаПроект», 2024. – Вып.20. – 124-135",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2024,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Ливонович К.С., Гурина З.С., Шутова Т.Г. Мультислойные покрытия на основе привитого сополимера хитозана и полиэтиленгликоля и его N-карбоксиметилированного производного // Свиридовские чтения – 2024. Материалы Х Международной конференции. – Минск : Государственное предприятие «СтройМедиаПроект», 2024. – С. 153-155",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2024,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Петрова Е.Г., Баранова А.С., Панибрат О.В., Паньков В.В., Шутова Т.Г. Биосовместимы магнитные наночастицы на основе ферритов-шпинелей // \"Альтернативные источники сырья и топлива\". Сборник научных трудов. –Минск: «Беларуская навука», 2023. – Вып. 6. – Р. 110-112",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2023,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Потапович А. И., Костюк Т.В., Шутова Т.Г., Костюк В.А. Влияние кверцетина и его микроструктурированных форм на жизнеспособность клеток и деградацию ядерной ДНК в кератиноцитах человека при моделировании окислительного стресса // Журнал БГУ: Экспериментальная биология и биотехнология. – 2024. – № 2. – С. 46-54",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2024,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Потапович А.И., Костюк Т.В., Шутова Т.Г., Костюк В.А. Получение полидисперсных наночастиц зеина, содержащих кверцетин, и оценка их биологической активности // Экспериментальная биология и биотехнология. – 2024. – №3. – С.4-9",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2024,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Hileuskaya K., Kakasi B., Kulikouskaya V., Vonderviszt F., Nikalaichuk V., Dubatouka K., Chyshankou I., Kraskouski A.,Muravsky A., Murauski A., Pinchuk S., Vasilevich I., Volotovski I., Agabekov V. Contact guidance of mesenchymal stem cells by flagellin-modified substrates: aspects of cell-surface interaction from the point of view of liquid crystal theory // Colloids and Surfaces A: Physicochemical and Engineering Aspects. – 2023. –Vol. 663. – Art. 131113",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2023,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Станевич В.Ю., Чепелева Д.С., Курилов А.Д., Безрученко В.С., Муравский А.А. Массивы жидкокристаллических линз на основе фоточувствительного полимерного ориентанта // Журнал Белорусского государственного университета. Физика. – 2023. – № 3. –C. 22-30",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2023,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Muravsky A. A., Murauski A. A., Yakovleva A. S. Green technology of photoalignment layer coating from H2O solution for achromatic polymerizable liquid crystal retarder (47.1) / In SID Symposium Digest of Technical Papers. – 2023. – Vol. 54. – P. 333-335",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2023,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Сахаревич Д. Ю., Тимоненкова А. С.,. Паньков В. В, Шутова Т. Г. Композиты фумарата циркония и полиэлектролитов с улучшенными адсорбционными и механическими характеристиками // Полимерные материалы и технологии. –2023. – Т.9, № 1. – Р. 28-38",
+      "doi": "https://doi.org/10.32864/polymmattech-2023-9-1-28-38",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2023,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Potapovich A.I., Kostyuk T.V., Ishutina O.V., Shutava T.G., Kostyuk V.A. Effects of Native and Particulate Polyphenols on Dna Damage and Cell Viability After UV-C Exposure // Naunyn-Schmiedeberg's Archives of Pharmacology. – 2023. – Vol. 396, № 9. –Р. 1923-1930. https://doi.org/10.1007/s00210-023-02443-3",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2023,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Potapovich A.I., Kostyuk T.V., Shman T.V., Ermilova T.I., Shutava T.G., Kostyuk V.A. DNA repair activation and cell death suppression by plant polyphenols in keratinocytes exposed to UV-irradiation // Rejuvenation Research. – 2023. – Vol. 26, № 1. – Р. 1-8. https://doi.org/10.1089/rej.2022.0031",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2023,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Скорина М. Ю., Тимоненкова А.С., Паньков В.В., Шутова Т. Г. Cорбция водяного пара композитами MIL-101(Cr) и полиэлектролитов // Инновационные материалы и технологии : материалы Междунар. науч.-техн. конф. молодых ученых, г. Минск, 21–23 марта 2023 г. – Минск : БГТУ, 2023. – С. 321-324",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2023,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Shutava T.G., Livanovich K.S. Evaluation of metal-organic framework / polyelectrolyte composites as desiccant materials // Actual Problems of Solid State Physics:proc. book X Intern. Scient. Conf., Minsk, 22-26 May, 2023. – Minsk : Publisher A.Varaksin, 2023. – P. 598-601",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2023,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Тимоненкова А. С., Паньков В. В., Шутова Т. Г. Оптимизация метода синтеза металл-органических каркасов на основе циркония // Actual Problems of Solid State Physics:proc. book X Intern. Scient. Conf., Minsk, 22-26 May, 2023. – Minsk : Publisher A.Varaksin, 2023. – P. 347-351",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2023,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Muravsky, A., Bezruchenko, V., Murauski, A., Mahilny V. Surface control of LC alignment for creation of liquid crystal lenses arrays (U. 54.3: invited paper) // In SID Symposium Digest of Technical Papers. – 2022. – Vol. 53, № S1. – Р. 538-540",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2022,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Shutava T., Jansen C., Livanovich K., Pankov V., Janiak C. Metal organic framework / polyelectrolyte composites for water vapor sorption applications // Dalton Transactions. – 2022. – Vol. 51, № 18. –Р. 7053-7067",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2022,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Потапович А.И., Костюк Т.В., Шутова Т.Г., Ишутина О.В., Костюк В.А Активация репарации ДНК и подавление клеточной гибели кверцетином и его наноструктурированными формами после УФ-С воздействия // Физико-химическая биология как основа современной медицины : материалы докладов участников Международной научно-практической конференции (Минск, 28 октября 2022 г)– Минск : БГМУ, 2022. – С. 252-258",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2022,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Zou C., Amaya C., Fasold S., Muravsky A.A., Murauski A. A., Pertsch T., Staude I. Multiresponsive dielectric metasurfaces //ACS Photonics. – 2021. – Vol.8, № 6. – Р. 1775-1783",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2021,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Muravsky, A. A., Murauski, A. A., Kukhta, I. N., Yakovleva, A. S. High anchoring photoalignment material based on new photo-induced hole dipoles' mechanism // Journal of the Society for Information Display. – 2021. – Vol. 29, №11. – Р. 833 839",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2021,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Bezruchenko V. S., Muravsky A. A., Murauski A. A., Stankevich A. I., Mahilny U. V. Gradient pretilt angle alignment materials with different photosensitivity for tunable polarization-independent self-aligned liquid crystal lens // Journal of the Society for Information Display. – 2021. –Vol.29, № 11. – Р. 825-832",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2021,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Muravsky A., Murauski A. Effect of birefringent alignment layer on azimuthal anchoring energy measurement. (40.3) // In SID Symposium Digest of Technical Papers. – 2021. – Vol. 52. – P. 497-499",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2021,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Корсакова А. С., Д. Котиков А., Ливонович К. С., Шутова Т. Г., Гайдук Ю.С., Паньков В.В. Магнитные наночастицы для компонентов МРТ-диагностики и электронных устройств // Журнал Белорусского государственного университета. Физика. – 2021. – № 1. – P. 12-19",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2021,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Ливонович К.С., Бовтрамович А.А., Паньков В.В., Шутова Т.Г. Сорбция паров воды мультислойными полиэлектролитными пленками / // Полимерные материалы и технологии. – 2021. – Т.7, № 1. –Р. 50-59",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2021,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Романенко М. В., Шеремет А.А., Ливонович К. С., Шутова Т. Г.Влияние мультислойных оболочек (полимер/полифенол)n на растворение микрокристаллов сахарозы // Полимерные материалы и технологии. – 2021. – Т.7, № 2. – С.48-58",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2021,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Livanovich K.S., Sharamet A.A., Shimko A.N., Shutava T.G. Layer-by-Layer Films of Polysaccharides Modified with Poly(N-vinylpyrrolidone) and Poly(vinyl alcohol) // HELIYON. – 2021. – Vol.7,№ 10. – Art.Е08224,",
+      "doi": "https://doi.org/10.1016/j.heliyon.2021.e08224",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2021,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "T. G. Shutava, V. V. Pankov, А. S. Тsimanenkava Metal-organic framework / magnetite composites for water vapor sorption applications // Actual Problems of Solid State Physics: proc. book IX Intern. Scient. Conf., (Minsk, November 22-26, 2021). 2 b. B. 2. – Minsk: Publisher A. Varaksin, 2021. – Р. 219-222",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2021,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Shutava T., Pankov V. Layer-by-layer coated metal-organic frameworks for water vapor sorption applications // Actual Problems of Solid State Physics: proc. book IX Intern. Scient. Conf., (Minsk, November 22-26, 2021). 2 b. B. 2. – Minsk: Publisher A. Varaksin, 2021. – C.179-182",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2021,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Сахаревич Д. Ю., Паньков В. В., Шутова Т. Г.Синтез металлорганического координационного полимера фумарата циркония для устройств сорбции водяного пара // Международная научно-практическая Online-Offline конференция «Биотехнология: достижения и перспективы развития» 25-26 ноября 2021 года, г. Пинск, Беларусь",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2021,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Потапович А.И., Шутова Т.Г., Костюк Т.В., Костюк В.А. Способность природного химиопрофилактического агента куркумина функционировать как эффективный УФ–фотосенсибилизатор // Журнал Белорусского государственного университета. Биология. – 2021. – № 3. – С. 28–37",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2021,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Потапович А. И., Сухан Т. О., Шутова Т. Г., Костюк В. А. Рецептор-опосредованный эндоцитоз – важный путь поступления желатиновых наночастиц в клетки // Журнал БГУ. Биология – 2020. – №.1. – С. 3-10",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2020,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Shutava T.G., Livanovich K.S. Colloidal stability of silver nanoparticles coated with Layer-by-Layer shell of chitosan copolymers // Journal of Nanoparticle Research. – 2020 – Vol. 22. – Art. 154",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2020,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Потапович А.И., Сухан Т.О., Шутова Т.Г., Костюк В.А. Рецептор-опосредованый эндоцитоз – важный путь поступления желатиновых наночастиц в клетки // Журнал БГУ. Биология. – 2020. – №1. – С. 3-10",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2020,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Шутова Т.Г., Ливонович К.С., Паньков В.В. Кинетика сорбции водяных паров металлорганическими координационными полимерами, модифицированными полиэлектролитной оболочкой // Материалы и структуры современной электроники : материалы IX Междунар. науч. конф., Минск, 14–16 окт. 2020 г. – Минск : БГУ, 2020. – С. 448-452",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2020,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Тимоненкова А. С., Шутова Т. Г. , Паньков В. В. Композиционные материалы на основе каркасных металлорганических полимеров для устройств электроники // Материалы и структуры современной электроники : материалы IX Междунар. науч. конф., Минск, 14–16 окт. 2020 г.– Минск : БГУ, 2020. – С. 402-405",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2020,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Корсакова А.С., Котиков Д.А., Шутова Т.Г., Гайдук Ю.С., Паньков В.В. Магнитные наночастицы для компонентов МРТ-диагностики и электронных устройств // Материалы и структуры современной электроники : материалы IX Междунар. науч. конф., Минск, 14–16 окт. 2020 г. – Минск : БГУ, 2020. – С. 233 234",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2020,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Кабанова О.С., Рушнова И.И., Мельникова Е.А., Толстик А.Л., Муравский Ал.А.,. Муравский Ан. А, Хайнцманн Р. Двумерная дифракционная оптическая структура на основе текстурированной фотоориентации полимеризуемого жидкого кристалла // Журнал БГУ. Физика. – 2019. – №3, Р. 4-11",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2019,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Chepeleva, D. S., Yakovleva, A. S., Murauski, A. A., Kukhta, I. N., & Muravsky, A. A. Phototunable selective reflection of cholesteric liquid crystals. Доклады Белорусского государственного университета информатики и радиоэлектроники. – 2019. – №7 ( 125). – P. 28-31",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2019,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Безрученко В.С., Муравский Ал.А., Муравский Ан.А., Станкевич А.И., Могильный В.В. Градиентные ориентирующие материалы с разным порогом фоточувствительности для создания управляемых поляризационно-независимых жидкокристаллических линз // Доклады Белорусского государственного университета информатики и радиоэлектроники. – 2019. – №7 ( 125). – P. 13-20",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2019,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Zou C., Komar A., Fasold S., Bohn J., Muravsky A. A., Murauski A. A., ... Staude, I. Electrically tunable transparent displays for visible light based on dielectric metasurfaces // ACS Photonics. – 2019. – Vol.6, № 6. – Р. 1533-1540",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2019,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Zou, C., Komar, A., Bohn, J., Fasold, S., Muravsky, A., Murauski, A., ... & Staude, I. Tunable Huygens metasurfaces for large amplitude and phase modulations (Conference Presentation) // In High Contrast Metastructures VIII SPIE. – 2019. –Vol. 10928. – Art. 109280R",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2019,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Shutava T. G., Livanovich K. S., Sharamet A. A. Layer-by-layer films of polysaccharides modified with polyethylene glycol and dextran // Colloids and Surf B. – 2019. – Vol. 173, № 1. – P. 412-420",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2019,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Livanovich K., Shutava T. Influence of Chitosan/Dextran Sulfate Layer-by-layer shell on Colloidal Properties of Silver Nanoparticles // Int.J.Nanosci. – 2019. – Vol.18, №03n04. – Art. 1940077",
+      "doi": "https://doi.org/10.1142/S0219581X19400775",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2019,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Шутова Т.Г.,. Паньков В.В, Jansen C., Janiak C. Новые сорбенты для систем сбора атмосферной воды на основе модифицированных полиэлектролитами MOF // Сборник материалов IV Международной научно-практической конференции “Биотехнология: достижения и перспективы развития”, 20 - 22 ноября 2019 г., г. Пинск, Беларусь. – С. 141-144",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2019,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Шутова А.Г., Шутова Т.Г., Башилов А.В. Капсулы – жемчужины с эфирными маслами на основе альгиновой кислоты // Сборник материалов IV Международной научно-практической конференции “Биотехнология: достижения и перспективы развития”, 20 - 22 ноября 2019 г., г. Пинск, Беларусь – С.136-141",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2019,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Bezruchenko V., Muravsky A., Murauski A., Stankevich A., Mahilny U. Alignment Materials with controllable anchoring energy // Jnl Soc Info Display. – 2018. – Vol. 26, № 9. – Р. 561–566",
+      "doi": "https://doi.org/10.1002/jsid.675",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2018,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Rushnova I.I., Melnikova E.A., Tolstik A.L., Muravsky A.A. Electrically Switchable Photonic Liquid Crystal Devices for Routing of a Polarized Light Wave // Optics Communications. – 2018. – Vol. 413. – P.179-183",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2018,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Bey M.P., Yuvchenko A.P., Muravsky A.A., Murauski A.A. New amides and imidoamides of maleopimaric acid as chiral dopants for nematic liquid crystal compounds // Rus. J. Gen. Chem. –2018. – Vol. 88, №2. – Р. 273-278",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2018,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Shutava T.G., Livanovich K.S., Pankov V.V. Cooperative effect of polyethylene glycol-grafted chitosan and albumin on layer-by-layer nanocapsules stability // Colloids and Surfaces A. Physicochemical and Engineering Aspects. – 2018. – Vol. 539. – P. 69-79",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2018,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Шутова Т.Г., Ливонович К.С., Паньков В.В. Влияние структуры сополимера и мультислойной оболочки на агрегативную устойчивость нанокапсул (хитозан-прив-полиэтиленгликоль / полистиролсульфонат)n // Весцi НАН Беларусi. Сер. хiм. навук. – 2018. – Том 54, № 2. – C. 135-145. https://doi.org/10.29235/1561-8331-2018-54-2-135-145",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2018,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Сухан Т. О., Шутова Т. Г., Ушенкина А. М., Потапович А. И., Костюк В. А. Получение желатиновых наночастиц и исследование их взаимодействия с культивируемыми клетками // Журнал Белорусского государственного университета. Биология. – 2018. – № 1. – C.13-19",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2018,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Shutava H., Shutava T., Kavalenka N., Supichenka H. Antiradical and Antibacterial Activity of Essential Oils from the Lamiaceae Family Plants in Connection with their Composition and Optical Activity of Components // International Journal of Secondary Metabolite. – 2018. – Vol.5, № 2. – C. 109-122",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2018,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Ливонович К.С., Шутова Т.Г. Мультислойные покрытия на основе привитых сополимеров полиаллиламина гидрохлорида и полиэтиленгликоля. Свиридовские чтения: cб. cт. – Минск, БГУ, 2018. – Вып. 14. – C.72-80",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2018,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Ливонович К.С., Шутова Т.Г. Морфология поверхности мультислойных покрытий на основе привитых гидрофильных сополимеров // 13-ая Международная конференция «Методологические аспекты сканирующей зондовой микроскопии»: Материалы конференции, Минск, 16-19 октября 2018 / ИТМО НАН Беларуси. – Минск: Беларуская навука, 2018. – C. 131-135",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2018,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Bezruchenko V.S., Mahilny U.V., Stankevich A.I., Muravsky A.A., Murauski A.A., Kukhta I.N., Формирование центросимметричных распределений световой интенсивности для экспонирования фоточувствительных ориентирующих слоев жидкокристаллических линз // Журнал БГУ. Физика. – 2017. – № 3. – Р. 12-19",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2017,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Паньков В.В., Шутова Т.Г., Ливонович К.С., Котиков Д.А., Петрова Е.Г., В.О. Натаров, Труханов C.B. Наночастицы MgхZnyFe3-x-yO4: синтез, магнитные свойства, функционализация поверхности // Весцi НАН Беларусi. Сер. хiм. навук.– 2017. – №2. – С. 15-24",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2017,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Шутова Т.Г., Паньков В.В., Котиков Д.А., Петрова Е.Г., НатаровВ .О., Ливонович К.С., Богачев Ю.В., Никитина А.В., Костина А.А., Сабитова В.А. ЯМР релаксационная эффективность композитных магнитных наночастиц MgxZnyFe3-x-yO4/ полиэлектролитная оболочка для медицинской диагностики // Журнал БГУ. Химия. – 2017. – № 1. – С. 10-15",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2017,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Shutava T.G., Livanovich K.S., Sheremet A.A. Stable colloids through ultrasonication and two hydrophilic component layer-by-layer shells // Physics, Chemistry and Applications of Nanostructures: Reviews of Short Notes to Nanomeeting-2017. World Scientific; edit.: V.E. Borisenko [et al]. – Singapore, 2017. – P. 303-306",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2017,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Livanovich K. S., Shutava T. G., Pankov V. V. Ultrasonically prepared magnetite colloids with layer-by-layer hydrophilic polyelectrolyte shell // Physics, Chemistry and Applications of Nanostructures: Reviews of Short Notes to Nanomeeting-2017. World Scientific; edit.: V.E. Borisenko [et al]. – Singapore, 2017. – P. 295-298",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2017,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Bogachev Yu.V., Nikitina A.V., Kostina A.A., Sabitova V.A., Pankov V.V., Shutаva T.G., Petrova E.G., Kotsikau D.A., Natarov V.O., Livanovich K.S. NMR relaxation efficiency of aqueous solutions of composite MgxZnyFe3-x-yO4 nanoparticles // Applied Magnetic Resоnance. – 2017. – Vol. 48, № 7. – Р.715-722",
+      "doi": "https://doi.org/10.1007/s00723-017-0889-6",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2017,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Bezruchenko V.S., Muravsky A.A., Murauski A.A., Stankevich A.I., Mahilny U.V., Tunable Liquid Crystal Lens based on Pretilt Angle Gradient Alignment // Mol. Cryst. Liq. Cryst. – 2016. – Vol. 626. – P. 222-228",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2016,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Bezruchenko V.S., Muravsky A.A., Murauski A.A., Stankevich A.I., Mahilny U.V., Azimuthal Anchoring Energy increase of Gradient Copolymer by Additives of Planar Alignment Polymer // Liq. Cryst. and their Appl., Russian Journal – 2016. – Vol.16,№ 1. – Р. 38-41",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2016,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Mikulich V.S., Murauski An.A., Muravsky Al.A., Agabekov V.E. Influence of Methyl Substituents on Azo-Dye Photoalignment in Thin Films // J. Appl. Spectr. – 2016. – Vol. 83. – P.115-120",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2016,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Mikulich V.S., Murauski An.A., Muravsky Al.A. Agabekov V.E. Effect of Temperature on the Photoalignment of Azo Dyes in Thin Films // Rus. J. Phys. Chem. A – 2016. – Vol. 90. – P. 675–682",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2016,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Melnikova E.A., Tolstik A.L., Rushnova I.I., Kabanova O.S., Muravsky A.A., Electrically controlled spatial-polarization switch based on patterned photoalignment of nematic liquid crystals // Appl.Opt. – 2016. – Vol. 55, № 23. – P. 6491-6495",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2016,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Stankevich A., Bezruchenko V., Muravsky A., Murauski A., Agabekov V., Anisotropic Thin Films Formation Rate оn PEDOT:PSS Layer with High Azimuthal Anchoring // J. Soc. Inf. Displ. – 2016. – Vol. 24, № 10. – P. 628-632",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2016,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "Шутова Т.Г., Шеремет А.А., Ливонович К.С. Адсорбция белков cыворотки крови на мультислойных пленках модифицированных полиэтиленгликолем полисахаридов // Труды Белорусского государственного университета, Физиологические, биохимические и молекулярные основы функционирования биосистем. – 2016. – Т. 11, Ч. 1. – С. 258-266",
+      "lab_id": "lab-lcd",
+      "laboratory": "Лаборатория материалов и технологий ЖК-устройств",
+      "year": 2016,
+      "lab_slug": "lcd"
+    },
+    {
+      "cite": "А.I. Ivanets, А.I. Rat'ko, Т.А. Azarova, S.М. Azarov, S.H. Al-Khowaiter, О. Al-Harbi,S.V. Shemchonok, V.А. Dobysh, V.А. Tarasevich, V.Е. Agabekov, А.А. Rat'ko &laquo;Preparation and properties of microfiltration membranes based on natural crystalline SiO2&raquo;. Ceramics International. &ndash; 2014. &ndash; Vol. 40. &ndash; P. 12343-12351",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2014,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "В.А. Добыш, А.И. Иванец, Т.А. Азарова, Д. Бартсурэн, Ж. Тунсаг, Ж. Оюунцэцэг, Ж. Ганбаатар, В.А. Тарасевич, В.Е. Агабеков &laquo;Синтез и свойства биоактивных органоминеральных композитов для защиты керамических фильтрующих материалов&raquo;. Доклады НАН Беларуси. &ndash; 2015. &ndash; Т. 59. №2. &ndash; С. 79-83",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2015,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "О.К. Халлыева, В.А. Добыш, Н.В. Коктыш, Н.А. Белясова, В.А. Тарасевич. Органорастворимые соли полигексаметиленгуанидина. Успехи в химии и химической технологии. &ndash; 2016. &ndash; Т. 30. №1 (170). &ndash; С. 11-13",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2016,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "В.А. Добыш, Н.В. Коктыш, Н.А. Белясова, В.В. Корней, В.А. Тарасевич &laquo;Исследование структуры и свойств тройного полимер-металлического комплекса хитозан &ndash; Cu(II) &ndash; полигекскаметиленгуанидин&raquo; Известия вузов. Прикладная химия и биотехнология. &ndash; 2017. &ndash; Т. 7. №1. &ndash; С. 31-39",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2017,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "V.S.Yashchenko, D.A.Vasilevskii, V.S.Bezruchenko, V.N.Dokuchaev, V.K.Ol&rsquo;khovik. New High-Impact Thermally Stable Copolymers of Poly(p-phenylene-1,3,4-oxadiazole) // Polymer Science, Ser. B, 2014, Vol. 56, No. 3, pp. 307&ndash;313",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2014,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "D.A.Vasilevskii, V.S.Yashchenko, V.K.Ol&rsquo;khovik. Synthesis of heterofunctional 3,3'-sulfonyldibenzoic acid derivatives // Chemistry of Heterocyclic Compounds, 2016 V.52, (2), рр. 128-132",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2016,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "V.S.Yashchenko, A.A.Pap, Yu.V.Matveenko, V.K.Ol&rsquo;khovik. One-Pot Method for the Synthesis of Sulfonated Poly(1,3,4-oxadiazoles) Based on 4,4'-Oxydibenzoic Acid // Polymer Science, Series B, 2016, Vol. 58, No. 5, рр.529&ndash;540",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2016,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "Матвеенко Ю.В., Пап А.А., Головченко Л.А., Ольховик В.К. Синтез и фунгицидная активность тетразолилбифенилов // Весці НАН Беларусі, Сер. хім. навук., 2016, №4, с. 65-71",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2016,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "Петушок В.Г., Ольховик В.К., Калечиц Г.В., Муравский Ал.Ан., Рушнова И.И. Новые сольватохромные красители ряда дибензотиофен-5,5-диона // Весцi НАН Беларусi, сер. хiм. навук. &ndash; 2017. &ndash; №1. &ndash; С. 73 &ndash; 81",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2017,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "Синтез функционализированных амидов 2-(ариламино)пиримидинового ряда / Ж.В. Игнатович, Е.В. Королева // Журнал органической химии. 2017. Т. 53, № 2. С. 255&ndash;260.&nbsp",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2017,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "T.G. Shutava, G. Parekh, Y.M. Lvov, Core&ndash;Shell Drug and Contrast Agent Nanocolloids Through Layer-by-Layer Assembly, in Encyclopedia of Nanoscience and Nanotechnology, ed. H.S. Nalwa, 30-Vol. Set, vol. 26-30, Ch. 4 (2017), ISBN: 1-58883-001-2 (vol.1-10)/1-58883-159-0 (vol.11-25)/1-58883-212-0 (vol.26-30).&nbsp",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2017,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "Bogachev Yu.V., Nikitina A.V., Kostina A.A., Sabitova V.A., Pankov V.V., Shutаva T.G., Petrova E.G., Kotsikau D.A., Natarov V.O., Livanovich K.S. NMR relaxation efficiency of aqueous solutions of composite MgxZnyFe3-x-yO4 nanoparticles // Applied Magnetic Resоnance, 2017, 48, № 7, p.715-722",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2017,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "Ж.В. Игнатович, А.Л. Ермолинская, Я.М. Каток, Е.В. Королёва, А.Н. Еремин, В.Е. Агабеков Каталитическая активность никелевых наночастиц в реакции восстановления нитроаренов // Журнал общей химии. 2018. Т. 88. Вып. 3 С. 382",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2018,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "А.I. Ivanets, А.I. Rat'ko, Т.А. Azarova, S.М. Azarov, S.H. Al-Khowaiter, О. Al-Harbi, S.V. Shemchonok, V.А. Dobysh, V.А. Tarasevich, V.Е. Agabekov, А.А. Rat'ko &ldquo;Preparation and properties of microfiltration membranes based on natural crystalline SiO2&rdquo;. Ceramics International. &ndash; 2014. &ndash; Vol. 40. &ndash; P. 12343-12351",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2014,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "V.A. Dobysh, A.I. Ivanets, T.A. Azarova, D. Batsuren, J. Tunsag, J. Oyuntsetseg, J. Ganbaatar, V.A. Tarasevich, V.E. Agabekov &ldquo;Synthesis and properties of organo-mineral bioactive composites for protection of ceramic filtrating materials&rdquo;. Reports of NAS of Belarus. &ndash; 2015. &ndash; Vol. 59. №2. &ndash; P. 79-83",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2015,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "O.K. Hallyyeva, V.A. Dobysh, N.V. Koktysh, N.A. Belyasova, V.A. Tarasevich &ldquo;Borne polyhexamethyleneguanidine salts&rdquo;. Successes in chemistry and chemical technology. &ndash; 2016. &ndash; Vol. 30. №1 (170). &ndash; P. 11-13",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2016,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "V.A. Dobysh, N.V. Koktysh, N.A. Belyasova, V.V. Kornei, V.A. Tarasevich Study of structure and properties of the triple polymer-metal complex chitosan-Cu(II)-polyhexamethyleneguanidine. Proceedings of Universities. Applied Chemistry and Biotechnology. &ndash; 2017. &ndash; Vol. 7. №1. &ndash; P. 31-39",
+      "lab_id": "lab-composites",
+      "laboratory": "Отраслевая лаборатория термостойких полимерных композиционных материалов",
+      "year": 2017,
+      "lab_slug": "composites"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, T.V. Khalimonyuk, Yu.M. Kurban, I.V. Ilyina, N.S. Li-Zhulanov, O.S. Patrusheva, A. Aho, I. Heinmaa, K.P. Volcho, N.F. Salakhutdinov, D.Yu. Murzin, V.E. Agabekov, Catalytic synthesis of heterocyclic compounds with a cineole moiety based on α-pinene, Appl. Catal. A:Gen, 2025, 691, 120070. https://doi.org/10.1016/j.apcata.2024.120070",
+      "doi": "https://doi.org/10.1016/j.apcata.2024.120070",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2025,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "М.П. Бей, А.П. Ювченко, Н.Р. Прокопчук, К.В. Вишневский «Получение канифольноцитраконовых аддуктов в качестве модификаторов эластомерных композиций» // Весцi НАН Беларусi. Сер. хiм. навук. – 2025. – Т. 61. № 2. – С. 118-125",
+      "doi": "https://doi.org/10.29235/1561-8331-2025-61-2-118-125",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2025,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "E.Yu. Brazovskaya, A.Yu. Sidorenko, T.V. Khalimonyuk, Yu.A. Alikina, K.A. Belyaeva, Sh.O. Omarov, A.V. Dobrodumov, O.Yu. Golubeva, Preparation, acidity and catalytic activity of syn-thetic montmorillonites in &alpha;-pinene isomerization, Langmuir 2025, 41, 15, 9631&ndash;9644. https://doi.org/10.1021/acs.langmuir.4c04825",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2025,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "S. Hao, T. Zhang, X. Chen, F. Zhou, T. Chen, H. Li, A. Sidorenko, J. Huang, Y. Gu. Synthesis of UV-Filtering, Self-Healing, and Self-Adhesion Multifunctional Ionogel for Multimodal Sensation Ionic Skins by Electron Beam Irradiation. ACS Materials Letters, 2025, 7 (4), P. 1250-1259. https://doi.org/10.1021/acsmaterialslett.5c00042",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2025,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, Yu.M. Kurban, T.V. Khalimonyuk, I.V. Il'ina, N.S. Li-Zhulanov, O.S. Patrusheva, V.V. Goltsova, M.P. Bei, Zh.V. Ihnatovich, J. Wärnå, K.P. Volcho, N.F. Salakhutdinov, D.Yu. Murzin, V.E. Agabekov, Catalytic condensation of 3-carene with formaldehyde, _Mol. Catal_., 2024, 552, 113627. https://doi.org/10.1016/j.mcat.2023.113627 2 A.Yu. Sidorenko, Yu.M. Kurban, I.V. Il'ina, N.S. Li-Zhulanov, O.S. Patrusheva, V.V. Goltsova, M.P. Bei, A. Aho, J. Wärnå, I. Heinmaa, T.F. Kouznetsova, K.P. Volcho, N.F. Salakhutdinov, D.Yu. Murzin, V.E. Agabekov, Catalytic condensation of α-pinene with formaldehyde, _J. Catal_., 2024, 430, 115306. https://doi.org/10.1016/j.jcat.2024.115306",
+      "doi": "https://doi.org/10.1016/j.mcat.2023.113627",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2024,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "J.E. Sánchez-Velandia, L.A. Gallego-Villada, P. Mäki-Arvela, A.Yu. Sidorenko, D.Yu. Murzin, Upgrading Biomass to High-Added Value Chemicals: Synthesis of Terpenes-based Compounds using Catalytic Green Chemical Pathways, _Catalysis Reviews,_ 1–126. https://doi.org/10.1080/01614940.2024.2329553",
+      "doi": "https://doi.org/10.1080/01614940.2024.2329553",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2024,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Z. Chen, S. Hao, H. Li, X. Dong, X. Chen, J. Yuan, A. Sidorenko, J. Huang, Y. Gu, Dipolar microenvironment engineering enabled by electron beam irradiation for boosting catalytic performance, _Adv. Sci_. 2024, 2401562. https://doi.org/10.1002/advs.202401562",
+      "doi": "https://doi.org/10.1002/advs.202401562",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2024,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "А.Ю. Сидоренко, В.Е. Агабеков, Новые каталитические системы для конденсации монотерпеновых соединений с альдегидами // ЖОХ, 2024, 94, № 2, С. 1&ndash;20",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2024,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "I.V. Ilyina, O.S. Patrusheva, V.V. Goltsova, K. Christopher, Y.V. Gatilov, A.Yu. Sidorenko, V.E. Agabekov, N.F. Salakhutdinov, I.V. Alabugin, K.P. Volcho, Unusual cascade reactions of 8-acetoxy-6-hydroxymethyllimonene with salicylic aldehydes: diverse oxygen heterocycles from common precursors, _J. __Org. __Chem_., 2024, 89, 11593–11606. https://doi.org/10.1021/acs.joc.4c01282 7. A.Yu. Sidorenko, T.V. Khalimonyuk, B.D. Mamatkodirov, Y.Yu. Yakubov, A. Aho, T.V. Sviridova, T.F. Kouznetsova, B.Z. Adizov, A.B. Ibragimov, D.Yu. Murzin, Y. Gu, V.E. Agabekov, Preparation, acid modification and catalytic activity of kaolinite nanotubes in α-pinene oxide isomerization, _RSC __Adv_., 2024, 14, 25079–25092. https://doi.org/10.1039/D4RA03777D",
+      "doi": "https://doi.org/10.1021/acs.joc.4c01282",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2024,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "М.П. Бей, А.П. Ювченко. Цитраконопимаровая кислота: получение и свойства // Сборник научных трудов «Альтернативные источники сырья и топлива» (выпуск 6), под редакцией академика В.Е. Агабекова, Ю.К. Михайловского, Ж.В. Игнатович; по материалам докладов IX Международной научно-технической конференции «АИСТ-2023», Минск, 17–20 октября 2023 г. Минск, «Беларуская навука», 2024. ISBN 978-985-08-3216-0. 137 с. – С. 3–7. 9. А.Ю. Сидоренко, Й.Ю. Якубов, В.Е. Агабеков, Б.Д. Маматкодиров, Т.В. Свиридова, А.Б. Ибрагимов, Получение каолинитовых нанотрубок и их каталитическая активация кислотной обработкой, _Доклады Национальной академии наук Беларуси_. 2024. Т. 68, № 4. С. 311–316",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2023,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "М.П. Бей, А.П. Ювченко. Синтез ароматических и гетероциклических триамидов фумаропимаровой кислоты // Журнал общей химии. – 2023. – Т. 93, № 7. – С. 1001–1006; M.P. Bei, and A.P. Yuvchenko. Synthesis of Aromatic and Heterocyclic Fumaropimaric Acid Triamides // Russian Journal of General Chemistry. – 2023. – Vol. 93, No. 7. – P. 1649–1654. . 2. I.V. Ilyina, N.S. Li-Zhulanov, Y.V. Gatilov, K.P. Volcho, A.Y. Sidorenko, V.E. Agabekov, N.F. Salakhutdinov, (2aR,2a1S,5aR,9bR)-4-Isopropyl-7,8-dimethoxy-2a1-methyl-2,2a,2a1,3,5a,9b-hexahydro-fluoreno[9,1-bc]furan, Molbank, 4 (2023), M1734. https://doi.org/10.3390/M1734 3. S. Hao, Z. Chen, H. Li, J. Yuan, X. Chen, A. Sidorenko, J. Huang, Y. Gu, Skin-Inspired, Highly Sensitive, Broad-Range-Response and Ultra-Strong Gradient Ionogels Prepared by Electron Beam Irradiation, Small, e2309931, https://doi.org/10.1002/smll.202309931 . 3. М.П. Бей, А.П. Ювченко. Синтез новых имидов и имидоамидов цитраконопимаровой кислоты // Весцi НАН Беларусi. Сер. хiм. навук. – 2023. – Т. 59. № 1. – С. 35-41",
+      "doi": "https://doi.org/10.3390/M1734",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2023,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "N.S. Li-Zhulanov, I.V. Il&rsquo;ina, A.Yu. Sidorenko, D.V. Korchagina,V.E. Agabekov, K.P. Volcho, Nariman F. Salakhutdinov, Cascade transformation of 4-hydroxymethyl-2-carene into novel cage methanopyrano[4,3-b]thieno[3,2-g]benzofuran derivative, Mendeleev Commun., 2022, 32, 443&ndash;445",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2022,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Z. Chen, W. Huang, L. Yi, X. Dong, K. Sheng, M. Li, R. Bai, A.Yu. Sidorenko, J. Huang, Y. Gu, Synthesis of indoles and carbazoles from a lignin model compound &alpha;-hydroxyacetophenone, Green Chem., 2022, 24, 2919-2926",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2022,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "W. Huang, F. Liu, K. Wang, A. Sidorenko, M. Bei, Z. Zhang, W. Fang, M. Li, Y. Gu, S. Ke, Sc(OTf)3-catalyzed synthesis of polysubstituted furans from acylacetonitriles and renewable acetol, Green Synthesis and Catalysis, 2022, Accepted",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2022,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "J.E. S&aacute;nchez-Velandia, H.G. Baldov&iacute;, Alexander Yu. Sidorenko, J.A. Becerra, F. Mart&iacute;nez-Ortega, Synthesis of heterocycles compounds from condensation of limonene with aldehydes using heteropolyacids supported on metal oxides, Mol. Catal., 2022, Accepted. .&nbsp",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2022,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, Yu.M. Kurban, A.F. Peixoto, N.S. Li-Zhulanov, J.E. Sanchez-Velandia, A. Aho, J. Warna, Y. Gu, K.P. Volcho, N.F. Salakhutdinov, D.Yu. Murzin, V.E. Agabekov, Bronsted acid catalyzed Prins-Ritter reaction for selective synthesis of terpenoid-derived 4-amidotetrahydropyran compounds, _Appl. Catal. A:Gen., 2023, 649, _118967",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2023,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Zhiyan Chen, Haozhe Li, Keyan Sheng, Xiaohan Dong, Jushigang Yuan, Shuai Hao, Minghao Li, Rongxian Bai, Yves Queneau, Alexander Sidorenko, Jiang Huang, Yanlong Gu., Dipolar Modification in Heterogeneous Catalysts under Electron Beam Irradiation for the Conversion of Biomass-derived Platform Molecules, ACS Catal., 2022, 12, 15618&ndash;15625, https://doi.org/10.1021/acscatal.2c04519 [1] &nbsp",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2022,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, Yu.M. Kurban, A. Aho, Zh.V. Ihnatovich, T.F. Kuznetsova, I. Heinmaa, D.Yu. Murzin, V.E. Agabekov, Solvent-free synthesis of tetrahydropyran alcohols over acid-modified clays, Mol. Catal., 2021, 499, 111306. https://doi.org/10.1016/j.mcat.2020.111306",
+      "doi": "https://doi.org/10.1016/j.mcat.2020.111306",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2021,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, Yu.M. Kurban, I.V. Il'ina, N.S. Li-Zhulanov, D.V. Korchagina, O.V. Ardashov, J. Wärnå, K.P. Volcho, N.F. Salakhutdinov, D.Yu. Murzin, V.E. Agabekov, Catalytic synthesis of terpenoid-derived hexahydro-2H-chromenes with analgesic activity over halloysite nanotubes, Appl. Catal. A:Gen., 2021, 618, 118144, h ttps://doi.org/10.1016/j.apcata.2021.118144",
+      "doi": "https://doi.org/10.1016/j.apcata.2021.118144",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2021,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "М.П. Бей, А.П. Ювченко, В.И. Поткин, С.К. Петкевич &laquo;Синтез и свойства амидов, имидов и имидоамидов малеопимаровой кислоты с арилизоксазольным и хинолиновым фрагментами&raquo; // Весцi НАН Беларусi. Сер. хiм. навук. &ndash; 2021.&ndash;Т. 57, № 4. &ndash; С. 424&ndash;430 /",
+      "doi": "https://doi.org/10.29235/1561-8331-2021-57-4-424-430",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2021,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, Yu.M. Kurban, A.V. Kravtsova, I.V. Il'ina, N.S.Li-Zhulanov, D.V. Korchagina, J.E.Sánchez-Velandia, A. Aho, K.P. Volcho,N.F. Salakhutdinov, D.Yu. Murzin, V.E. Agabekov, Clays catalyzed cascade Prins and Prins-Friedel-Crafts reactions for synthesis of terpenoid-derived polycyclic compounds, Appl. Catal. A:Gen., 2021, Available online 13 October 2021, 118395, https://doi.org/10.1016/j.apcata.2021.118395",
+      "doi": "https://doi.org/10.1016/j.apcata.2021.118395%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20IF=5.706",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2021,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "В.Е. Агабеков, А.Ю. Сидоренко, Т.В. Свиридова, Ю.М. Курбан, Д.В. Свиридов, Получение алюмосиликатных нанотрубок из природного каолина,Доклады Национальной академии наук Беларуси. 2021. Т. 65, № 4. С.576–581. https://doi.org/10.29235/1561-8323-2021-65-5-576-581",
+      "doi": "https://doi.org/10.29235/1561-8323-2021-65-5-576-581",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2021,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Stereoselectivity inversion by water addition in the -SO3H catalyzed tandem Prins-Ritter reaction for synthesis of 4-amidotetrahydropyran derivatives. ChemCatChem, First published: 05 February 2020,",
+      "doi": "https://doi.org/10.1002/cctc.202000070",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2020,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "M. Laluc, P. Maki-Arvela, A.F. Peixoto, N. Li-Zhulanov, T. Sandberg, N.F. Salakhutdinov, K. Volcho, C. Freire, A.Yu. Sidorenko, D.Yu. Murzin. Catalytic synthesis of bioactive 2H-chromene alcohols from (-)-isopulegol and acetone on sulfonated clays. Reaction Kinetics, Mechanisms and Catalysis, Published: 20 February 2020 ,",
+      "doi": "https://doi.org/10.1007/s11144-020-01740-9",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2020,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, A.V. Kravtsova, P. Mäki-Arvela, A. Aho, T. Sandberg, I.V. Il'ina, N.S. Li-Zhulanov, D.V. Korchagina, K.P. Volcho, N.F. Salakhutdinov, D.Yu. Murzin, V.E. Agabekov. Synthesis of isobenzofuran derivatives from renewable 2-carene over halloysite nanotubes // Mol. Catal., Vol. 490 – 2020 – 110974, https://doi.org/10.1016/j.mcat.2020.110974",
+      "doi": "https://doi.org/10.1016/j.mcat.2020.110974",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2020,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "I.V. Il’ina, N.S. Dyrkheeva, A.L Zakharenko, A.Y. Sidorenko, N.S. Li-Zhulanov, D.V. Korchagina, R. Chand, D.M Ayine-Tora, A.A. Chepanova, O.D. Zakharova, E.S. Ilina, J. Reynisson, A.A. Malakhova, S.P. Medvedev, S.M. Zakian, K.P. Volcho, N.F. Salakhutdinov, O.I Lavrik, Design, Synthesis, and Biological Investigation of Novel Classes of 3-Carene-Derived Potent Inhibitors of TDP1. Molecules, 2020, 25, 3496, https://doi.org/10.3390/molecules25153496",
+      "doi": "https://doi.org/10.3390/molecules25153496",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2020,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Бей М.П., Муравский Ал.Ан., Муравский Ан.Ал., Чепелева Д.С., Пучкова Н.В., Ювченко А.П. Синтез производных малео- и цитраконопимаровых кислот с мезогенными группами в качестве хиральных допантов ЖК-композиций // Весцi НАН Беларусi. Сер. хiм. навук. &ndash; 2020. &ndash; Т. 56, № 3. &ndash; С. 293&ndash;300",
+      "doi": "https://doi.org/10.29235/1561-8331-2020-56-3-293-300",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2020,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Бей М.П., Пучкова Н.В., Ювченко А.П. Новые аддукты скипидара, канифоли с цитраконовым ангидридом и итаконовой кислотой // АЛЬТЕРНАТИВНЫЕ ИСТОЧНИКИ СЫРЬЯ И ТОПЛИВА: Сборник научных трудов. Вып. 4. &ndash; 2020. &ndash; Минск: &laquo;Беларуская навука&raquo;. &ndash; С. 58&ndash;67",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2020,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "А.Ю. Сидоренко, В.Е. Агабеков, К.П. Волчо, Н.Ф. Салахутдинов, Д.Ю. Мурзин. Получение хиральных изобензофуранов на основе 3-карена в присутствии галлуазитовых нанокатализаторов // Докл. Нац. акад. наук Беларуси. – 2020. – Т. 64, № 4. – С. 426–430. https://doi.org/10.29235/1561-8323-2020-6 4 -4-426-430",
+      "doi": "https://doi.org/10.29235/1561-8323-2020-6%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%204%20-4-426-430",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2020,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, A.V. Kravtsova, A. Aho, I. Heinmaa, J. Warna, H. Pazniak, K.P.Volcho, N.F. Salakhutdinov, D.Yu. Murzin, V.E. Agabekov // Highly selective Prins reaction over acid-modified halloysite nanotubes for synthesis of isopulegol-derived 2H-chromene compounds // J. Catal, 2019 – Vol. 374 – P. 360 – 377, https://doi.org/10.1016/j.jcat.2019.05.009",
+      "doi": "https://doi.org/10.1016/j.jcat.2019.05.009",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2019,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "N. Li-Zhulanov, P.Mäki-Arvela, M. Laluca, , E. Kholkina, T. Sandberg, A. Aho, K. Volcho, N. Salakhutdinov, Cristina Freire, A.Yu. Sidorenko, D.Yu. Murzin, Prins cyclization of (-)-isopulegol with benzaldehyde for production of chromenols over organosulfonic clays // Mol. Catal., Vol. 478 – 2019 – 110569, https://doi.org/10.1016/j.mcat.2019.110569",
+      "doi": "https://doi.org/10.1016/j.mcat.2019.110569",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2019,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, A.V. Kravtsova, I.V. Il’ina, J. Wärnå, D.V. Korchagina, Yu.V.Gatilov, K.P. Volcho, N.F. Salakhutdinov, D.Yu. Murzin, V.E. Agabekov, Clay nanotubes catalyzed solvent-free synthesis of octahydro-2H-chromenols with pharmaceutical potential from (-)-isopulegol and ketones// J. Catal, 2019 – Vol. 380 – P. 145 – 152. https://doi.org/10.1016/j.jcat.2019.10.015",
+      "doi": "https://doi.org/10.1016/j.jcat.2019.10.015",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2019,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, I.V. Il&rsquo;ina, A.V. Kravtsova, A. Aho, O.V. Ardashov, N.S. Li-Zhulanov, K.P. Volcho, N.F. Salakhutdinov, D.Yu. Murzin, V.E. Agabekov, Preparation of chiral isobenzofurans from 3-carene in the presence of modified clays, Mol. Catal. Vol 459 &ndash; 2018 &ndash; P. 38 &ndash; 45",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2018,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Бей М.П., Ювченко А.П. Синтез новых азотсодержащих производных фумаропимаровой кислот // ЖОрХ. 2018. Т. 54, № 3. С. 468&ndash;476",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2018,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A. Sidorenko, A. Kravtsova, A. Aho, I. Heinmaa, K. Volcho, N. Salakhutdinov, V. Agabekov, D. Murzin, Acid-modified Halloysite Nanotubes as a Stereoselective Catalyst for Synthesis of 2H-Chromene Derivatives by the Reaction of Isopulegol with Aldehydes, ChemCatChem, First published: 11 July 2018",
+      "doi": "https://doi.org/10.1002/cctc.201800974",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2018,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Бей М.П., Ювченко А.П., Муравский Ал.Ан., Муравский Ан.Ал. Новые амиды и имидоамиды малеопимаровой кислоты в качестве хиральных допантов для нематических жидкокристалличеких композиций // ЖОХ. 2018. Т. 88, № 2. С. 273&ndash;278",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2018,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, A.V. Kravtsova, , J. W&auml;rn&aring; A. Aho, I. Heinmaa, I.V. Il&rsquo;ina , O.V. Ardashov, K.P. Volcho, N.F. Salakhutdinov, D.Yu. Murzin, , V.E. Agabekov. Preparation of octahydro-2H-chromen-4-ol with analgesic activity from isopulegol and thiophene-2-carbaldehyde in the presence of acid-modified clays // Mol. Cat. Vol. 453 &ndash; 2018 &ndash; P. 139&ndash;148",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2018,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Бей М.П., Пучкова Н.В., Ювченко А.П., Барановский А.В. Новые аддукты скипидара, канифоли с цитраконовым ангидридом и итаконовой кислотой // Весцi НАН Беларуси. Сер. хiм. навук. &ndash; 2018. &ndash; Т. 54, № 4. &ndash; С. 434&ndash;441",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2018,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, A. Aho, J. Ganbaatar, D. Batsuren, D.B. Utenkova, G.M. Sen&rsquo;kov, J. W&auml;rn&aring;, D.Yu. Murzin, V.E. Agabekov. Catalytic isomerization of &alpha;-pinene and 3-carene in the presence of modified layered aluminosilicates // Mol. Cat. Vol. 443, &ndash;2018 &ndash; P. 193 &ndash; 202",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2018,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, Zh.V. Ignatovich, A. L. Ermolinskaya, A. V. Kravtsova, A. V. Baranovskii, E. V. Koroleva, V. E. Agabekov, Synthesis of fencholenic aldehyde from &alpha;-pinene epoxide on modified clays, Chem. Nat. Comp., Vol. 54&ndash; 2018 &ndash; No. 5 &ndash; P. 893 &ndash; 897",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2018,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "A.Yu. Sidorenko, A.V. Kravtsova, A. Aho, I. Heinmaa, T.F. Kuznetsova, D.Yu. Murzin, V.E. Agabekov. Catalytic isomerization of &alpha;-pinene oxide in the presence of acid-modified clays // Mol. Cat. Vol. 448 &ndash; 2018 &ndash; P. 18&ndash;29",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2018,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Bei M.P., Yuvchenko A.P. The synthesis and properties of new oxygen- and nitrogen containing terpene acid derivatives / Chapter 3. &ndash; P. 47&ndash;74 // Chemistry and Technology of Plant Substances. Ed. Kutchin A.V., Shishkina L.N., Weisfeld L.I. &ndash; Toronto, New Jersey: Apple Academic Press. &ndash; 2017. &ndash; 357 p",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2017,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Bei M.P., Yuvchenko A.P., Sokol O.V. Synthesis and properties of new derivatives of maleopimaric and citraconopimaric acids // Весцi НАН Беларуси. Сер. хiм. навук. 2017, № 2. С. 111&ndash;125",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2017,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "D.B. Utenkova, E.D. Skakovskii, G.M. Senkov, V.E. Agabekov A.V. Baranovskii, S.E. Bogushevich, A.Yu. Sidorenko. NMR and GC Analyses of 3-Carene Isomerization Products over Activated Glauconite // J. Appl. Spectrosc. &ndash; 2017 &ndash; Vol. 83 &ndash; P. 1026 &ndash;1030",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2017,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Бей М.П., Ювченко А.П., Сокол О.В., Пучковой Н.В. Синтез и свойства N-арил(аралкил) имидоамидов малеопимаровой кислоты // ЖОХ. 2016. Т. 86, № 4. С. 634&ndash;638",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2016,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "M.P. Bei, A.P. Yuvchenko &ldquo;Citraconopimaric acid: preparation and properties&rdquo; // IX International Scientific and Technical Conference \"AIST-2023\", Minsk, October 17-20, 2023. Minsk, \"Belarusian Science\", 2024. ISBN 978-985-08-3216-0. 137 p. &ndash; P. 3&ndash;7",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2023,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "M.P. Bei, and A.P. Yuvchenko. Synthesis of Aromatic and Heterocyclic Fumaropimaric Acid Triamides // Russian Journal of General Chemistry. &ndash; 2023. &ndash; Vol. 93, No. 7. &ndash; P. 1649&ndash;1654",
+      "doi": "https://doi.org/10.1134/S1070363223070034",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2023,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "M.P. Bei, and A.P. Yuvchenko. Synthesis of new imides and imidoamides of citraconopimaric acid // Proceed. Nat. Acad. Sci. Belarus. Chem. Ser. ‒ 2023. ‒ Vol. 59, N 1. ‒ P. 35-41",
+      "doi": "https://doi.org/10.29235/1561-8331-2023-59-1-35-41",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2023,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Bei M.P., Yuvchenko A.P., Muravskii Al.An., Muravskii An.Al. New Amides and Imidoamides of Maleopimaric Acid as a Chiral Dopants for Nematic Liquid Crystal Compositions // Russ. J. Gen. Chem. 2018. Vol. 88, No 2. P. 251&ndash;256",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2018,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Bei M.P., Puchkova N.V., Yuvchenko A.P., Baranovsky A.V. New adducts of turpentine and rosin with citraconic anhydride and itaconic acid // Proc. NAS of Belarus. Chem. ser. &ndash; 2018. &ndash; Vol. 54, No 4. &ndash; P. 434&ndash;441",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2018,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Bei M.P., Yuvchenko A.P. Synthesis of New Nitrogen-Containing Derivatives of Fumaropimaric Acid // Russ. J. Org. Chem. 2018. Vol. 54, No 3. P. 475&ndash;484",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2018,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Bei M.P., Yuvchenko A.P., Sokol O.V. Synthesis and properties of new derivatives of maleopimaric and citraconopimaric acids // Proc. NAS of Belarus. Chem. Ser. 2017, No 2. P. 111&ndash;125",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2017,
+      "lab_slug": "woodchem"
+    },
+    {
+      "cite": "Bei M.P., Yuvchenko A.P., Sokol O.V., Puchkova N.V. Synthesis and reactivity of maleopimaric acid N-aryl(aralkyl)imidoamides // Russ. J. Gen. Chem. 2016. Vol. 86, No 4. P. 821&ndash;825",
+      "lab_id": "lab-woodchem",
+      "laboratory": "Лаборатория лесохимических продуктов и технологий",
+      "year": 2016,
+      "lab_slug": "woodchem"
+    }
+  ],
+  "count": 208,
+  "about_publications_page": "https://ichnm.by/c.eco?q=about:l:selected_info_catalog:v:15:l:selected_info:v:21",
+  "about_publications_note": "Institute «Публикации и монографии» page has aggregate counts only (no cite list)."
+}

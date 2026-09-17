@@ -66,6 +66,7 @@
     ]
   },
   "post_types": ["news", "event", "media_about", "publication", "department", "person"],
+  "forbidden_feeds": ["announcement"],
   "roles": {
     "editor_may_publish": ["news", "event", "media_about", "publication"],
     "editor_locked": ["header", "footer"]

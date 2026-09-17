@@ -4,6 +4,8 @@
  */
 get_header();
 
+$hub = function_exists('ichnm_hub_strings') ? ichnm_hub_strings() : [];
+
 while (have_posts()) {
     the_post();
     $chart = function_exists('ichnm_publication_chart_html') ? ichnm_publication_chart_html() : '';
@@ -24,12 +26,12 @@ while (have_posts()) {
 
       <section class="ichnm-home-band" aria-labelledby="ichnm-pubs-list">
         <div class="ichnm-band-head">
-          <h2 id="ichnm-pubs-list">Публикации лабораторий</h2>
+          <h2 id="ichnm-pubs-list"><?php echo esc_html($hub['pubs_labs'] ?? 'Публикации лабораторий'); ?></h2>
         </div>
         <?php
         $query = new WP_Query([
             'post_type' => 'publication',
-            'posts_per_page' => 50,
+            'posts_per_page' => 300,
             'post_status' => 'publish',
             'orderby' => 'date',
             'order' => 'DESC',
@@ -45,7 +47,7 @@ while (have_posts()) {
             echo '</div>';
             wp_reset_postdata();
         else :
-            echo '<p>Стартовый список публикаций появится после передачи каталога Институтом. Сейчас на страницах лабораторий лежат макетные строки.</p>';
+            echo '<p>' . esc_html($hub['pubs_empty'] ?? 'Стартовый список публикаций появится после передачи каталога Институтом или снятия записей со старого ichnm.by.') . '</p>';
         endif;
         ?>
       </section>

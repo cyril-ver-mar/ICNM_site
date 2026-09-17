@@ -4,7 +4,7 @@ Theme URI: https://ichnm.by/
 Description: Дочерняя тема Kadence для официального сайта ИХНМ НАН Беларуси.
 Author: ИХНМ
 Template: kadence
-Version: 0.3.11
+Version: 0.3.19
 Text Domain: ichnm-kadence
 */
 
@@ -18,12 +18,21 @@ Text Domain: ichnm-kadence
   --ichnm-ink: #313131;
   --ichnm-muted: #edf2f7;
   --ichnm-line: rgba(26, 32, 44, 0.12);
+  --ichnm-shadow: 0 2px 13px rgba(0, 0, 0, 0.08);
   --global-palette1: #3182ce;
   --global-palette2: #2b6cb0;
   --global-palette3: #1a202c;
   --global-palette6: #28a7ea;
   --global-palette9: #ffffff;
   --ichnm-wrap: min(1290px, calc(100% - 3rem));
+  --ichnm-prose: 52.625rem;
+  --ichnm-space-band: clamp(2.5rem, 4vw, 3.5rem);
+  --ichnm-space-page: clamp(1.75rem, 3vw, 2.5rem);
+  --ichnm-header-btn-border: rgba(255, 255, 255, 0.45);
+  --ichnm-map-ocean: #c5dcec;
+  --ichnm-map-land: #ffffff;
+  --ichnm-map-stroke: var(--ichnm-navy);
+  --ichnm-map-water: #b4cfe0;
 }
 
 .wrap {
@@ -35,20 +44,33 @@ Text Domain: ichnm-kadence
 .ichnm-chrome {
   background: var(--ichnm-navy);
   color: #fff;
-  padding: 0.65rem 0 0.35rem;
+  padding: 0.45rem 0 0.2rem;
+  position: sticky;
+  top: 0;
+  z-index: 40;
 }
 
 .ichnm-chrome-inner {
   display: grid;
-  gap: 0.55rem;
+  grid-template-columns: minmax(12rem, 1fr) auto;
+  grid-template-areas:
+    "brand tools"
+    "nav nav";
+  align-items: center;
+  column-gap: 1rem;
+  row-gap: 0.15rem;
+  min-height: 80px;
 }
 
 .ichnm-identity {
+  grid-area: brand;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.7rem;
   font-size: 0.85rem;
   line-height: 1.4;
+  min-width: 0;
+  z-index: 2;
 }
 
 .nas-emblem {
@@ -56,8 +78,10 @@ Text Domain: ichnm-kadence
   place-items: center;
   background: #fff;
   border-radius: 4px;
-  padding: 0.15rem 0.3rem;
+  padding: 0.18rem 0.32rem;
   flex: none;
+  height: 2.9rem;
+  line-height: 0;
 }
 
 .nas-emblem img {
@@ -84,19 +108,58 @@ Text Domain: ichnm-kadence
 
 .ichnm-identity-text strong {
   display: block;
-  font-size: 0.95rem;
+  font-size: clamp(0.92rem, 1.4vw, 1.15rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.ichnm-identity-text a {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.82;
+  line-height: 1.3;
+  text-decoration: none;
 }
 
 .ichnm-chrome-tools {
+  grid-area: tools;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem 1.25rem;
+  justify-content: flex-end;
+  gap: 0.35rem 0.75rem;
+  pointer-events: none;
+}
+
+.ichnm-chrome-tools > .ichnm-menu-toggle {
+  pointer-events: auto;
+}
+
+.ichnm-header-panel {
+  display: contents;
+}
+
+.ichnm-header-utilities {
+  grid-area: tools;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem 0.75rem;
+}
+
+@media (min-width: 901px) {
+  .ichnm-header-utilities {
+    flex-wrap: nowrap;
+  }
 }
 
 .ichnm-lang-switch {
   display: flex;
-  gap: 0.35rem;
+  gap: 0.15rem;
   font-weight: 600;
   font-size: 0.8rem;
 }
@@ -104,20 +167,30 @@ Text Domain: ichnm-kadence
 .ichnm-lang-switch a {
   color: #fff;
   text-decoration: none;
-  min-width: 2rem;
+  min-width: 2.2rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   opacity: 0.85;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  padding: 0 0.35rem;
 }
 
 .ichnm-lang-switch a.is-current {
   font-weight: 700;
   color: var(--ichnm-accent);
   opacity: 1;
+  border-color: var(--ichnm-header-btn-border);
 }
 
 .ichnm-menu {
+  grid-area: nav;
+  min-width: 0;
   border-top: 1px solid rgba(255, 255, 255, 0.14);
-  padding-top: 0.25rem;
+  padding-top: 0.15rem;
 }
 
 .ichnm-menu .menu,
@@ -232,6 +305,32 @@ Text Domain: ichnm-kadence
   display: none !important;
 }
 
+/* Drop Kadence boxed margin/padding — institute templates own vertical rhythm. */
+body.home .content-area,
+body.page .content-area,
+body.single .content-area {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+body.home .entry-content-wrap,
+body.page .entry-content-wrap,
+body.single .entry-content-wrap {
+  padding: 0;
+}
+
+body.home .entry.single-entry,
+body.page .entry.single-entry,
+body.single .entry.single-entry {
+  box-shadow: none;
+}
+
+body.home,
+body.page,
+body.single {
+  background: var(--ichnm-paper);
+}
+
 /* Inner vitrine / CPT content rhythm */
 .entry-content.ichnm-vitrine,
 .single-news .entry-content,
@@ -240,8 +339,18 @@ Text Domain: ichnm-kadence
 .page .entry-content {
   max-width: var(--ichnm-wrap);
   margin-inline: auto;
-  padding: 1.5rem 0 2.5rem;
+  padding: var(--ichnm-space-page) 0 clamp(2.75rem, 5vw, 4rem);
   color: var(--ichnm-ink);
+  line-height: 1.6;
+}
+
+/* Institute wrappers already pad; avoid double spacing inside them. */
+.ichnm-page .entry-content,
+.ichnm-single .entry-content,
+.ichnm-news-hub .entry-content {
+  max-width: none;
+  margin-inline: 0;
+  padding: 0;
 }
 
 .ichnm-news-gallery img {
@@ -280,33 +389,87 @@ Text Domain: ichnm-kadence
 }
 
 .ichnm-hero {
+  position: relative;
+  overflow: hidden;
   background:
-    linear-gradient(105deg, rgba(10, 28, 46, 0.94) 8%, rgba(15, 42, 67, 0.72) 52%, rgba(15, 42, 67, 0.55) 100%),
+    linear-gradient(105deg, rgba(10, 28, 46, 0.88) 8%, rgba(15, 42, 67, 0.55) 52%, rgba(15, 42, 67, 0.4) 100%),
     linear-gradient(180deg, var(--ichnm-navy-deep), var(--ichnm-navy));
   color: #fff;
-  padding: 3.5rem 0 2.75rem;
+  padding: clamp(2.75rem, 5vw, 4rem) 0 clamp(2.25rem, 4vw, 3.25rem);
+}
+
+.ichnm-hero .hero-lattice {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ichnm-home .dir-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  margin: 1.15rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ichnm-home .dir-grid a {
+  display: block;
+  background: #fff;
+  border: 1px solid var(--ichnm-line);
+  box-shadow: var(--ichnm-shadow);
+  padding: 1.15rem 1.25rem;
+  text-decoration: none;
+  color: var(--ichnm-navy);
+  min-height: 5.5rem;
+  font-weight: 600;
+  line-height: 1.35;
+  transition: transform 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.ichnm-home .dir-grid a:hover {
+  transform: translateY(-2px);
+  color: var(--ichnm-link);
+  border-color: rgba(43, 108, 176, 0.35);
+}
+
+.ichnm-home .dir-grid p {
+  margin: 0.4rem 0 0;
+  font-weight: 400;
+  font-size: 0.92rem;
+  color: #4a5568;
+}
+
+.ichnm-hero-inner {
+  position: relative;
+  z-index: 1;
 }
 
 .ichnm-hero-kicker {
   margin: 0 0 0.65rem;
   font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  opacity: 0.85;
+  color: var(--ichnm-accent);
+  opacity: 1;
 }
 
 .ichnm-hero-title {
-  margin: 0 0 0.85rem;
-  font-size: clamp(1.65rem, 3.2vw, 2.45rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+  font-size: clamp(1.85rem, 4vw, 2.85rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
   max-width: 18ch;
 }
 
 .ichnm-hero-lead {
-  margin: 0 0 1.35rem;
+  margin: 0 0 1.75rem;
   max-width: 42rem;
-  font-size: 1.05rem;
+  font-size: clamp(1.05rem, 1.4vw, 1.18rem);
   line-height: 1.55;
   opacity: 0.95;
 }
@@ -345,33 +508,35 @@ Text Domain: ichnm-kadence
 
 .ichnm-stats {
   background: var(--ichnm-muted);
-  padding: 1.35rem 0;
+  padding: 1.75rem 0;
   border-bottom: 1px solid var(--ichnm-line);
 }
 
 .ichnm-stats-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 1.25rem 2rem;
 }
 
 .ichnm-stat-value {
   display: block;
-  font-size: 1.85rem;
+  font-size: clamp(1.85rem, 3.5vw, 2.45rem);
   font-weight: 700;
   color: var(--ichnm-navy);
-  line-height: 1.1;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
 }
 
 .ichnm-stat-label {
   display: block;
-  margin-top: 0.25rem;
-  font-size: 0.9rem;
+  margin-top: 0.35rem;
+  font-size: 0.92rem;
+  line-height: 1.4;
   color: #4a5568;
 }
 
 .ichnm-home-band {
-  padding: 2.25rem 0;
+  padding: var(--ichnm-space-band) 0;
 }
 
 .ichnm-band-head {
@@ -380,14 +545,16 @@ Text Domain: ichnm-kadence
   align-items: baseline;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-bottom: 1.1rem;
+  margin-bottom: 1.35rem;
 }
 
 .ichnm-band-head h2,
 .ichnm-home-band > .wrap > h2,
 .ichnm-entry-card h2 {
   margin: 0;
-  font-size: 1.45rem;
+  font-size: clamp(1.4rem, 2.4vw, 1.75rem);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
   color: var(--ichnm-navy);
 }
 
@@ -399,45 +566,52 @@ Text Domain: ichnm-kadence
 .ichnm-news-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 1.15rem;
 }
 
 .ichnm-news-card {
   background: #fff;
   border: 1px solid var(--ichnm-line);
-  padding: 1rem 1.05rem 1.15rem;
-  box-shadow: 0 2px 13px rgba(0, 0, 0, 0.06);
+  padding: 1.25rem 1.3rem 1.4rem;
+  box-shadow: var(--ichnm-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 9.5rem;
 }
 
 .ichnm-news-card time {
   display: block;
   font-size: 0.82rem;
+  font-weight: 500;
   color: #4a5568;
-  margin-bottom: 0.45rem;
+  margin-bottom: 0;
 }
 
 .ichnm-news-card h3 {
   margin: 0;
-  font-size: 1.02rem;
+  font-size: 1.05rem;
+  font-weight: 600;
   line-height: 1.35;
+  letter-spacing: -0.015em;
   color: var(--ichnm-ink);
 }
 
 .ichnm-entry-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 1.15rem;
 }
 
 .ichnm-entry-card {
   background: var(--ichnm-muted);
   border: 1px solid var(--ichnm-line);
-  padding: 1.25rem 1.3rem 1.4rem;
+  padding: 1.45rem 1.5rem 1.6rem;
 }
 
 .ichnm-entry-card p {
-  margin: 0.55rem 0 1rem;
-  line-height: 1.5;
+  margin: 0.65rem 0 1.15rem;
+  line-height: 1.55;
 }
 
 .ichnm-entry-card .ichnm-pill,
@@ -512,7 +686,8 @@ Text Domain: ichnm-kadence
   .ichnm-stats-grid,
   .ichnm-news-grid,
   .ichnm-entry-grid,
-  .ichnm-card-grid {
+  .ichnm-card-grid,
+  .ichnm-home .dir-grid {
     grid-template-columns: 1fr;
   }
 
@@ -525,8 +700,8 @@ Text Domain: ichnm-kadence
 .ichnm-card-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin: 1rem 0 1.75rem;
+  gap: 1.15rem;
+  margin: 1.15rem 0 2rem;
 }
 
 .ichnm-person-card {
@@ -582,19 +757,27 @@ Text Domain: ichnm-kadence
 }
 
 .ichnm-catalogue-card {
-  padding: 1rem 1.05rem 1.15rem;
+  padding: 1.2rem 1.25rem 1.35rem;
   border: 1px solid var(--ichnm-line);
   background: #fff;
+  box-shadow: var(--ichnm-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 8.5rem;
 }
 
 .ichnm-catalogue-card h3 {
-  margin: 0 0 0.45rem;
-  font-size: 1.05rem;
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
 }
 
 .ichnm-catalogue-card p {
-  margin: 0 0 0.45rem;
-  line-height: 1.45;
+  margin: 0;
+  line-height: 1.5;
 }
 
 .ichnm-catalogue-meta {
@@ -602,23 +785,103 @@ Text Domain: ichnm-kadence
   color: #4a5568;
 }
 
+.ichnm-catalogue-meta a {
+  color: var(--ichnm-link);
+  text-decoration: none;
+}
+
+.ichnm-catalogue-meta a:hover {
+  text-decoration: underline;
+}
+
+/* Science / developments / facilities: three columns on wide screens (preview cover-grid.is-3). */
+.ichnm-catalogue-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .ichnm-catalogue-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .ichnm-catalogue-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .ichnm-news-hub {
-  padding: 1.5rem 0 2.5rem;
+  padding: var(--ichnm-space-page) 0 clamp(2.75rem, 5vw, 4rem);
+}
+
+.ichnm-news-hub .ichnm-home-band {
+  padding: 1.75rem 0 0;
+}
+
+.ichnm-news-hub .ichnm-home-band + .ichnm-home-band {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--ichnm-line);
+}
+
+.ichnm-page-head {
+  margin-bottom: 0.35rem;
 }
 
 .ichnm-page-head h1 {
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.85rem;
+  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
   color: var(--ichnm-navy);
 }
 
 .ichnm-page-intro {
-  margin-bottom: 1.5rem;
-  max-width: 46rem;
+  margin-bottom: 1.75rem;
+  max-width: var(--ichnm-prose);
+  font-size: 1.02rem;
+  line-height: 1.6;
+}
+
+.ichnm-page-body h2,
+.ichnm-single-body h2,
+.page .entry-content h2,
+.single-department .entry-content h2 {
+  margin: 2rem 0 0.85rem;
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--ichnm-navy);
+}
+
+.ichnm-page-body h2:first-child,
+.ichnm-single-body h2:first-child,
+.page .entry-content > h2:first-child {
+  margin-top: 0.35rem;
 }
 
 .ichnm-structure-labs {
   columns: 2;
-  gap: 1.5rem;
+  gap: 1.75rem 2.25rem;
+  margin: 0.75rem 0 1.75rem;
+}
+
+.ichnm-structure-labs li {
+  break-inside: avoid;
+  margin: 0 0 0.55rem;
+  line-height: 1.45;
+}
+
+.ichnm-structure-labs a {
+  color: var(--ichnm-link);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.ichnm-structure-labs a:hover {
+  color: var(--ichnm-accent);
+  text-decoration: underline;
 }
 
 @media (max-width: 700px) {
@@ -627,48 +890,108 @@ Text Domain: ichnm-kadence
   }
 }
 
-.ichnm-write-btn {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.1rem;
-  padding: 0.25rem 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  color: #fff;
-  text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.ichnm-write-btn:hover {
-  border-color: var(--ichnm-accent);
-  color: var(--ichnm-accent);
+/* Cooperation section: pops must escape the map box (ticket 21). */
+.ichnm-coop-map {
+  overflow: visible;
+  position: relative;
+  z-index: 2;
 }
 
 .ichnm-world-map {
   position: relative;
-  margin: 1rem 0 1.75rem;
-  background: #d7e6f2;
-  border: 1px solid var(--ichnm-line);
-  overflow: hidden;
+  display: block;
+  width: 100%;
+  margin: 1.25rem 0 2rem;
   aspect-ratio: 2 / 1;
+  background: var(--ichnm-map-ocean);
+  border: 1px solid var(--ichnm-line);
+  box-shadow: var(--ichnm-shadow);
+  /* Visible so partner hover/focus cards are not clipped (ticket 21). */
+  overflow: visible;
+  --ichnm-map-ocean: #c5dcec;
+  --ichnm-map-land: #ffffff;
+  --ichnm-map-stroke: var(--ichnm-navy);
+  --ichnm-map-water: #b4cfe0;
 }
 
+.ichnm-coop-map .ichnm-world-map {
+  margin-bottom: 3.5rem;
+  overflow: visible;
+}
+
+/* Ticket 20: city-map stays a compact card — never full-bleed / full-viewport. */
 .ichnm-world-map.ichnm-city-map {
   aspect-ratio: 8 / 5;
   max-width: 42rem;
+  width: 100%;
+  /* Size is constrained; overflow stays visible so the address pop is not clipped. */
+  overflow: visible;
+  margin-inline: 0;
+  height: auto;
+  max-height: none;
+}
+
+.ichnm-world-map > svg.world-outline,
+.ichnm-world-map .world-outline,
+.ichnm-world-map > svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.ichnm-world-map .world-ocean {
+  fill: var(--ichnm-map-ocean);
+}
+
+.ichnm-world-map .world-land,
+.ichnm-world-map .world-land path {
+  fill: var(--ichnm-map-land);
+  stroke: var(--ichnm-map-stroke);
+  stroke-width: 0.55;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.ichnm-city-map .world-land,
+.ichnm-city-map .world-land path {
+  stroke-width: 1.05;
+}
+
+.ichnm-world-map .city-water {
+  fill: var(--ichnm-map-water);
+  stroke: none;
+}
+
+.ichnm-world-map .city-river,
+.ichnm-world-map .city-river path {
+  fill: none;
+  stroke: var(--ichnm-map-water);
+  stroke-width: 4.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .ichnm-world-map-bg {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  pointer-events: none;
 }
 
 .ichnm-map-hotspot {
   position: absolute;
+  width: 2.75rem;
+  height: 2.75rem;
   transform: translate(-50%, -50%);
   z-index: 2;
+  display: grid;
+  place-items: center;
 }
 
 .ichnm-map-pin {
@@ -695,13 +1018,53 @@ Text Domain: ichnm-kadence
   color: var(--ichnm-ink);
   border: 1px solid var(--ichnm-line);
   box-shadow: 0 10px 24px rgba(15, 42, 67, 0.18);
-  z-index: 3;
+  z-index: 5;
+  pointer-events: none;
 }
 
 .ichnm-map-hotspot:hover .ichnm-map-pop,
 .ichnm-map-hotspot:focus-within .ichnm-map-pop,
 .ichnm-map-pop.is-open {
   display: block;
+}
+
+.ichnm-map-hotspot:hover,
+.ichnm-map-hotspot:focus-within {
+  z-index: 6;
+}
+
+.ichnm-city-map .ichnm-map-pop {
+  left: auto;
+  right: 1.2rem;
+  transform: none;
+  bottom: calc(100% + 0.55rem);
+  width: min(16rem, 72vw);
+}
+
+.ichnm-map-hotspot[data-pop="below"] .ichnm-map-pop {
+  bottom: auto;
+  top: calc(100% + 0.55rem);
+}
+
+/* City-map pin is often in the upper half; keep below-pop after city overrides. */
+.ichnm-city-map .ichnm-map-hotspot[data-pop="below"] .ichnm-map-pop {
+  bottom: auto;
+  top: calc(100% + 0.55rem);
+}
+
+.ichnm-map-pop .photo-slot {
+  aspect-ratio: 16 / 10;
+  min-height: 4.5rem;
+  margin: 0 0 0.55rem;
+  padding: 0.45rem;
+}
+
+.ichnm-map-pop .photo-slot span {
+  font-size: 1.05rem;
+}
+
+.ichnm-map-pop .photo-slot p {
+  font-size: 0.72rem;
 }
 
 .ichnm-map-place {
@@ -717,7 +1080,7 @@ Text Domain: ichnm-kadence
   font-size: 0.98rem;
 }
 
-.ichnm-map-pop p {
+.ichnm-map-pop > p {
   margin: 0;
   font-size: 0.88rem;
   line-height: 1.4;
@@ -768,6 +1131,15 @@ Text Domain: ichnm-kadence
 .page .entry-content .ichnm-pill {
   margin-right: 0.45rem;
   margin-bottom: 0.45rem;
+  background: #17344f;
+  border-color: #17344f;
+  color: #fff;
+}
+
+.page .entry-content .ichnm-pill:hover {
+  background: var(--ichnm-accent);
+  border-color: var(--ichnm-accent);
+  color: #fff;
 }
 
 .page .entry-content .ichnm-pill-primary {
@@ -871,24 +1243,40 @@ Text Domain: ichnm-kadence
 
 .ichnm-menu-toggle {
   display: none;
-  min-height: 2.1rem;
-  padding: 0.25rem 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: transparent;
-  color: #fff;
-  font: inherit;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
+  align-items: center;
+  justify-content: center;
 }
 
-.ichnm-bvi,
+.ichnm-bvi {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ichnm-bvi .bvi-shortcode,
 .ichnm-bvi .bvi-shortcode a,
 .ichnm-bvi .bvi-open {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--ichnm-header-btn-border);
+  background: transparent;
   color: #fff !important;
-  text-decoration: none;
-  font-size: 0.78rem;
-  font-weight: 600;
+  text-decoration: none !important;
+  font: 600 0.78rem/1.2 inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  vertical-align: middle;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.ichnm-bvi .bvi-shortcode a:hover,
+.ichnm-bvi .bvi-open:hover {
+  border-color: var(--ichnm-accent);
+  color: var(--ichnm-accent) !important;
 }
 
 .ichnm-bvi .bvi-svg-eye {
@@ -904,10 +1292,18 @@ Text Domain: ichnm-kadence
   align-items: start;
 }
 
+.ichnm-footer-map {
+  display: block;
+  max-width: 17rem;
+  color: #fff;
+}
+
 .ichnm-footer-map .ichnm-world-map {
   margin: 0;
   max-width: none;
   aspect-ratio: 8 / 5;
+  box-shadow: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .ichnm-footer-map .ichnm-map-pop {
@@ -925,17 +1321,111 @@ Text Domain: ichnm-kadence
 }
 
 @media (max-width: 900px) {
-  .ichnm-menu-toggle {
-    display: inline-flex;
-    align-items: center;
+  .ichnm-chrome-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand tools";
+    position: relative;
+    min-height: 0;
+    padding: 0.28rem 0;
+    column-gap: 0.5rem;
   }
 
-  .ichnm-menu {
+  .ichnm-identity {
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .nas-emblem {
+    height: 2.4rem;
+    padding: 0.12rem 0.25rem;
+  }
+
+  .nas-emblem img {
+    height: 2.1rem;
+  }
+
+  .ichnm-mark {
+    width: 2.4rem;
+  }
+
+  .ichnm-identity-text {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .ichnm-identity-text a {
     display: none;
   }
 
-  .ichnm-chrome.is-menu-open .ichnm-menu {
+  .ichnm-identity-text strong {
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ichnm-chrome-tools {
+    pointer-events: auto;
+    z-index: 3;
+    flex-wrap: nowrap;
+    flex: none;
+    justify-self: end;
+  }
+
+  .ichnm-menu-toggle {
+    display: inline-flex !important;
+    flex: none;
+    font-weight: 700;
+  }
+
+  .ichnm-header-panel {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 50;
+    background: var(--ichnm-navy);
+    color: #fff;
+    max-height: min(75vh, calc(100dvh - 4.5rem));
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 12px 28px rgba(10, 28, 46, 0.35);
+  }
+
+  .ichnm-chrome.is-menu-open .ichnm-header-panel {
     display: block;
+  }
+
+  .ichnm-header-utilities {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: stretch;
+    gap: 0.4rem;
+    padding: 0.75rem 0.9rem 0.6rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .ichnm-header-utilities .ichnm-lang-switch {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .ichnm-header-utilities .ichnm-tool-btn,
+  .ichnm-header-utilities .ichnm-write-btn,
+  .ichnm-header-utilities .ichnm-bvi,
+  .ichnm-header-utilities .ichnm-bvi .bvi-shortcode,
+  .ichnm-header-utilities .ichnm-bvi .bvi-shortcode a,
+  .ichnm-header-utilities .ichnm-bvi .bvi-open {
+    width: 100%;
+  }
+
+  .ichnm-menu {
+    display: block;
+    border-top: 0;
+    padding: 0.35rem 0.5rem 0.75rem;
   }
 
   .ichnm-footer-grid {
@@ -947,15 +1437,38 @@ Text Domain: ichnm-kadence
 @media (prefers-reduced-motion: reduce) {
   .ichnm-chart-col,
   .ichnm-map-pin,
-  .ichnm-hero {
+  .ichnm-hero,
+  .ichnm-map-pop,
+  .ichnm-map-hotspot {
     animation: none !important;
     transition: none !important;
   }
+
+  .ichnm-hero .hero-lattice,
+  .hero-lattice {
+    display: none !important;
+  }
 }
 
+body.bvi-active .ichnm-coop-map,
+html.bvi-active .ichnm-coop-map,
+body.bvi-body .ichnm-coop-map,
 body.bvi-active .ichnm-world-map,
 html.bvi-active .ichnm-world-map,
 body.bvi-body .ichnm-world-map {
+  display: none;
+}
+
+body.bvi-active .hero-lattice,
+html.bvi-active .hero-lattice,
+body.bvi-body .hero-lattice,
+html.is-bvi .hero-lattice {
+  display: none !important;
+}
+
+body.bvi-active .ichnm-map-pop .photo-slot,
+html.bvi-active .ichnm-map-pop .photo-slot,
+body.bvi-body .ichnm-map-pop .photo-slot {
   display: none;
 }
 
@@ -963,6 +1476,11 @@ body.bvi-active .ichnm-hero,
 html.bvi-active .ichnm-hero {
   background: #fff !important;
   color: #000 !important;
+}
+
+body.bvi-active .ichnm-hero-kicker,
+html.bvi-active .ichnm-hero-kicker {
+  color: inherit !important;
 }
 
 body.bvi-active .ichnm-chrome,
@@ -1032,24 +1550,37 @@ html.bvi-active .ichnm-page-veil {
   display: none !important;
 }
 
-.ichnm-tool-btn {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.1rem;
-  padding: 0.25rem 0.7rem;
-  border: 1px solid rgba(255, 255, 255, 0.28);
+.ichnm-tool-btn,
+.ichnm-menu-toggle,
+.ichnm-write-btn {
+  appearance: none;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--ichnm-header-btn-border);
   background: transparent;
   color: #fff;
   text-decoration: none;
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font: 600 0.78rem/1.2 inherit;
   cursor: pointer;
+  touch-action: manipulation;
+  vertical-align: middle;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
 }
 
-.ichnm-tool-btn:hover {
+.ichnm-tool-btn,
+.ichnm-write-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ichnm-tool-btn:hover,
+.ichnm-menu-toggle:hover,
+.ichnm-write-btn:hover {
   border-color: var(--ichnm-accent);
   color: var(--ichnm-accent);
+  text-decoration: none;
 }
 
 .ichnm-site-search {
@@ -1205,11 +1736,25 @@ body.single-event .entry-hero,
 }
 
 .ichnm-page {
-  padding: 1.5rem 0 2.75rem;
+  padding: var(--ichnm-space-page) 0 clamp(2.75rem, 5vw, 4rem);
 }
 
 .ichnm-page-body {
-  max-width: 48rem;
+  max-width: var(--ichnm-prose);
+  line-height: 1.6;
+}
+
+.ichnm-page-body.is-wide,
+.ichnm-page-body:has(.ichnm-catalogue-grid),
+.ichnm-page-body:has(.ichnm-structure-labs),
+.ichnm-page-body:has(.ichnm-coop-map),
+.ichnm-page-body:has(.ichnm-world-map:not(.ichnm-city-map)) {
+  max-width: none;
+}
+
+.ichnm-page-body:has(.ichnm-coop-map),
+.entry-content:has(.ichnm-coop-map) {
+  overflow: visible;
 }
 
 body.page .content-area .entry-hero-container,
@@ -1233,7 +1778,7 @@ body.single .entry-header {
 }
 
 .ichnm-single {
-  padding: 1.5rem 0 2.75rem;
+  padding: var(--ichnm-space-page) 0 clamp(2.75rem, 5vw, 4rem);
 }
 
 .ichnm-single-meta {
@@ -1242,8 +1787,9 @@ body.single .entry-header {
 }
 
 .ichnm-single-body {
-  max-width: 46rem;
-  margin-top: 1rem;
+  max-width: var(--ichnm-prose);
+  margin-top: 1.15rem;
+  line-height: 1.6;
 }
 
 .ichnm-about-gallery {
@@ -1278,3 +1824,331 @@ body.single .entry-header {
     grid-template-columns: 1fr;
   }
 }
+
+/* Lab pack — contour from honest preview/labs/{slug}/ */
+.ichnm-single-lab .ichnm-single-body.is-lab {
+  max-width: none;
+}
+
+.ichnm-crumbs {
+  margin: 0 0 1rem;
+  font-size: 0.86rem;
+  color: #4a5568;
+}
+
+.ichnm-crumbs a {
+  color: var(--ichnm-link);
+  text-decoration: none;
+}
+
+.ichnm-crumbs-sep {
+  margin: 0 0.25rem;
+  opacity: 0.7;
+}
+
+.lab-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ichnm-accent);
+  font-weight: 600;
+}
+
+.lab-local {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.15rem;
+  margin: 0 0 1.75rem;
+  padding: 0.45rem 0 0.55rem;
+  border-bottom: 1px solid var(--ichnm-line);
+}
+
+.lab-local a {
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 0.55rem 0.8rem;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  color: var(--ichnm-ink);
+}
+
+.lab-local a:hover {
+  color: var(--ichnm-navy);
+}
+
+.lab-split {
+  display: grid;
+  grid-template-columns: minmax(10rem, 16rem) 1fr;
+  gap: 1.25rem;
+  align-items: start;
+  margin: 1rem 0 1.75rem;
+}
+
+.photo-slot {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  width: 100%;
+  min-height: 9rem;
+  padding: 0.75rem;
+  text-align: center;
+  background:
+    linear-gradient(160deg, rgba(40, 167, 234, 0.16), rgba(15, 42, 67, 0.08)),
+    repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(15, 42, 67, 0.04) 8px, rgba(15, 42, 67, 0.04) 9px);
+  color: #4a5568;
+}
+
+.photo-slot span {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--ichnm-navy);
+}
+
+.photo-slot p {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+}
+
+.ichnm-lab-dir-list,
+.ichnm-lab-project-list,
+.ichnm-lab-pub-list {
+  margin: 0.75rem 0 1.5rem;
+  padding-left: 1.1rem;
+}
+
+.ichnm-lab-dir-list li,
+.ichnm-lab-project-list li {
+  margin: 0 0 0.85rem;
+}
+
+.ichnm-lab-dir-list p,
+.ichnm-lab-project-list p {
+  margin: 0.25rem 0 0;
+  color: #4a5568;
+}
+
+.lab-equip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 1.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.lab-equip-item {
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(15, 32, 67, 0.08);
+  overflow: hidden;
+}
+
+.lab-equip-card {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+  min-height: 100%;
+}
+
+.lab-equip-card h3 {
+  margin: 0.85rem 0.95rem 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.lab-equip-card p {
+  margin: 0 0.95rem 1rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: #4a5568;
+}
+
+.staff-tab {
+  margin-top: 1rem;
+  padding: 1.1rem 1.2rem;
+  background: var(--ichnm-muted);
+  box-shadow: 0 8px 22px rgba(15, 32, 67, 0.06);
+}
+
+.people-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+  margin: 1.05rem 0 0.5rem;
+}
+
+.people-list .ichnm-person-card {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.55rem 0.8rem;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(15, 32, 67, 0.08);
+  text-decoration: none;
+  color: inherit;
+}
+
+.people-list .ichnm-person-card-photo {
+  display: grid;
+  place-items: center;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 0;
+  background: var(--ichnm-navy);
+  color: #fff;
+  font-weight: 700;
+}
+
+.lab-contacts {
+  background: var(--ichnm-navy);
+  color: #fff;
+  padding: 1.45rem 1.5rem 1.55rem;
+  margin-top: 2rem;
+}
+
+.lab-contacts h2,
+.lab-contacts p {
+  color: #fff;
+}
+
+.lab-contacts h2 {
+  margin: 0 0 0.65rem;
+  font-size: 1.2rem;
+  letter-spacing: -0.015em;
+}
+
+.lab-contacts a {
+  color: #9be3ff;
+}
+
+.ichnm-empty-slot {
+  color: #4a5568;
+  font-style: italic;
+}
+
+.file-shelf {
+  list-style: none;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.file-slot {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(15, 32, 67, 0.06);
+}
+
+.file-slot small {
+  color: #718096;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 960px) {
+  .lab-equip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .lab-split,
+  .lab-equip,
+  .people-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.unit-back {
+  margin: 0 0 1rem;
+}
+
+.unit-back a {
+  color: var(--ichnm-link);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.ichnm-unit-page .ichnm-page-body {
+  max-width: none;
+}
+
+.ichnm-person-card-phone {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.88rem;
+  color: #4a5568;
+}
+
+.ichnm-person-card-name {
+  display: block;
+  font-weight: 700;
+  margin: 0.15rem 0;
+}
+
+.ichnm-person-card-role,
+.ichnm-person-card-degree {
+  display: block;
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.ichnm-single-person .metrics-note {
+  font-size: 0.92rem;
+  color: #4a5568;
+}
+
+.ichnm-single-person .metrics-list {
+  display: grid;
+  grid-template-columns: minmax(8rem, 13rem) 1fr;
+  gap: 0.4rem 1.1rem;
+  margin: 0.75rem 0 1.5rem;
+}
+
+.ichnm-single-person .metrics-list dt {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.ichnm-single-person .metrics-list dd {
+  margin: 0;
+}
+
+.ichnm-single-person .plain-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.ichnm-single-person .plain-list li {
+  margin: 0.35rem 0;
+}
+
+.ichnm-single-person .empty-state {
+  margin: 1rem 0 1.5rem;
+  padding: 0.85rem 1rem;
+  background: #f7f8fb;
+  border-left: 3px solid #c5cdd8;
+}
+
+@media (max-width: 720px) {
+  .ichnm-single-person .metrics-list {
+    grid-template-columns: 1fr;
+    gap: 0.15rem 0;
+  }
+
+  .ichnm-single-person .metrics-list dt {
+    margin-top: 0.55rem;
+  }
+}
+

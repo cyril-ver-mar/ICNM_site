@@ -240,15 +240,53 @@ def lab_equipment() -> list[dict[str, Any]]:
     return rows
 
 
+def _publication_is_mock(row: dict[str, Any]) -> bool:
+    """Honest-copy fish only (not preview-filled letter-coded DOIs)."""
+    doi = str(row.get("doi") or "").lower()
+    if "ichnm.mock" in doi:
+        return True
+    return "макет" in str(row.get("cite") or "").lower()
+
+
 def lab_publications() -> list[dict[str, Any]]:
+    """Sparse pack rows only (lab pages). Skip mock DOIs."""
     rows = []
     for lab in labs():
         for item in lab.get("publications") or []:
+            if not isinstance(item, dict) or _publication_is_mock(item):
+                continue
             row = dict(item)
             row["lab_id"] = lab["id"]
             row["lab_title"] = lab["title"]
             rows.append(row)
     return rows
+
+
+def institute_publications() -> list[dict[str, Any]]:
+    """Institute hub catalogue: publications_items when present, else lab packs.
+
+    Filled preview keeps letter-coded fish on lab packs only — ignore honest
+    ``publications_items`` there so the dummy catalogue stays separate.
+    """
+    from src.core.copy import is_filled_copy
+
+    if is_filled_copy():
+        return lab_publications()
+
+    top = _copy().get("publications_items") or _copy().get("publications") or []
+    if isinstance(top, list) and top:
+        rows: list[dict[str, Any]] = []
+        for item in top:
+            if not isinstance(item, dict) or _publication_is_mock(item):
+                continue
+            row = dict(item)
+            if not row.get("lab_title") and row.get("laboratory"):
+                row["lab_title"] = row["laboratory"]
+            if not row.get("lab_id") and row.get("lab_slug"):
+                row["lab_id"] = f"lab-{row['lab_slug']}"
+            rows.append(row)
+        return rows
+    return lab_publications()
 
 
 def head_contact_line(lab: dict[str, Any]) -> str:

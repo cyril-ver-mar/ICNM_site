@@ -75,4 +75,12 @@
       }).join("");
     });
   }
+
+  // Map hover cards: open below the pin when it sits in the upper half.
+  document.querySelectorAll(".ichnm-world-map .ichnm-map-hotspot").forEach((spot) => {
+    const top = parseFloat(String(spot.style.top || "50"));
+    if (!Number.isNaN(top) && top < 42) {
+      spot.setAttribute("data-pop", "below");
+    }
+  });
 })();

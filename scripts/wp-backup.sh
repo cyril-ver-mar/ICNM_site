@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 # Export a portable WordPress snapshot for PHP hosting handoff (not Java Forever).
+#
+# Prerequisites:
+#   - Docker Desktop running; from repo root: docker compose up -d
+#   - services db + wordpress healthy (see docker compose ps)
+#
+# Usage:
+#   ./scripts/wp-backup.sh                  # → exports/wp-backup-YYYYMMDD-HHMM/
+#   ./scripts/wp-backup.sh exports/my-name  # custom output dir
+#
+# Output is gitignored (exports/). Restore notes land in OUT_DIR/README.txt
+# and docs/work/2026-09-02-hosting-handoff.md (contour 2026-09-17).
+# Smoke after restore: docs/work/smoke-checklist.md / ./scripts/wp-smoke.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -11,6 +23,7 @@ echo "Exporting WordPress snapshot to $OUT_DIR"
 
 if ! docker compose ps --status running 2>/dev/null | grep -q wordpress; then
   echo "WordPress containers are not running. Start with: docker compose up -d" >&2
+  echo "Volumes (DB/files): typically icnm_site_db_data / icnm_site_wp_data" >&2
   exit 1
 fi
 
@@ -52,6 +65,13 @@ Contents
 - wp-content-overlay.tgz Child theme ichnm-kadence + plugin ichnm-site
 - uploads.tgz            Media from the container (if present)
 
+Contour notes (2026-09-17)
+- Polylang structure langs RU/EN/BE/ZH; shell slugs like about-en (no Pro)
+- Content seed: ICHNM_CONTENT_SEED_VERSION in ichnm-site content-sync.php
+- Local Docker volumes: icnm_site_db_data, icnm_site_wp_data (not in git)
+- Feed role: ichnm_feed_editor — docs/work/notes/feed-editor-role.md
+- Smoke: docs/work/smoke-checklist.md / scripts/wp-smoke.sh
+
 Target hosting
 - PHP 8.3 + MySQL/MariaDB (Active.by / Hoster.by PHP tariff)
 - Do NOT deploy onto the current Forever Java stack
@@ -63,7 +83,7 @@ Restore sketch
    - themes/ichnm-kadence
    - plugins/ichnm-site
    - uploads/
-4. Set siteurl/home, permalinks /%postname%/, activate theme + ichnm-site.
+4. Set siteurl/home, permalinks /%postname%/, activate theme + ichnm-site + Polylang.
 5. Keep aist.ichnm.by and mail MX untouched when cutting over ichnm.by later.
 
 See also: docs/work/2026-09-02-hosting-handoff.md
