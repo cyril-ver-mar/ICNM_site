@@ -56,6 +56,15 @@ elif [[ $tar_rc -ne 0 && $tar_rc -ne 1 ]]; then
   echo "uploads.tgz warning: tar exit $tar_rc (file kept if non-empty)"
 fi
 
+SEED_VER=""
+if [[ -f wp-content/plugins/ichnm-site/includes/content-sync.php ]]; then
+  SEED_VER="$(grep -E 'const ICHNM_CONTENT_SEED_VERSION' wp-content/plugins/ichnm-site/includes/content-sync.php | head -1 | grep -oE '[0-9]+' || true)"
+fi
+SEED_LINE="ICHNM_CONTENT_SEED_VERSION in ichnm-site content-sync.php"
+if [[ -n "$SEED_VER" ]]; then
+  SEED_LINE="ICHNM_CONTENT_SEED_VERSION = ${SEED_VER} (ichnm-site content-sync.php)"
+fi
+
 cat > "$OUT_DIR/README.txt" <<EOF
 ICNM WordPress local export — $STAMP
 =====================================
@@ -67,14 +76,19 @@ Contents
 
 Contour notes (2026-09-17)
 - Polylang structure langs RU/EN/BE/ZH; shell slugs like about-en (no Pro)
-- Content seed: ICHNM_CONTENT_SEED_VERSION in ichnm-site content-sync.php
+- Content seed: ${SEED_LINE}
+- After restore on PHP: if option ichnm_content_seed_version lags, run:
+  wp eval 'ichnm_sync_content(true);'
 - Local Docker volumes: icnm_site_db_data, icnm_site_wp_data (not in git)
 - Feed role: ichnm_feed_editor — docs/work/notes/feed-editor-role.md
 - Smoke: docs/work/smoke-checklist.md / scripts/wp-smoke.sh
+  Local check: BASE_URL=http://localhost:8080 ./scripts/wp-smoke.sh
+  Host check:  BASE_URL=https://YOUR-TEST-URL ./scripts/wp-smoke.sh
 
 Target hosting
 - PHP 8.3 + MySQL/MariaDB (Active.by / Hoster.by PHP tariff)
 - Do NOT deploy onto the current Forever Java stack
+- Do NOT invent a public test URL until the panel gives one
 
 Restore sketch
 1. Create empty DB and user on PHP hosting.
@@ -84,7 +98,8 @@ Restore sketch
    - plugins/ichnm-site
    - uploads/
 4. Set siteurl/home, permalinks /%postname%/, activate theme + ichnm-site + Polylang.
-5. Keep aist.ichnm.by and mail MX untouched when cutting over ichnm.by later.
+5. Confirm seed option matches const (force sync if needed — see above).
+6. Keep aist.ichnm.by and mail MX untouched when cutting over ichnm.by later.
 
 See also: docs/work/2026-09-02-hosting-handoff.md
 EOF

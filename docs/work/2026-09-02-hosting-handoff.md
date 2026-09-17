@@ -26,8 +26,9 @@
 
 ### Сид контента
 
-- Константа `ICHNM_CONTENT_SEED_VERSION` в `wp-content/plugins/ichnm-site/includes/content-sync.php` — сейчас **31** (единственный авторитетный номер; visual class hooks для packs/person/catalogues/contacts).
-- Опция WP: `ichnm_content_seed_version`. После деплоя на PHP при необходимости форс-ресід: `wp eval 'ichnm_sync_content(true);'` (или `scripts/local-setup.sh`).
+- Константа `ICHNM_CONTENT_SEED_VERSION` в `wp-content/plugins/ichnm-site/includes/content-sync.php` — сейчас **32** (colleague packet ingest; visual class hooks для packs/person/catalogues/contacts).
+- Локальный Docker (`http://localhost:8080`): option `ichnm_content_seed_version` = **32** (= const; форс-синк не нужен, 2026-09-17).
+- После деплоя на PHP при отставании option: `wp eval 'ichnm_sync_content(true);'` (или `scripts/local-setup.sh`). Пакет коллег: после дропа в `assets/incoming/` достаточно `wp eval 'ichnm_apply_colleague_packet();'`.
 
 ### Docker volumes (данные не в git)
 
@@ -42,6 +43,12 @@
 
 - Роль `ichnm_feed_editor` («Редактор лент ИХНМ»): новости, мероприятия, «СМИ о нас», публикации.
 - Не даёт править шапку/подвал/витрины. Памятка: `docs/work/notes/feed-editor-role.md`.
+
+### Обратная связь (`/feedback/`)
+
+- Shortcode `[ichnm_feedback_form]`. Локально (localhost) — журнал `ichnm_last_feedback` + `error_log`; на PHP-хосте — `wp_mail`.
+- Получатель без правки шаблонов: константа `ICHNM_FEEDBACK_TO` в `wp-config.php`, иначе option `ichnm_feedback_to`, иначе `ichnm@ichnm.by`.
+- Принудительный режим: `ICHNM_FEEDBACK_DELIVERY` = `journal` | `mail`.
 
 ### Smoke и бэкап
 
@@ -59,6 +66,31 @@
 2. Smoke + sign-off руководства.
 3. Смена только A/`www`; MX / `aist.ichnm.by` не трогать.
 4. Старый Java остаётся до приказа; откат = вернуть A на старый IP.
+
+### Test URL — blocked / waiting on (2026-09-17)
+
+**Публичного PHP test URL ещё нет.** В репозитории нет учётных данных Active.by / Hoster.by; PHP-тариф — операционный gap (`docs/DECISIONS.md`). DNS `ichnm.by` / Forever Java / MX / `aist.ichnm.by` **не** трогаем.
+
+**Уже готово к выкладке (локально):**
+
+| Артефакт | Где |
+| --- | --- |
+| Свежий бэкап | `exports/wp-backup-YYYYMMDD-HHMM/` (gitignored): `wordpress.sql`, `wp-content-overlay.tgz`, `uploads.tgz`, `README.txt` |
+| Команда бэкапа | `./scripts/wp-backup.sh` |
+| Сид | const + option **32** на `http://localhost:8080` |
+| HTTP smoke (local) | `./scripts/wp-smoke.sh` — все обязательные пути **200** (2026-09-17) |
+
+**Следующие шаги человека (панель, без секретов в git):**
+
+1. Заказать / открыть **PHP 8.3 + MySQL** тариф на институт (Active.by или Hoster.by) — **не** Java Forever.
+2. В панели: сайт + БД + пользователь БД + Let’s Encrypt; записать **временный URL** хостера или `new.`/`test.ichnm.by` (A на новый IP, боевой `ichnm.by` не менять).
+3. Импорт из свежего `exports/wp-backup-…` по `README.txt` внутри архива; `search-replace` `localhost:8080` → test URL.
+4. Overlay тема/плагин; активировать Polylang + `ichnm-kadence` + `ichnm-site`; permalinks `/%postname%/`.
+5. При необходимости: `wp eval 'ichnm_sync_content(true);'` → сверить option с const **32**.
+6. `BASE_URL=https://<test-url> ./scripts/wp-smoke.sh` + ручной row V vs `preview/`.
+7. Только после sign-off — смена A/`www`; MX и `aist.ichnm.by` не трогать.
+
+Пока URL нет — в handoff **не** выдумывать адрес. Когда появится, дописать одну строку сюда (без логинов/паролей).
 
 Подробный опросник Forever — ниже (без изменений по смыслу с 2026-08/09).
 

@@ -61,6 +61,13 @@ BASE_URL=https://new.ichnm.by ./scripts/wp-smoke.sh
 | I | Главная: dir-grid | `/` | ☐ | Полоса «основные направления» (`dir-grid` / эквивалент) |
 | J | Главная: top menu | `/` | ☐ | Верхнее меню: Об институте / Новости / Мероприятия / Контакты |
 | V | Visual pass (preview parity) | `/`, `/labs/nano/`, `/contacts/` side-by-side vs `preview/` | ☐ | Chrome + home bands + packs + footer grid/pictograms; not Kadence default strip. Spec: `docs/work/specs/2026-09-17-wp-visual-preview-parity.md` |
+| M | Veil + BVI | `/` и любая внутренняя: OS reduced-motion **или** включённый BVI → нет navy wipe; кнопка BVI в шапке открывает панель плагина; меню и язык остаются доступны | ☐ | Ticket 32; veil off when `prefers-reduced-motion` / BVI-active |
+
+### Заметки прогона (ticket 34, 2026-09-17)
+
+- **HTTP smoke local:** `./scripts/wp-smoke.sh` vs `http://localhost:8080` — все обязательные и optional пути **200**. Seed option **32**.
+- **Row V:** не закрыт как приёмка. Тикеты 28–32 закрыли chrome/cookie/night/veil на локали; финальный side-by-side vs `preview/` (`/`, `/labs/nano/`, `/contacts/`) — ручной gate на test URL (или локально до sign-off). Публичного PHP URL нет → remote smoke не запускался.
+- **Бэкап:** `./scripts/wp-backup.sh` → `exports/wp-backup-…` (gitignored). См. handoff «Test URL — blocked / waiting on».
 
 ---
 

@@ -1986,7 +1986,6 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
         chunks.append(
             '<div class="map-slot is-filled">'
             f"{_minsk_map()}"
-            f"<p>{_t(_st('street'))}</p>"
             "</div>"
         )
     elif copied.get("list") and item.id not in {"structure"}:
@@ -2470,11 +2469,8 @@ def _minsk_map_variants_body() -> str:
     """Side-by-side Minsk map variants for visual picking (not a public IA page)."""
     variants_dir = _HERE.parents[1] / "assets" / "maps" / "variants"
     catalog = [
-        ("minsk-v1-admin.svg", "v1 — админ. граница (с восточными выносами)"),
-        ("minsk-v2-compact.svg", "v2 — компакт (восток обрезан) — текущий default"),
-        ("minsk-v3-mkad.svg", "v3 — компакт + контур МКАД"),
-        ("minsk-v4-green.svg", "v4 — компакт + парки / леса"),
-        ("minsk-v5-mkad-green.svg", "v5 — компакт + МКАД + зелень"),
+        ("minsk-hand.svg", "Итоговый контур (fill-width, без пустых полей) — production"),
+        ("minsk-v1-admin.svg", "v1 — сырой админ OSM (с восточным лесным поясом)"),
     ]
     cards = []
     for filename, label in catalog:
@@ -2498,7 +2494,7 @@ def _minsk_map_variants_body() -> str:
             "</article>"
         )
 
-    builder_src = variants_dir / "minsk-v5-mkad-green.svg"
+    builder_src = variants_dir / "minsk-hand.svg"
     builder = ""
     if builder_src.is_file():
         outline = _minsk_outline_from(builder_src)
@@ -2508,11 +2504,9 @@ def _minsk_map_variants_body() -> str:
         pin_t = top.group(1) if top else "29.13"
         builder = (
             '<section class="map-variant-builder" data-minsk-layer-builder>'
-            "<h2>Конструктор слоёв</h2>"
-            "<p>Включите или выключите МКАД и зелень на одном контуре — так проще выбрать набор.</p>"
+            "<h2>Слои итогового контура</h2>"
+            "<p>Вода и река из твоей правки. Зелень OSM можно наложить отдельно позже.</p>"
             '<div class="map-variant-toggles">'
-            '<label><input type="checkbox" data-layer="city-mkad" checked> МКАД</label>'
-            '<label><input type="checkbox" data-layer="city-green" checked> Парки / леса</label>'
             '<label><input type="checkbox" data-layer="city-water" checked> Водоёмы</label>'
             '<label><input type="checkbox" data-layer="city-river" checked> Река</label>'
             "</div>"
@@ -2531,8 +2525,9 @@ def _minsk_map_variants_body() -> str:
     return (
         '<header class="page-hero"><div class="wrap">'
         "<h1>Варианты карты Минска</h1>"
-        "<p>Восточные админ-выносы убраны в v2+. Слои МКАД и зелени — на выбор. "
-        "Страница только для подбора; в контакты/подвал пойдёт выбранный файл.</p>"
+        "<p>Production — контур из твоей правки "
+        "<code>assets/maps/edit/minsk-full-east-uncropped.svg</code> "
+        "(пустота справа обрезана). Восточный лесной пояс снят вручную в Illustrator.</p>"
         "</div></header>"
         f'<div class="page-body is-wide map-variants">{"".join(cards)}{builder}'
         '<p><a href="contacts.html">К контактам</a> · <a href="index.html">На главную</a></p>'
@@ -2556,8 +2551,9 @@ def _minsk_pin_pct() -> tuple[str, str]:
 
 def _minsk_map(*, compact: bool = False) -> str:
     left, top = _minsk_pin_pct()
+    pop_attr = ' data-pop="below"' if float(top) < 42.0 else ""
     hotspot = (
-        f'<div class="map-hotspot" style="left:{left}%;top:{top}%">'
+        f'<div class="map-hotspot"{pop_attr} style="left:{left}%;top:{top}%">'
     )
     if compact:
         pin = f'{hotspot}<span class="map-pin"></span></div>'

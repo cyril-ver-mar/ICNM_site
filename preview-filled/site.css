@@ -1292,7 +1292,10 @@ html.theme-night .world-map {
 }
 
 .world-map.city-map {
-  aspect-ratio: 8 / 5;
+  /* Matches assets/maps/minsk.svg viewBox (hand silhouette, fill-width). */
+  aspect-ratio: 800 / 656;
+  width: 100%;
+  max-width: 42rem;
 }
 
 .city-map .world-land,
@@ -1303,6 +1306,27 @@ html.theme-night .world-map {
 .city-water {
   fill: var(--map-water);
   stroke: none;
+}
+
+.city-green {
+  fill: color-mix(in srgb, var(--map-water) 22%, #4a8a5c);
+  fill-opacity: 0.9;
+  stroke: none;
+}
+
+.city-green-hand {
+  fill: color-mix(in srgb, var(--map-water) 12%, #5aa86a);
+  fill-opacity: 0.88;
+}
+
+.city-mkad,
+.city-mkad path {
+  fill: none;
+  stroke: var(--map-stroke);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.9;
 }
 
 .city-river,
@@ -1317,6 +1341,49 @@ html.theme-night .world-map {
 .city-map .map-pop {
   left: auto;
   right: 1.2rem;
+}
+
+/* Minsk map variants picker */
+.map-variants {
+  display: grid;
+  gap: 2rem;
+}
+
+.map-variant-card h2,
+.map-variant-builder h2 {
+  margin: 0 0 0.35rem;
+  font-family: Montserrat, sans-serif;
+  font-size: 1.15rem;
+}
+
+.map-variant-file {
+  margin: 0 0 0.75rem;
+  color: var(--palette5);
+  font-size: 0.9rem;
+}
+
+.map-variant-frame {
+  max-width: 42rem;
+  margin: 0;
+}
+
+.map-variant-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin: 0 0 1rem;
+}
+
+.map-variant-toggles label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 500;
+}
+
+.map-variant-builder {
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
 }
 
 .world-map::after {
@@ -2846,11 +2913,18 @@ html.is-bvi body.is-home .home-band {
 
 .map-slot.is-filled {
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
+  background: transparent;
+  min-height: 0;
+  display: block;
+  color: inherit;
+  text-align: left;
 }
 
 .map-slot.is-filled .world-map {
   margin: 0;
+  width: 100%;
+  max-width: 42rem;
 }
 
 .map-slot.is-filled img {

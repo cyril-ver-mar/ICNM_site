@@ -110,6 +110,14 @@ function ichnm_chrome_strings(?string $lang = null): array
             'nas' => 'Национальная академия наук Беларуси',
             'cookies' => 'Политика cookie',
             'personal' => 'Персональные данные',
+            'cookie_title' => 'Файлы cookie',
+            'cookie_lead' => 'Сайт запоминает язык, тему и версию для слабовидящих. Это необходимые cookie. Аналитические cookie в v1 выключены. Подробнее —',
+            'cookie_accept' => 'Принять',
+            'cookie_reject' => 'Отклонить необязательные',
+            'cookie_settings' => 'Настроить',
+            'cookie_necessary' => 'Необходимые (всегда)',
+            'cookie_analytics' => 'Аналитические',
+            'cookie_save' => 'Сохранить',
             'sections' => 'Разделы',
             'footer_institute' => 'Институт',
             'footer_on_site' => 'На сайте',
@@ -126,6 +134,15 @@ function ichnm_chrome_strings(?string $lang = null): array
             'footer_feedback' => 'Обратная связь',
             'footer_street' => 'ул. Ф. Скорины, 36',
             'footer_address' => '220084, Республика Беларусь, г. Минск, ул. Ф. Скорины, 36',
+            'fb_name' => 'Имя',
+            'fb_email' => 'Email',
+            'fb_message' => 'Сообщение',
+            'fb_submit' => 'Отправить',
+            'fb_ok_journal' => 'Сообщение принято. На локальном контуре оно сохранено в журнал WordPress.',
+            'fb_ok_mail' => 'Сообщение отправлено. Мы ответим на указанный адрес.',
+            'fb_err_nonce' => 'Сессия формы устарела. Обновите страницу.',
+            'fb_err_fields' => 'Проверьте имя, email и текст сообщения.',
+            'fb_err_mail' => 'Не удалось отправить сообщение. Попробуйте позже или напишите на адрес института.',
         ],
         'en' => [
             'lang_aria' => 'Language',
@@ -145,6 +162,14 @@ function ichnm_chrome_strings(?string $lang = null): array
             'nas' => 'National Academy of Sciences of Belarus',
             'cookies' => 'Cookie policy',
             'personal' => 'Personal data',
+            'cookie_title' => 'Cookies',
+            'cookie_lead' => 'The site remembers language, theme, and the visually impaired mode. These are necessary cookies. Analytics cookies are off in v1. See',
+            'cookie_accept' => 'Accept',
+            'cookie_reject' => 'Reject optional',
+            'cookie_settings' => 'Settings',
+            'cookie_necessary' => 'Necessary (always on)',
+            'cookie_analytics' => 'Analytics',
+            'cookie_save' => 'Save',
             'sections' => 'Sections',
             'footer_institute' => 'Institute',
             'footer_on_site' => 'On this site',
@@ -161,6 +186,15 @@ function ichnm_chrome_strings(?string $lang = null): array
             'footer_feedback' => 'Feedback',
             'footer_street' => '36 Skaryna Street',
             'footer_address' => '220084, Republic of Belarus, Minsk, 36 Skaryna Street',
+            'fb_name' => 'Name',
+            'fb_email' => 'Email',
+            'fb_message' => 'Message',
+            'fb_submit' => 'Send',
+            'fb_ok_journal' => 'Message accepted. On the local contour it is stored in the WordPress journal.',
+            'fb_ok_mail' => 'Message sent. We will reply to the address you provided.',
+            'fb_err_nonce' => 'The form session expired. Please reload the page.',
+            'fb_err_fields' => 'Please check your name, email, and message.',
+            'fb_err_mail' => 'Could not send the message. Try again later or write to the institute address.',
         ],
         'be' => [
             'lang_aria' => 'Мова',
@@ -180,6 +214,14 @@ function ichnm_chrome_strings(?string $lang = null): array
             'nas' => 'Нацыянальная акадэмія навук Беларусі',
             'cookies' => 'Палітыка cookie',
             'personal' => 'Персанальныя даныя',
+            'cookie_title' => 'Файлы cookie',
+            'cookie_lead' => 'Сайт запамінае мову, тэму і версію для слабавідушчых. Гэта неабходныя cookie. Аналітычныя cookie ў v1 выключаны. Падрабязней —',
+            'cookie_accept' => 'Прыняць',
+            'cookie_reject' => 'Адхіліць неабавязковыя',
+            'cookie_settings' => 'Наладзіць',
+            'cookie_necessary' => 'Неабходныя (заўсёды)',
+            'cookie_analytics' => 'Аналітычныя',
+            'cookie_save' => 'Захаваць',
             'sections' => 'Раздзелы',
             'footer_institute' => 'Інстытут',
             'footer_on_site' => 'На сайце',
@@ -196,6 +238,15 @@ function ichnm_chrome_strings(?string $lang = null): array
             'footer_feedback' => 'Зваротная сувязь',
             'footer_street' => 'вул. Ф. Скарыны, 36',
             'footer_address' => '220084, Рэспубліка Беларусь, г. Мінск, вул. Ф. Скарыны, 36',
+            'fb_name' => 'Імя',
+            'fb_email' => 'Email',
+            'fb_message' => 'Паведамленне',
+            'fb_submit' => 'Адправіць',
+            'fb_ok_journal' => 'Паведамленне прынята. На лакальным контуры яно захавана ў журнале WordPress.',
+            'fb_ok_mail' => 'Паведамленне адпраўлена. Мы адкажам на пазначаны адрас.',
+            'fb_err_nonce' => 'Сесія формы састарэла. Абнавіце старонку.',
+            'fb_err_fields' => 'Праверце імя, email і тэкст паведамлення.',
+            'fb_err_mail' => 'Не ўдалося адправіць паведамленне. Паспрабуйце пазней або напішыце на адрас інстытута.',
         ],
         'zh' => [
             'lang_aria' => '语言',
@@ -215,6 +266,14 @@ function ichnm_chrome_strings(?string $lang = null): array
             'nas' => '白俄罗斯国家科学院',
             'cookies' => 'Cookie 政策',
             'personal' => '个人数据',
+            'cookie_title' => 'Cookie',
+            'cookie_lead' => '网站会记住语言、主题和无障碍模式。这些是必要 Cookie。v1 中分析 Cookie 已关闭。详见',
+            'cookie_accept' => '接受',
+            'cookie_reject' => '拒绝非必要项',
+            'cookie_settings' => '设置',
+            'cookie_necessary' => '必要（始终开启）',
+            'cookie_analytics' => '分析',
+            'cookie_save' => '保存',
             'sections' => '栏目',
             'footer_institute' => '研究所',
             'footer_on_site' => '本站',
@@ -231,6 +290,15 @@ function ichnm_chrome_strings(?string $lang = null): array
             'footer_feedback' => '反馈',
             'footer_street' => '斯卡里纳大街 36 号',
             'footer_address' => '220084，白俄罗斯共和国，明斯克，斯卡里纳大街 36 号',
+            'fb_name' => '姓名',
+            'fb_email' => '电子邮件',
+            'fb_message' => '留言',
+            'fb_submit' => '发送',
+            'fb_ok_journal' => '留言已接收。在本地环境中保存到 WordPress 日志。',
+            'fb_ok_mail' => '留言已发送。我们会回复到您填写的地址。',
+            'fb_err_nonce' => '表单会话已过期，请刷新页面。',
+            'fb_err_fields' => '请检查姓名、电子邮件和留言内容。',
+            'fb_err_mail' => '无法发送留言。请稍后再试，或写信至研究所邮箱。',
         ],
     ];
     return $pack[$lang] ?? $pack['ru'];
@@ -506,11 +574,12 @@ function ichnm_bind_primary_menu(): void
 }
 add_action('init', 'ichnm_bind_primary_menu', 30);
 
+/**
+ * NAS-class page-open veil markup. Hidden via CSS when prefers-reduced-motion
+ * or BVI is active; chrome.js only runs the wipe when js-motion is allowed.
+ */
 function ichnm_render_veil(): void
 {
-    if (is_front_page()) {
-        // Still show a short veil on home for continuity with NAS motion.
-    }
     echo '<div class="ichnm-page-veil" aria-hidden="true"></div>';
 }
 
@@ -528,7 +597,11 @@ function ichnm_render_identity(): void
     $home = function_exists('pll_home_url') ? (string) pll_home_url() : home_url('/');
     echo '<div class="ichnm-identity">';
     echo '<a class="nas-emblem" href="' . esc_url($nas) . '" title="' . esc_attr($ui['nas']) . '">';
-    echo '<img src="' . esc_url(get_stylesheet_directory_uri() . '/assets/nas-emblem.webp') . '" width="220" height="120" alt="' . esc_attr($ui['nas']) . '">';
+    $nas_svg = get_stylesheet_directory() . '/assets/nas-emblem.svg';
+    $nas_src = (is_readable($nas_svg) && (int) filesize($nas_svg) > 0)
+        ? get_stylesheet_directory_uri() . '/assets/nas-emblem.svg'
+        : get_stylesheet_directory_uri() . '/assets/nas-emblem.webp';
+    echo '<img src="' . esc_url($nas_src) . '" width="220" height="120" alt="' . esc_attr($ui['nas']) . '">';
     echo '</a>';
     echo '<a href="' . esc_url($home) . '">';
     echo '<img class="ichnm-mark" src="' . esc_url(get_stylesheet_directory_uri() . '/assets/ichnm-mark.svg') . '" width="230" height="193" alt="Эмблема ИХНМ">';
@@ -650,11 +723,12 @@ function ichnm_render_search_overlay(): void
 }
 
 /**
- * Early theme + motion boot (same FOUC guard as honest preview).
+ * Early theme + motion + cookie consent boot (same FOUC guard as honest preview).
+ * Motion (js-motion) skips prefers-reduced-motion and active BVI cookie/class.
  */
 function ichnm_theme_boot_script(): void
 {
-    echo '<script>(function(){try{var t=localStorage.getItem("ichnm-theme");var h=new Date().getHours();var night=t==="night"||(t!=="day"&&(h>=21||h<7));if(night)document.documentElement.classList.add("theme-night")}catch(e){}try{var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(!reduce)document.documentElement.classList.add("js-motion")}catch(e){}})();</script>' . "\n";
+    echo '<script>(function(){try{if(document.cookie.indexOf("ichnm-cookies=")!==-1||localStorage.getItem("ichnm-cookies")){document.documentElement.classList.add("cookies-ok")}}catch(e){}try{var t=localStorage.getItem("ichnm-theme");var h=new Date().getHours();var night=t==="night"||(t!=="day"&&(h>=21||h<7));if(night)document.documentElement.classList.add("theme-night")}catch(e){}try{var d=document.documentElement;var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;var bvi=d.classList.contains("bvi-active")||d.classList.contains("is-bvi")||/(?:^|;\\s*)bvi[^=]*=/.test(document.cookie||"");if(!reduce&&!bvi)d.classList.add("js-motion")}catch(e){}})();</script>' . "\n";
 }
 add_action('wp_head', 'ichnm_theme_boot_script', 0);
 
@@ -718,6 +792,14 @@ function ichnm_footer_site_links(array $ui): array
 }
 
 /**
+ * Drop Kadence #colophon / theme credit from the public DOM.
+ * Institute footer is rendered by ichnm_render_footer(); CSS hide alone leaves screen-reader text.
+ */
+add_action('wp', static function (): void {
+    remove_action('kadence_footer', 'Kadence\\footer_markup');
+}, 20);
+
+/**
  * Institute footer matching honest preview: identity / on-site / social / map + NAS pictograms.
  */
 function ichnm_render_footer(): void
@@ -728,12 +810,14 @@ function ichnm_render_footer(): void
     $legal_name = (string) ($identity['legal_name'] ?? 'ИХНМ НАН Беларуси');
     $nas = (string) ($identity['nas_portal_href'] ?? 'https://nasb.gov.by/rus/index.php');
     $nas_social = $model['footer']['nas_social'] ?? [];
-    $icnm_social = array_values(array_filter(
-        $model['footer']['icnm_social'] ?? [],
-        static function ($row): bool {
-            return is_array($row) && !empty($row['href']);
-        }
-    ));
+    $icnm_social = function_exists('ichnm_effective_icnm_social')
+        ? ichnm_effective_icnm_social()
+        : array_values(array_filter(
+            $model['footer']['icnm_social'] ?? [],
+            static function ($row): bool {
+                return is_array($row) && !empty($row['href']);
+            }
+        ));
     $pictograms = $model['footer']['pictograms'] ?? [];
     $contacts = ichnm_translated_page('contacts');
     $contacts_href = $contacts instanceof WP_Post ? (string) get_permalink($contacts) : home_url('/contacts/');
@@ -821,6 +905,37 @@ function ichnm_render_footer(): void
 }
 
 add_action('wp_footer', 'ichnm_render_footer', 5);
+
+/**
+ * Cookie consent banner (honest preview parity). Analytics stay off in v1.
+ */
+function ichnm_render_cookie_banner(): void
+{
+    $ui = ichnm_chrome_strings();
+    $cookies = ichnm_translated_page('cookies');
+    $personal = ichnm_translated_page('personal-data');
+    $cookies_href = $cookies instanceof WP_Post ? (string) get_permalink($cookies) : home_url('/cookies/');
+    $personal_href = $personal instanceof WP_Post ? (string) get_permalink($personal) : home_url('/personal-data/');
+
+    echo '<div class="cookie-banner" id="cookie-banner" hidden role="dialog" aria-modal="true" aria-labelledby="cookie-title">';
+    echo '<p id="cookie-title">' . esc_html($ui['cookie_title']) . '</p>';
+    echo '<p>' . esc_html($ui['cookie_lead']) . ' ';
+    echo '<a href="' . esc_url($cookies_href) . '">' . esc_html($ui['cookies']) . '</a>';
+    echo ' · ';
+    echo '<a href="' . esc_url($personal_href) . '">' . esc_html($ui['personal']) . '</a>.</p>';
+    echo '<div class="cookie-actions">';
+    echo '<button type="button" data-cookie="accept">' . esc_html($ui['cookie_accept']) . '</button>';
+    echo '<button type="button" data-cookie="reject">' . esc_html($ui['cookie_reject']) . '</button>';
+    echo '<button type="button" data-cookie="settings">' . esc_html($ui['cookie_settings']) . '</button>';
+    echo '</div>';
+    echo '<form class="cookie-settings" id="cookie-settings" hidden>';
+    echo '<label><input type="checkbox" name="necessary" checked disabled> ' . esc_html($ui['cookie_necessary']) . '</label>';
+    echo '<label><input type="checkbox" name="analytics"> ' . esc_html($ui['cookie_analytics']) . '</label>';
+    echo '<button type="submit">' . esc_html($ui['cookie_save']) . '</button>';
+    echo '</form></div>';
+}
+
+add_action('wp_footer', 'ichnm_render_cookie_banner', 15);
 
 /**
  * Language shells use slugs like news-en; map them onto dedicated hub templates.

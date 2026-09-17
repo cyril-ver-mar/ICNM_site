@@ -1,17 +1,44 @@
 (() => {
   const doc = document.documentElement;
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const bviOn = !!(document.body && (document.body.classList.contains("bvi-active") || document.body.classList.contains("bvi-body")));
   const THEME_KEY = "ichnm-theme";
 
-  if (!reduce && !bviOn) {
-    doc.classList.add("js-motion");
-    requestAnimationFrame(() => {
-      doc.classList.add("is-entered");
-    });
-  } else {
+  // --- Veil / page-open motion (keep separable from cookie / theme work) ---
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function isBviOn() {
+    const body = document.body;
+    return !!(
+      (body && (body.classList.contains("bvi-active") || body.classList.contains("bvi-body"))) ||
+      doc.classList.contains("bvi-active") ||
+      doc.classList.contains("is-bvi")
+    );
+  }
+
+  function enterPage(allowMotion) {
+    if (allowMotion && !reduce && !isBviOn()) {
+      doc.classList.add("js-motion");
+      requestAnimationFrame(() => {
+        doc.classList.add("is-entered");
+      });
+      return;
+    }
+    doc.classList.remove("js-motion");
     doc.classList.add("is-entered");
   }
+
+  enterPage(true);
+
+  // BVI plugin may add classes after chrome boot; drop motion if it activates.
+  if (document.body && typeof MutationObserver === "function") {
+    const bviWatch = new MutationObserver(() => {
+      if (!isBviOn()) return;
+      enterPage(false);
+      bviWatch.disconnect();
+    });
+    bviWatch.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    bviWatch.observe(doc, { attributes: true, attributeFilter: ["class"] });
+  }
+  // --- end veil / motion ---
 
   const themeBtn = document.querySelector("[data-theme-toggle]");
   const applyTheme = (night, persist) => {
@@ -127,4 +154,67 @@
       spot.setAttribute("data-pop", "below");
     }
   });
+
+  // --- Cookie consent (preview parity; analytics never loaded in v1) ---
+  const COOKIE_KEY = "ichnm-cookies";
+  const cookieState = () => {
+    try {
+      const raw = localStorage.getItem(COOKIE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (err) {
+      /* ignore */
+    }
+    try {
+      const match = document.cookie.match(/(?:^|; )ichnm-cookies=([^;]*)/);
+      if (match) return JSON.parse(decodeURIComponent(match[1]));
+    } catch (err) {
+      /* ignore */
+    }
+    return null;
+  };
+  const saveCookies = (state) => {
+    const payload = JSON.stringify(state);
+    try {
+      localStorage.setItem(COOKIE_KEY, payload);
+    } catch (err) {
+      /* ignore quota / private mode */
+    }
+    try {
+      document.cookie =
+        "ichnm-cookies=" +
+        encodeURIComponent(payload) +
+        "; path=/; max-age=31536000; SameSite=Lax";
+    } catch (err) {
+      /* ignore */
+    }
+    doc.classList.add("cookies-ok");
+  };
+  const cookieBanner = document.getElementById("cookie-banner");
+  const cookieForm = document.getElementById("cookie-settings");
+  const savedCookies = cookieState();
+  if (cookieBanner && !savedCookies) cookieBanner.hidden = false;
+  if (cookieBanner && savedCookies) cookieBanner.hidden = true;
+  if (cookieBanner) {
+    cookieBanner.addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-cookie]");
+      if (!btn) return;
+      const act = btn.getAttribute("data-cookie");
+      if (act === "settings" && cookieForm) {
+        cookieForm.hidden = false;
+        return;
+      }
+      // Preference stored; no analytics scripts ship in v1.
+      saveCookies({ necessary: true, analytics: act === "accept" });
+      cookieBanner.hidden = true;
+    });
+  }
+  if (cookieForm) {
+    cookieForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const analyticsInput = cookieForm.querySelector('[name="analytics"]');
+      const analytics = Boolean(analyticsInput && analyticsInput.checked);
+      saveCookies({ necessary: true, analytics: analytics });
+      if (cookieBanner) cookieBanner.hidden = true;
+    });
+  }
 })();

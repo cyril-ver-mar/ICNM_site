@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-const ICHNM_CONTENT_SEED_VERSION = 31;
+const ICHNM_CONTENT_SEED_VERSION = 32;
 
 function ichnm_migrated_copy(): array
 {
@@ -1241,8 +1241,8 @@ function ichnm_minsk_map_html(): string
             break;
         }
     }
-    $left = '65.66';
-    $top = '29.13';
+    $left = '85.61';
+    $top = '26.94';
     if ($raw !== '') {
         if (preg_match('/data-pin-left="([\d.]+)"/', $raw, $m)) {
             $left = $m[1];
@@ -1267,7 +1267,7 @@ function ichnm_minsk_map_html(): string
         . ((float) $top < 42.0 ? ' data-pop="below"' : '')
         . ' style="left:' . esc_attr($left) . '%;top:' . esc_attr($top) . '%">';
     $html .= '<span class="ichnm-map-pin" title="ул. Ф. Скорины, 36"></span>';
-    $html .= '<div class="ichnm-map-pop is-open">';
+    $html .= '<div class="ichnm-map-pop">';
     $html .= '<p class="ichnm-map-place">Минск</p>';
     $html .= '<h3>ул. Ф. Скорины, 36</h3>';
     $html .= '<p>ГНУ «Институт химии новых материалов НАН Беларуси»</p>';
@@ -2891,6 +2891,10 @@ function ichnm_sync_content(bool $force = false): void
 {
     $current = (int) get_option('ichnm_content_seed_version', 0);
     if (!$force && $current >= ICHNM_CONTENT_SEED_VERSION) {
+        // Files may arrive after the seed is current — still attach the packet.
+        if (function_exists('ichnm_apply_colleague_packet')) {
+            ichnm_apply_colleague_packet();
+        }
         return;
     }
     ichnm_configure_site_contour();
@@ -2912,6 +2916,10 @@ function ichnm_sync_content(bool $force = false): void
     }
     delete_option('ichnm_menu_seeded');
     ichnm_sync_nav_menu(true);
+    // After hubs/pages are filled: attach PDFs, import colleague pubs, social/brand hooks.
+    if (function_exists('ichnm_apply_colleague_packet')) {
+        ichnm_apply_colleague_packet();
+    }
     update_option('ichnm_content_seed_version', ICHNM_CONTENT_SEED_VERSION);
     flush_rewrite_rules(false);
 }

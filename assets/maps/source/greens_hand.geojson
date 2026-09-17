@@ -1,0 +1,538 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "nw-drozdy",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.42,
+              53.955
+            ],
+            [
+              27.5,
+              53.955
+            ],
+            [
+              27.52,
+              53.935
+            ],
+            [
+              27.48,
+              53.925
+            ],
+            [
+              27.43,
+              53.935
+            ],
+            [
+              27.42,
+              53.955
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "n-sovetsky",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.57,
+              53.945
+            ],
+            [
+              27.62,
+              53.945
+            ],
+            [
+              27.62,
+              53.925
+            ],
+            [
+              27.57,
+              53.925
+            ],
+            [
+              27.57,
+              53.945
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "ne-logoysk",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.64,
+              53.945
+            ],
+            [
+              27.69,
+              53.948
+            ],
+            [
+              27.695,
+              53.93
+            ],
+            [
+              27.66,
+              53.922
+            ],
+            [
+              27.64,
+              53.945
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "ne-chelyuskintsev",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.61,
+              53.94
+            ],
+            [
+              27.65,
+              53.942
+            ],
+            [
+              27.655,
+              53.92
+            ],
+            [
+              27.615,
+              53.918
+            ],
+            [
+              27.61,
+              53.94
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "e-strip-inner-mkad",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.675,
+              53.93
+            ],
+            [
+              27.705,
+              53.932
+            ],
+            [
+              27.708,
+              53.88
+            ],
+            [
+              27.678,
+              53.878
+            ],
+            [
+              27.675,
+              53.93
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "center-botanical",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.635,
+              53.92
+            ],
+            [
+              27.665,
+              53.922
+            ],
+            [
+              27.668,
+              53.905
+            ],
+            [
+              27.638,
+              53.903
+            ],
+            [
+              27.635,
+              53.92
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "w-frunze-1",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.45,
+              53.915
+            ],
+            [
+              27.49,
+              53.918
+            ],
+            [
+              27.495,
+              53.9
+            ],
+            [
+              27.455,
+              53.897
+            ],
+            [
+              27.45,
+              53.915
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "w-frunze-2",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.46,
+              53.895
+            ],
+            [
+              27.5,
+              53.898
+            ],
+            [
+              27.505,
+              53.88
+            ],
+            [
+              27.465,
+              53.877
+            ],
+            [
+              27.46,
+              53.895
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "sw-malinovka",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.43,
+              53.875
+            ],
+            [
+              27.48,
+              53.878
+            ],
+            [
+              27.485,
+              53.858
+            ],
+            [
+              27.435,
+              53.855
+            ],
+            [
+              27.43,
+              53.875
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "s-loshitsa-main",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.555,
+              53.875
+            ],
+            [
+              27.62,
+              53.88
+            ],
+            [
+              27.635,
+              53.855
+            ],
+            [
+              27.6,
+              53.845
+            ],
+            [
+              27.56,
+              53.85
+            ],
+            [
+              27.555,
+              53.875
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "s-loshitsa-east",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.62,
+              53.87
+            ],
+            [
+              27.66,
+              53.872
+            ],
+            [
+              27.665,
+              53.85
+            ],
+            [
+              27.625,
+              53.848
+            ],
+            [
+              27.62,
+              53.87
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "se-chizhovka-green",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.655,
+              53.86
+            ],
+            [
+              27.695,
+              53.862
+            ],
+            [
+              27.698,
+              53.845
+            ],
+            [
+              27.658,
+              53.843
+            ],
+            [
+              27.655,
+              53.86
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "nw-small",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.5,
+              53.95
+            ],
+            [
+              27.54,
+              53.952
+            ],
+            [
+              27.545,
+              53.938
+            ],
+            [
+              27.505,
+              53.936
+            ],
+            [
+              27.5,
+              53.95
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "w-small",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.48,
+              53.93
+            ],
+            [
+              27.51,
+              53.932
+            ],
+            [
+              27.515,
+              53.918
+            ],
+            [
+              27.485,
+              53.916
+            ],
+            [
+              27.48,
+              53.93
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "center-west",
+        "kind": "hand",
+        "source": "user-annotation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.52,
+              53.91
+            ],
+            [
+              27.56,
+              53.912
+            ],
+            [
+              27.565,
+              53.895
+            ],
+            [
+              27.525,
+              53.893
+            ],
+            [
+              27.52,
+              53.91
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

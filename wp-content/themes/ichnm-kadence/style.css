@@ -4,7 +4,7 @@ Theme URI: https://ichnm.by/
 Description: Дочерняя тема Kadence для официального сайта ИХНМ НАН Беларуси.
 Author: ИХНМ
 Template: kadence
-Version: 0.3.27
+Version: 0.3.28
 Text Domain: ichnm-kadence
 */
 
@@ -164,6 +164,11 @@ body.home .ichnm-chrome.is-scrolled .ichnm-mark {
   filter: none;
 }
 
+/* Night paper is dark: keep mark halo so the SVG still reads on scrolled chrome. */
+html.theme-night body.home .ichnm-chrome.is-scrolled .ichnm-mark {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.95));
+}
+
 @media (prefers-reduced-transparency: reduce) {
   body.home .ichnm-chrome:not(.is-scrolled) {
     --header-bg: var(--navy);
@@ -175,6 +180,11 @@ body.home .ichnm-chrome.is-scrolled .ichnm-mark {
   body.home .ichnm-chrome:not(.is-scrolled) {
     --header-bg: var(--navy);
     backdrop-filter: none;
+  }
+
+  html.theme-night {
+    --header-glass: var(--navy);
+    --line: rgba(255, 255, 255, 0.45);
   }
 }
 
@@ -961,7 +971,7 @@ body.single {
 .footer-map .ichnm-world-map {
   margin: 0;
   max-width: none;
-  aspect-ratio: 8 / 5;
+  aspect-ratio: 800 / 656;
   box-shadow: none;
   border: 1px solid rgba(255, 255, 255, 0.18);
   /* Light card on navy footer so the outline does not vanish. */
@@ -1376,7 +1386,8 @@ body.single {
 
 /* Ticket 20: city-map stays a compact card — never full-bleed / full-viewport. */
 .ichnm-world-map.ichnm-city-map {
-  aspect-ratio: 8 / 5;
+  /* Matches assets/maps/minsk.svg viewBox (hand silhouette, fill-width). */
+  aspect-ratio: 800 / 656;
   max-width: 42rem;
   width: 100%;
   /* Size is constrained; overflow stays visible so the address pop is not clipped. */
@@ -1421,9 +1432,14 @@ body.single {
 }
 
 .ichnm-world-map .city-green {
-  fill: color-mix(in srgb, var(--ichnm-map-water) 35%, #3d6b4f);
-  fill-opacity: 0.85;
+  fill: color-mix(in srgb, var(--ichnm-map-water) 22%, #4a8a5c);
+  fill-opacity: 0.9;
   stroke: none;
+}
+
+.ichnm-world-map .city-green-hand {
+  fill: color-mix(in srgb, var(--ichnm-map-water) 12%, #5aa86a);
+  fill-opacity: 0.88;
 }
 
 .ichnm-world-map .city-mkad,
@@ -1719,6 +1735,8 @@ body.single {
 }
 
 .ichnm-bvi {
+  position: relative;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
 }
@@ -1822,7 +1840,8 @@ body.single {
     border-color: var(--header-btn-border);
   }
 
-  body.home .ichnm-chrome.is-scrolled .ichnm-menu-toggle {
+  /* Day scrolled only — night keeps ink on paper via --header-fg / --header-btn-border. */
+  html:not(.theme-night) body.home .ichnm-chrome.is-scrolled .ichnm-menu-toggle {
     color: #1a202c;
     -webkit-text-fill-color: #1a202c;
     background: #edf2f7;
@@ -1976,6 +1995,7 @@ html.bvi-active .footer-pictograms {
   box-shadow: none;
 }
 
+/* Page-open navy veil + home stagger. Off for prefers-reduced-motion and BVI. */
 .ichnm-page-veil {
   position: fixed;
   inset: 0;
@@ -1985,7 +2005,7 @@ html.bvi-active .footer-pictograms {
   pointer-events: none;
 }
 
-html.is-entered .ichnm-page-veil {
+html.js-motion.is-entered .ichnm-page-veil {
   animation: ichnm-veil-wipe 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
@@ -2002,15 +2022,15 @@ html.js-motion .ichnm-home .ichnm-home-band {
   transform: translateY(1rem);
 }
 
-html.is-entered .ichnm-home .ichnm-hero {
+html.js-motion.is-entered .ichnm-home .ichnm-hero {
   animation: ichnm-rise-in 0.55s 0.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-html.is-entered .ichnm-home .ichnm-stats {
+html.js-motion.is-entered .ichnm-home .ichnm-stats {
   animation: ichnm-rise-in 0.5s 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-html.is-entered .ichnm-home .ichnm-home-band {
+html.js-motion.is-entered .ichnm-home .ichnm-home-band {
   animation: ichnm-rise-in 0.5s 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
@@ -2020,7 +2040,10 @@ html.is-entered .ichnm-home .ichnm-home-band {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ichnm-page-veil,
+  .ichnm-page-veil {
+    display: none !important;
+  }
+
   html.js-motion .ichnm-home .ichnm-hero,
   html.js-motion .ichnm-home .ichnm-stats,
   html.js-motion .ichnm-home .ichnm-home-band {
@@ -2031,8 +2054,27 @@ html.is-entered .ichnm-home .ichnm-home-band {
 }
 
 body.bvi-active .ichnm-page-veil,
-html.bvi-active .ichnm-page-veil {
+html.bvi-active .ichnm-page-veil,
+body.bvi-body .ichnm-page-veil,
+html.is-bvi .ichnm-page-veil {
   display: none !important;
+}
+
+body.bvi-active .ichnm-home .ichnm-hero,
+html.bvi-active .ichnm-home .ichnm-hero,
+body.bvi-body .ichnm-home .ichnm-hero,
+html.is-bvi .ichnm-home .ichnm-hero,
+body.bvi-active .ichnm-home .ichnm-stats,
+html.bvi-active .ichnm-home .ichnm-stats,
+body.bvi-body .ichnm-home .ichnm-stats,
+html.is-bvi .ichnm-home .ichnm-stats,
+body.bvi-active .ichnm-home .ichnm-home-band,
+html.bvi-active .ichnm-home .ichnm-home-band,
+body.bvi-body .ichnm-home .ichnm-home-band,
+html.is-bvi .ichnm-home .ichnm-home-band {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 .ichnm-tool-btn,
@@ -2660,6 +2702,16 @@ body.single .entry-header {
   white-space: nowrap;
 }
 
+.file-slot.is-filled a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.file-slot.is-filled a:hover {
+  color: var(--ichnm-accent, #1a4f8b);
+}
+
 @media (max-width: 960px) {
   .lab-equip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2766,27 +2818,186 @@ body.single .entry-header {
 }
 
 
-/* Night surfaces for hardcoded white cards (preview parity). */
+/* Night surfaces for hardcoded white cards (preview/site.css html.theme-night parity). */
 html.theme-night .ichnm-news-card,
 html.theme-night .news-card,
 html.theme-night .ichnm-entry-card,
 html.theme-night .dir-grid a,
 html.theme-night .ichnm-home .dir-grid a,
+html.theme-night .lab-grid a,
 html.theme-night .event-banner,
 html.theme-night .ichnm-event-banner,
 html.theme-night .info-card,
 html.theme-night .cover-card,
+html.theme-night a.cover-card,
+html.theme-night a.cover-card:link,
+html.theme-night a.cover-card:visited,
+html.theme-night .ichnm-catalogue-card,
+html.theme-night .media-card,
+html.theme-night .leader-card,
+html.theme-night .staff-tab,
+html.theme-night .pub-chart,
+html.theme-night .ichnm-pub-chart,
+html.theme-night .ichnm-pub-item,
+html.theme-night .file-slot,
+html.theme-night .lab-equip li,
+html.theme-night .lab-equip-item,
+html.theme-night .empty-state,
 html.theme-night .map-slot,
 html.theme-night .map-pop,
 html.theme-night .ichnm-map-pop,
-html.theme-night .empty-state,
-html.theme-night .leader-card,
-html.theme-night .lab-equip li,
-html.theme-night .file-slot {
+html.theme-night .people-list .ichnm-person-card,
+html.theme-night .ichnm-about-figure,
+html.theme-night .ichnm-site-search-panel,
+html.theme-night .conf-card,
+html.theme-night .conf-hero,
+html.theme-night .cookie-banner {
   background: #132536;
   color: var(--ink);
 }
 
+html.theme-night .ichnm-home .dir-grid a:hover,
+html.theme-night .dir-grid a:hover,
+html.theme-night .lab-grid a:hover {
+  color: var(--accent);
+}
+
+html.theme-night .cover-card h3,
+html.theme-night .cover-card h3 a,
+html.theme-night .ichnm-catalogue-card h3,
+html.theme-night .ichnm-catalogue-card h3 a,
+html.theme-night .cover-card p,
+html.theme-night .cover-card .cover-meta,
+html.theme-night .ichnm-catalogue-card > p,
+html.theme-night .ichnm-catalogue-meta,
+html.theme-night .photo-slot,
+html.theme-night .photo-slot span,
+html.theme-night .pub-chart figcaption,
+html.theme-night .ichnm-pub-chart figcaption,
+html.theme-night .lab-equip-card,
+html.theme-night .lab-equip-card h3,
+html.theme-night .info-card h3,
+html.theme-night .info-card p,
+html.theme-night .ichnm-news-card h3,
+html.theme-night .ichnm-news-card h3 a,
+html.theme-night .news-card h3,
+html.theme-night .ichnm-entry-card h2,
+html.theme-night .ichnm-entry-card h2 a {
+  color: var(--ink);
+}
+
+html.theme-night .cover-card p,
+html.theme-night .ichnm-catalogue-card > p,
+html.theme-night .lab-equip-card p,
+html.theme-night .cover-card .cover-meta,
+html.theme-night .ichnm-catalogue-meta,
+html.theme-night .ichnm-entry-card p,
+html.theme-night .ichnm-home .dir-grid p {
+  color: var(--palette5);
+}
+
+html.theme-night .cover-card h3 a:hover,
+html.theme-night .ichnm-catalogue-card h3 a:hover,
+html.theme-night .ichnm-news-card h3 a:hover {
+  color: var(--accent);
+}
+
+/* Map fill tokens only — do not touch SVG geometry. */
+html.theme-night .ichnm-world-map,
+html.theme-night .ichnm-footer-map .ichnm-world-map,
+html.theme-night .footer-map .ichnm-world-map {
+  --ichnm-map-ocean: #0a1c2e;
+  --ichnm-map-land: #16324a;
+  --ichnm-map-stroke: #8eb8d4;
+  --ichnm-map-water: #0d2438;
+}
+
+html.theme-night .ichnm-site-search {
+  background: rgba(0, 0, 0, 0.62);
+}
+
+html.theme-night .ichnm-feedback-form input,
+html.theme-night .ichnm-feedback-form textarea,
+html.theme-night .ichnm-search-form input[type="search"] {
+  background: #132536;
+  color: var(--ink);
+  border-color: var(--line);
+}
+
 html.theme-night .ichnm-footer {
   --header-fg: #fff;
+}
+
+/* Cookie consent banner (honest preview parity). */
+.cookie-banner {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  z-index: 30;
+  width: min(28rem, calc(100% - 2rem));
+  padding: 1rem 1.1rem;
+  background: #fff;
+  color: var(--palette3);
+  box-shadow: var(--shadow);
+}
+
+html.cookies-ok .cookie-banner {
+  display: none !important;
+}
+
+.cookie-banner p {
+  margin: 0 0 0.55rem;
+}
+
+.cookie-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.cookie-actions button,
+.cookie-settings button {
+  min-height: 44px;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--line);
+  background: var(--navy);
+  color: #fff;
+  cursor: pointer;
+  touch-action: manipulation;
+  font: 600 0.82rem Montserrat, sans-serif;
+}
+
+.cookie-settings {
+  margin-top: 0.7rem;
+  display: none;
+  gap: 0.35rem;
+}
+
+.cookie-settings:not([hidden]) {
+  display: grid;
+}
+
+body.bvi-active .cookie-banner,
+html.bvi-active .cookie-banner,
+body.bvi-body .cookie-banner,
+html.is-bvi .cookie-banner {
+  background: #fff !important;
+  color: #000 !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 720px) {
+  .cookie-banner {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom));
+    box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.18);
+  }
+
+  .cookie-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
 }

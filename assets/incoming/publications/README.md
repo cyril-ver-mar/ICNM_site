@@ -19,4 +19,11 @@ Institute page «Публикации и монографии» (`…selected_in
 
 ## Colleague spreadsheet
 
-Drop xlsx/csv/ods here when the institute sends a full table. Do not commit empty placeholders as content. Import path already reads `publications_items` in migrated_copy.
+Drop xlsx/csv/ods here when the institute sends a full table. Prefer **csv or json** for automated import (`ichnm_import_incoming_publications`). Convert xlsx/ods to csv first. Do not commit empty placeholders as content.
+
+Import paths:
+
+1. Starter scraped catalogue — `publications_items` in `migrated_copy` → `ichnm_import_publications()`
+2. Colleague spreadsheet — non-evidence csv/json in this folder → `ichnm_import_incoming_publications()` (idempotent `incoming-pub-…` meta keys)
+
+See [`docs/work/notes/colleague-packet.md`](../../../docs/work/notes/colleague-packet.md).

@@ -52,8 +52,10 @@ function ichnm_migrated_copy_path(): string
 }
 
 require_once __DIR__ . '/includes/content-sync.php';
+require_once __DIR__ . '/includes/colleague-packet.php';
 require_once __DIR__ . '/includes/polylang-setup.php';
 require_once __DIR__ . '/includes/roles.php';
+require_once __DIR__ . '/includes/feedback.php';
 
 /**
  * Honest home copy for the local theme (same source as HTML preview).
@@ -326,29 +328,66 @@ add_action('init', static function (): void {
 }, 20);
 
 /**
+ * Chrome / form strings for the feedback shortcode (structure i18n; body copy stays RU).
+ *
+ * @return array<string, string>
+ */
+function ichnm_feedback_ui_strings(): array
+{
+    $ui = function_exists('ichnm_chrome_strings') ? ichnm_chrome_strings() : [];
+    $defaults = [
+        'fb_name' => 'Имя',
+        'fb_email' => 'Email',
+        'fb_message' => 'Сообщение',
+        'fb_submit' => 'Отправить',
+        'fb_ok_journal' => 'Сообщение принято. На локальном контуре оно сохранено в журнал WordPress.',
+        'fb_ok_mail' => 'Сообщение отправлено. Мы ответим на указанный адрес.',
+        'fb_err_nonce' => 'Сессия формы устарела. Обновите страницу.',
+        'fb_err_fields' => 'Проверьте имя, email и текст сообщения.',
+        'fb_err_mail' => 'Не удалось отправить сообщение. Попробуйте позже или напишите на адрес института.',
+    ];
+    foreach ($defaults as $key => $ru) {
+        if (!isset($ui[$key]) || $ui[$key] === '') {
+            $ui[$key] = $ru;
+        }
+    }
+    return $ui;
+}
+
+/**
  * Feedback form shortcode used on /feedback/.
  */
 function ichnm_feedback_form_shortcode(): string
 {
+    $ui = ichnm_feedback_ui_strings();
     $sent = isset($_GET['ichnm_sent']) && $_GET['ichnm_sent'] === '1';
-    $err = isset($_GET['ichnm_err']) ? sanitize_text_field(wp_unslash((string) $_GET['ichnm_err'])) : '';
+    $mode = isset($_GET['ichnm_mode']) ? sanitize_key((string) $_GET['ichnm_mode']) : '';
+    $err = isset($_GET['ichnm_err']) ? sanitize_key((string) $_GET['ichnm_err']) : '';
+
     $html = '<div class="ichnm-feedback">';
     if ($sent) {
-        $html .= '<p class="ichnm-feedback-ok">Сообщение принято. На локальном контуре письмо сохраняется в журнал WordPress; на PHP-хостинге будет уходить на ichnm@ichnm.by.</p>';
+        $ok = ($mode === 'mail') ? $ui['fb_ok_mail'] : $ui['fb_ok_journal'];
+        $html .= '<p class="ichnm-feedback-ok">' . esc_html($ok) . '</p>';
     }
     if ($err !== '') {
-        $html .= '<p class="ichnm-feedback-err">' . esc_html($err) . '</p>';
+        $map = [
+            'nonce' => $ui['fb_err_nonce'],
+            'fields' => $ui['fb_err_fields'],
+            'mail' => $ui['fb_err_mail'],
+        ];
+        $msg = $map[$err] ?? $ui['fb_err_fields'];
+        $html .= '<p class="ichnm-feedback-err">' . esc_html($msg) . '</p>';
     }
     $html .= '<form class="ichnm-feedback-form" method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
     $html .= '<input type="hidden" name="action" value="ichnm_feedback">';
     $html .= wp_nonce_field('ichnm_feedback', 'ichnm_feedback_nonce', true, false);
-    $html .= '<label for="ichnm-fb-name">Имя</label>';
+    $html .= '<label for="ichnm-fb-name">' . esc_html($ui['fb_name']) . '</label>';
     $html .= '<input id="ichnm-fb-name" name="ichnm_name" type="text" required maxlength="120">';
-    $html .= '<label for="ichnm-fb-email">Email</label>';
+    $html .= '<label for="ichnm-fb-email">' . esc_html($ui['fb_email']) . '</label>';
     $html .= '<input id="ichnm-fb-email" name="ichnm_email" type="email" required maxlength="180">';
-    $html .= '<label for="ichnm-fb-message">Сообщение</label>';
+    $html .= '<label for="ichnm-fb-message">' . esc_html($ui['fb_message']) . '</label>';
     $html .= '<textarea id="ichnm-fb-message" name="ichnm_message" rows="6" required maxlength="5000"></textarea>';
-    $html .= '<button type="submit" class="ichnm-pill ichnm-pill-primary">Отправить</button>';
+    $html .= '<button type="submit" class="ichnm-pill ichnm-pill-primary">' . esc_html($ui['fb_submit']) . '</button>';
     $html .= '</form></div>';
     return $html;
 }
@@ -369,33 +408,51 @@ function ichnm_minsk_map_shortcode(): string
 }
 add_shortcode('ichnm_minsk_map', 'ichnm_minsk_map_shortcode');
 
+function ichnm_feedback_redirect_target(): string
+{
+    $redirect = function_exists('ichnm_translated_page')
+        ? ichnm_translated_page('feedback')
+        : get_page_by_path('feedback');
+    return $redirect instanceof WP_Post ? (string) get_permalink($redirect) : home_url('/feedback/');
+}
+
 function ichnm_handle_feedback(): void
 {
-    $redirect = get_page_by_path('feedback');
-    $target = $redirect instanceof WP_Post ? get_permalink($redirect) : home_url('/feedback/');
+    $target = ichnm_feedback_redirect_target();
     if (!isset($_POST['ichnm_feedback_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash((string) $_POST['ichnm_feedback_nonce'])), 'ichnm_feedback')) {
-        wp_safe_redirect(add_query_arg('ichnm_err', rawurlencode('Сессия формы устарела. Обновите страницу.'), $target));
+        wp_safe_redirect(add_query_arg('ichnm_err', 'nonce', $target));
         exit;
     }
-    $name = sanitize_text_field(wp_unslash((string) ($_POST['ichnm_name'] ?? '')));
-    $email = sanitize_email(wp_unslash((string) ($_POST['ichnm_email'] ?? '')));
-    $message = sanitize_textarea_field(wp_unslash((string) ($_POST['ichnm_message'] ?? '')));
-    if ($name === '' || $email === '' || $message === '' || !is_email($email)) {
-        wp_safe_redirect(add_query_arg('ichnm_err', rawurlencode('Проверьте имя, email и текст сообщения.'), $target));
+
+    $raw = [
+        'name' => sanitize_text_field(wp_unslash((string) ($_POST['ichnm_name'] ?? ''))),
+        'email' => sanitize_email(wp_unslash((string) ($_POST['ichnm_email'] ?? ''))),
+        'message' => sanitize_textarea_field(wp_unslash((string) ($_POST['ichnm_message'] ?? ''))),
+    ];
+    $validated = ichnm_feedback_validate($raw);
+    if (empty($validated['ok'])) {
+        wp_safe_redirect(add_query_arg('ichnm_err', 'fields', $target));
         exit;
     }
-    $body = "Имя: {$name}\nEmail: {$email}\n\n{$message}\n";
-    $sent = wp_mail('ichnm@ichnm.by', 'Обратная связь с сайта ИХНМ', $body, ['Reply-To: ' . $email]);
-    // Always keep a local copy for the Docker contour where mail may be unavailable.
-    error_log('[ichnm_feedback] ' . str_replace("\n", ' | ', $body));
-    update_option('ichnm_last_feedback', [
-        'time' => current_time('mysql'),
-        'name' => $name,
-        'email' => $email,
-        'message' => $message,
-        'mail_sent' => (bool) $sent,
-    ], false);
-    wp_safe_redirect(add_query_arg('ichnm_sent', '1', $target));
+
+    $mode = ichnm_feedback_delivery_mode();
+    $recipient = ichnm_feedback_recipient();
+    $plan = ichnm_feedback_plan($validated, $mode, $recipient);
+    if (empty($plan['ok'])) {
+        wp_safe_redirect(add_query_arg('ichnm_err', (string) ($plan['error'] ?? 'fields'), $target));
+        exit;
+    }
+
+    $result = ichnm_feedback_execute($plan);
+    if (empty($result['ok'])) {
+        wp_safe_redirect(add_query_arg('ichnm_err', (string) ($result['error'] ?? 'mail'), $target));
+        exit;
+    }
+
+    wp_safe_redirect(add_query_arg([
+        'ichnm_sent' => '1',
+        'ichnm_mode' => (string) $result['mode'],
+    ], $target));
     exit;
 }
 add_action('admin_post_ichnm_feedback', 'ichnm_handle_feedback');
