@@ -57,7 +57,11 @@ def visible_metric_networks(
     person: Mapping[str, Any],
     fields: Sequence[str] | None = None,
 ) -> list[dict[str, Any]]:
-    """Networks that have a URL and/or bibliometric numbers, in locked order."""
+    """Networks shown only when a profile URL exists (ticket 59).
+
+    Numbers (h-index / citations) ride along when present; orphan numbers
+    without a link target are hidden.
+    """
     order = tuple(fields) if fields is not None else METRIC_FIELDS
     profiles = _profiles_for(person)
     bibliometrics = person.get("bibliometrics") or {}
@@ -67,13 +71,12 @@ def visible_metric_networks(
         stats = bibliometrics.get(field) or {}
         h_index = stats.get("h_index") if isinstance(stats, Mapping) else None
         citations = stats.get("citations") if isinstance(stats, Mapping) else None
-        if not href and h_index is None and citations is None:
-            continue
         if h_index == "":
             h_index = None
         if citations == "":
             citations = None
-        if not href and h_index is None and citations is None:
+        # Show+link or hide: no profile URL → do not render the network.
+        if not href:
             continue
         rows.append(
             {
@@ -85,6 +88,84 @@ def visible_metric_networks(
             }
         )
     return rows
+
+
+PERSON_OPTIONAL_SECTION_KEYS: tuple[str, ...] = (
+    "awards",
+    "publications_scientific",
+    "publications_methodical",
+    "interests",
+    "projects",
+)
+
+PERSON_OPTIONAL_SECTION_LABELS: dict[str, str] = {
+    "awards": "Награды",
+    "publications_scientific": "Научные публикации",
+    "publications_methodical": "Методические публикации",
+    "interests": "Исследовательские интересы",
+    "projects": "Научные проекты",
+}
+
+
+def _section_items(raw: Any) -> list[str]:
+    if raw is None:
+        return []
+    if isinstance(raw, str):
+        text = raw.strip()
+        return [text] if text else []
+    if isinstance(raw, Sequence) and not isinstance(raw, (str, bytes)):
+        out: list[str] = []
+        for item in raw:
+            if isinstance(item, Mapping):
+                line = str(item.get("title") or item.get("cite") or item.get("text") or "").strip()
+            else:
+                line = str(item).strip()
+            if line:
+                out.append(line)
+        return out
+    return []
+
+
+def filled_optional_sections(
+    person: Mapping[str, Any],
+    keys: Sequence[str] | None = None,
+) -> list[dict[str, Any]]:
+    """Person-owned sections that have content (ticket 60). No lab/catalogue sync."""
+    order = tuple(keys) if keys is not None else PERSON_OPTIONAL_SECTION_KEYS
+    sections_blob = person.get("person_sections") or person.get("sections") or {}
+    if not isinstance(sections_blob, Mapping):
+        sections_blob = {}
+    rows: list[dict[str, Any]] = []
+    for key in order:
+        items = _section_items(person.get(key))
+        if not items:
+            items = _section_items(sections_blob.get(key))
+        if not items:
+            continue
+        rows.append(
+            {
+                "key": key,
+                "label": PERSON_OPTIONAL_SECTION_LABELS.get(key, key),
+                "items": items,
+            }
+        )
+    return rows
+
+
+def optional_sections_html(
+    person: Mapping[str, Any],
+    keys: Sequence[str] | None = None,
+) -> str:
+    sections = filled_optional_sections(person, keys)
+    if not sections:
+        return ""
+    parts: list[str] = []
+    for section in sections:
+        parts.append(f"<h2>{escape(section['label'])}</h2><ul>")
+        for item in section["items"]:
+            parts.append(f"<li>{escape(item)}</li>")
+        parts.append("</ul>")
+    return "".join(parts)
 
 
 def affiliations_items(
@@ -127,7 +208,7 @@ def metrics_html(
     person: Mapping[str, Any],
     fields: Sequence[str] | None = None,
     *,
-    include_empty_state: bool = True,
+    include_empty_state: bool = False,
 ) -> str:
     rows = visible_metric_networks(person, fields)
     if not rows:
@@ -144,22 +225,20 @@ def metrics_html(
     bits_rows: list[str] = []
     for row in rows:
         bits: list[str] = []
+        label = escape(row["label"])
+        href = escape(row["href"])
+        # Whole network label links to the profile when present.
+        label_html = f'<a href="{href}" rel="noopener noreferrer">{label}</a>'
         if row["h_index"] is not None:
-            bits.append(f"h-индекс {escape(str(row['h_index']))}")
+            bits.append(f"h-индекс: {escape(str(row['h_index']))}")
         if row["citations"] is not None:
-            bits.append(f"цитирований {escape(str(row['citations']))}")
-        if row["href"]:
-            bits.append(
-                f'<a href="{escape(row["href"])}" rel="noopener noreferrer">профиль</a>'
-            )
+            bits.append(f"цитирований: {escape(str(row['citations']))}")
         bits_rows.append(
-            f"<dt>{escape(row['label'])}</dt><dd>{' · '.join(bits) or '—'}</dd>"
+            f"<dt>{label_html}</dt><dd>{' · '.join(bits) if bits else ''}</dd>"
         )
     return (
-        "<h2>Наукометрия</h2>"
-        '<p class="metrics-note">Цифры и ссылки вносит сотрудник или редактор. '
-        "Сайт не подтягивает базы автоматически.</p>"
-        f'<dl class="metrics-list">{"".join(bits_rows)}</dl>'
+        '<div class="ichnm-person-metrics"><h2>Наукометрия</h2>'
+        f'<dl class="metrics-list">{"".join(bits_rows)}</dl></div>'
     )
 
 

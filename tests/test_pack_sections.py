@@ -9,6 +9,7 @@ from src.core.pack_sections import (
     ADMIN_UNIT_REQUIRED_CLASSES,
     LAB_PACK_SECTION_IDS,
     admin_unit_pack_html,
+    filled_lab_pack_section_ids,
     lab_pack_section_ids,
     lab_pack_skeleton_html,
     section_ids_in_html,
@@ -45,7 +46,13 @@ def test_lab_fixture_from_migrated_copy_keeps_pack_contract():
     labs = load_migrated_copy().get("labs") or []
     assert labs, "expected at least one lab in migrated copy"
     html = lab_pack_skeleton_html(lab=labs[0])
-    assert section_ids_in_html(html) == list(LAB_PACK_SECTION_IDS)
+    assert section_ids_in_html(html) == list(filled_lab_pack_section_ids(labs[0]))
+
+
+def test_empty_lab_hides_optional_sections():
+    html = lab_pack_skeleton_html(lab={"slug": "empty", "title": "Empty"})
+    assert section_ids_in_html(html) == ["about", "contacts"]
+    assert "появится" not in html
 
 
 def test_admin_unit_requires_unit_back_and_people_list():

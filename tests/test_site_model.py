@@ -46,17 +46,21 @@ def test_top_menu_covers_locked_information_architecture(model):
         "scientific-council",
         "facilities",
         "documents",
+        "e-appeals",
         "vacancies",
     ]
     research = model.menu_item("research")
     assert research.kind == "folder"
     assert [child.id for child in research.children] == [
         "science",
+        "student-nir",
+        "graduate-employment",
         "developments",
         "cooperation",
         "publications",
         "education",
     ]
+    assert research.href == "science"
     assert model.menu_item("science").title == "Направления работы"
     assert model.menu_item("science").children == ()
     assert model.menu_item("education").title == "Научно-ориентированное образование"
@@ -80,8 +84,8 @@ def test_about_and_education_children(model):
         "Докторантура",
         "Совет по защитам",
         "Стажировки",
-        "Курсы",
     } <= set(child.title for child in education.children)
+    assert "Курсы" not in {child.title for child in education.children}
 
 
 def test_documents_set(model):
@@ -89,9 +93,16 @@ def test_documents_set(model):
     assert {
         "Устав",
         "Антикоррупция",
-        "Электронные обращения",
+        "Для сотрудника",
     } <= set(child.title for child in docs.children)
+    assert "Электронные обращения" not in {child.title for child in docs.children}
     assert "Реквизиты" not in {child.title for child in docs.children}
+    about = model.menu_item("about")
+    assert "e-appeals" in {child.id for child in about.children}
+    assert model.menu_item("e-appeals").title == "Электронные обращения"
+    assert model.menu_item("for-staff").title == "Для сотрудника"
+    assert model.menu_item("student-nir").title == "Научно-исследовательская работа студентов"
+    assert model.menu_item("graduate-employment").title == "Трудоустройство выпускников"
 
 
 def test_homepage_rhythm_forbids_3d_promo(model):

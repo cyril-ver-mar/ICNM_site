@@ -342,7 +342,7 @@ def filled_copy() -> dict[str, Any]:
                 "phone": f"+375 (17) 200-0{ord(letter) % 10}-{10 + index:02d}",
                 "email": f"{pid.replace('lab-', '')}@ichnm.by",
                 "bio": [
-                    f"{name} — макетная персоналия лаборатории на букву {letter}.",
+                    f"{name} — сотрудник лаборатории. Область интересов: {pack['direction'][0].lower()}.",
                     pack["about"],
                 ],
                 "interests": [pack["direction"][0], f"Аналитика на букву {letter}"],
@@ -430,6 +430,8 @@ def filled_copy() -> dict[str, Any]:
         "chair": ("Новиков Николай Николаевич", "НН", "Председатель учёного совета"),
         "member-1": ("Орлова Ольга Олеговна", "ОО", "Член совета"),
         "member-2": ("Петров Павел Павлович", "ПП", "Член совета"),
+        "union-member-1": ("Романова Раиса Романовна", "РР", "Член профкома"),
+        "union-member-2": ("Семёнов Сергей Сергеевич", "СС", "Член профкома"),
     }
     for unit in data.get("admin_units") or []:
         for person in unit.get("people") or []:
@@ -447,6 +449,17 @@ def filled_copy() -> dict[str, Any]:
                     {"unit_id": "scientific-council", "role": person.get("role") or ""}
                 ],
             }
+    for person in data.get("union_people") or []:
+        _rename_dummy(person, office_names)
+        pid = str(person.get("id") or "")
+        if pid and pid not in by_id:
+            by_id[pid] = {
+                **person,
+                "bio": [f"{person.get('name')} — сотрудник первичной профсоюзной организации."],
+                "affiliations": [{"unit_id": "union", "role": person.get("role") or ""}],
+            }
+        elif pid in by_id:
+            _rename_dummy(by_id[pid], office_names)
     for pid, (name, initials, role) in office_names.items():
         if pid.startswith("smu-"):
             by_id[pid] = {
@@ -454,17 +467,85 @@ def filled_copy() -> dict[str, Any]:
                 "name": name,
                 "role": role,
                 "initials": initials,
-                "bio": [f"{name} — макетная персоналия совета молодых учёных."],
+                "bio": [f"{name} — сотрудник совета молодых учёных Института."],
                 "affiliations": [{"unit_id": "young-scientists", "role": role}],
             }
 
     data["people"] = list(by_id.values())
     pages = data.setdefault("pages", {})
     pages.setdefault("vacancies", {})["list"] = [
-        "Макет: младший научный сотрудник лаборатории на букву А (альгинатные системы).",
-        "Макет: инженер лаборатории на букву Г (гидравлический пресс).",
+        "Младший научный сотрудник лаборатории микро- и наноструктурированных систем.",
+        "Инженер отраслевой лаборатории термостойких полимерных композиционных материалов.",
     ]
+    # Demo contour: no empty-slot / pending prose for staff review.
+    for page in pages.values():
+        if not isinstance(page, dict):
+            continue
+        page.pop("empty_slot", None)
+        if page.get("paragraphs"):
+            page["paragraphs"] = [
+                p for p in page["paragraphs"] if not _pending_phrase(str(p))
+            ]
+        if page.get("list"):
+            page["list"] = [row for row in page["list"] if not _pending_phrase(str(row))]
+    for person in data.get("people") or []:
+        if not isinstance(person, dict):
+            continue
+        if person.get("bio"):
+            person["bio"] = [p for p in person["bio"] if not _pending_phrase(str(p))]
+        if person.get("publications"):
+            person["publications"] = [
+                row
+                for row in person["publications"]
+                if not (isinstance(row, str) and _pending_phrase(row))
+            ]
+    student = pages.setdefault("student-nir", {})
+    if not student.get("paragraphs"):
+        student["paragraphs"] = [
+            "Научно-исследовательская работа студентов в Институте: темы согласовываются с лабораториями и направлениями работы.",
+            "Контакт ответственного за студенческую НИР: ichnm@ichnm.by.",
+        ]
+    student["list"] = [
+        "Ответственный за студенческую НИР: см. контакты Института",
+        "См. Направления работы и Разработки",
+    ]
+    employment = pages.setdefault("graduate-employment", {})
+    if not employment.get("paragraphs"):
+        employment["paragraphs"] = [
+            "Институт поддерживает трудоустройство выпускников аспирантуры и связанных программ.",
+            "Актуальные вакансии — в разделе «Вакансии»; вопросы — в отдел кадров.",
+        ]
+    thin = pages.setdefault("thin-film-department", {})
+    if not thin.get("paragraphs"):
+        thin["paragraphs"] = [
+            "Отдел физико-химии тонкоплёночных материалов объединяет лаборатории наноструктур, "
+            "оптических плёнок и материалов и технологий ЖК-устройств.",
+        ]
+    lead = pages.setdefault("leadership", {})
+    if not lead.get("paragraphs"):
+        lead["paragraphs"] = [
+            "Научное руководство Института: директор, заместители, почётный директор, "
+            "учёный секретарь и сотрудник приёмной.",
+        ]
+    pub_years = data.get("publication_years")
+    if isinstance(pub_years, dict):
+        pub_years["note"] = ""
     return data
+
+
+def _pending_phrase(text: str) -> bool:
+    lower = text.lower()
+    return any(
+        m in lower
+        for m in (
+            "появится",
+            "появятся",
+            "передаст",
+            "после передачи",
+            "наполненный макет",
+            "рыба:",
+        )
+    )
 
 
 def _rename_dummy(person: dict[str, Any], mapping: dict[str, tuple[str, str, str]]) -> None:

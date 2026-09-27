@@ -34,7 +34,8 @@ def test_homepage_preview_has_identity_menu_footer_and_no_3d():
     assert "arc-blue" not in home
     assert "animateMotion" not in home
     assert "Основные направления" in home
-    assert "Опыт работы" in home
+    assert "лет институту" in home
+    assert "1998" not in home.split("stats-band")[1].split("</section>")[0]
     assert "data-count-to" in home
     assert "1998" in home
     assert "3d_printing" not in home
@@ -411,10 +412,14 @@ def test_filled_preview_is_letter_coded_and_separate():
     assert "Дмитриева" in filled["labs/woodchem/index.html"]
     assert any(path.startswith("media/fish/") and path.endswith(".svg") for path in filled)
     assert "photo-slot is-filled" in nano
-    assert "Макетный файл" in filled["charter.html"]
-    assert "младший научный сотрудник" in filled["vacancies.html"]
+    assert "младший научный сотрудник" in filled["vacancies.html"].lower() or "Младший научный сотрудник" in filled["vacancies.html"]
     assert "empty-state" not in filled["vacancies.html"]
-    assert "Наполненный макет" in filled["index.html"]
+    assert "Наполненный макет" not in filled["index.html"]
+    assert "fish-banner" not in filled["index.html"]
+    assert "filled-ribbon" not in filled["index.html"]
+    assert "появится" not in filled["labs/nano/index.html"].lower()
+    assert "thin-film-department" in filled["structure.html"]
+    assert "Для студентов" in filled["index.html"] or "for-students" in filled["index.html"]
     assert "Ильина" in filled["young-scientists.html"]
     assert "Фамилия Имя Отчество" in honest["young-scientists.html"]
     assert "Место для официального фото" in honest["people/rogachev/index.html"]

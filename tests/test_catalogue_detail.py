@@ -16,6 +16,20 @@ def test_parents_are_science_developments_facilities():
     assert CATALOGUE_PARENTS == ("science", "developments", "facilities")
 
 
+def test_lab_pack_development_deeplink_matches_catalogue():
+    """Ticket 65: lab pack tile href == catalogue detail path for the same slug."""
+    found = False
+    for lab in roster.labs():
+        for item in lab.get("developments") or []:
+            slug = str(item.get("slug") or "")
+            if not slug:
+                continue
+            found = True
+            assert catalogue_detail_path("developments", slug) == f"/developments/{slug}/"
+            assert find_catalogue_item("developments", slug) is not None
+    assert found, "expected at least one lab development with a slug"
+
+
 def test_fixture_slug_from_migrated_copy_has_required_fields():
     item = find_catalogue_item("developments", "immuno-spheres")
     assert item is not None

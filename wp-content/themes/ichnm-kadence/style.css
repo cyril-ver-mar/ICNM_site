@@ -4,7 +4,7 @@ Theme URI: https://ichnm.by/
 Description: Дочерняя тема Kadence для официального сайта ИХНМ НАН Беларуси.
 Author: ИХНМ
 Template: kadence
-Version: 0.3.28
+Version: 0.3.40
 Text Domain: ichnm-kadence
 */
 
@@ -306,11 +306,12 @@ html.theme-night body.home .ichnm-chrome.is-scrolled .ichnm-mark {
   color: inherit;
   text-decoration: none;
   min-width: 2.2rem;
-  min-height: 44px;
+  min-height: 2.5rem;
   display: grid;
   place-items: center;
   padding: 0 0.35rem;
   box-sizing: border-box;
+  border-radius: 0.35rem;
 }
 
 .ichnm-lang-switch a.is-current {
@@ -365,7 +366,7 @@ html.theme-night body.home .ichnm-chrome.is-scrolled .ichnm-mark {
   z-index: 80;
   min-width: 17rem;
   max-width: min(24rem, 90vw);
-  background: var(--ichnm-navy);
+  background: var(--submenu-bg, #0f2a43);
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 12px 28px rgba(10, 28, 46, 0.35);
   flex-direction: column;
@@ -385,16 +386,89 @@ html.theme-night body.home .ichnm-chrome.is-scrolled .ichnm-mark {
 
 .ichnm-menu .sub-menu a {
   display: block;
-  padding: 0.55rem 0.85rem;
+  padding: 0.7em 1em;
   white-space: normal;
   line-height: 1.35;
   color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ichnm-menu .sub-menu > li:last-child > a {
+  border-bottom: 0;
+}
+
+.ichnm-menu .menu-item-has-children > a::after,
+.ichnm-menu .menu-item-has-children > .nav-parent > a::after {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 0.45rem;
+  vertical-align: 0.15em;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 5px solid currentColor;
+  opacity: 0.75;
+}
+
+.ichnm-menu .nav-parent {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.ichnm-menu .nav-parent > a {
+  flex: 1 1 auto;
+}
+
+.ichnm-menu .submenu-toggle {
+  display: none;
+  appearance: none;
+  place-items: center;
+  width: 2.75rem;
+  min-width: 2.75rem;
+  min-height: 2.5rem;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ichnm-menu .submenu-toggle::before {
+  content: "+";
+  font-family: var(--ichnm-font-display);
+  font-size: 1.35rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.ichnm-menu .menu-item.is-open > .nav-parent > .submenu-toggle::before,
+.ichnm-menu .menu-item-has-children.is-open > .nav-parent > .submenu-toggle::before {
+  content: "−";
 }
 
 .ichnm-menu .sub-menu .sub-menu {
   top: 0;
   left: 100%;
-  margin-left: 0.15rem;
+  margin-left: 0;
+  /* Invisible bridge so cursor does not drop hover when moving to flyout (ticket 62). */
+  padding-left: 0.35rem;
+  margin-left: -0.2rem;
+}
+
+.ichnm-menu .sub-menu > li {
+  position: relative;
+}
+
+.ichnm-menu .sub-menu > li.menu-item-has-children > .sub-menu::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -0.45rem;
+  width: 0.55rem;
 }
 
 .ichnm-menu .sub-menu > li:hover > .sub-menu,
@@ -409,10 +483,30 @@ html.theme-night body.home .ichnm-chrome.is-scrolled .ichnm-mark {
     align-items: stretch;
   }
 
+  .ichnm-menu .menu-item-has-children > a::after,
+  .ichnm-menu .menu-item-has-children > .nav-parent > a::after {
+    display: none;
+  }
+
+  .ichnm-menu .submenu-toggle {
+    display: grid;
+    border-left: 1px solid rgba(255, 255, 255, 0.22);
+    color: #fff;
+  }
+
+  .ichnm-menu .menu > li:hover > .sub-menu,
+  .ichnm-menu .menu > li:focus-within > .sub-menu,
+  .ichnm-menu .ichnm-menu-list > li:hover > .sub-menu,
+  .ichnm-menu .ichnm-menu-list > li:focus-within > .sub-menu,
+  .ichnm-menu .sub-menu > li:hover > .sub-menu,
+  .ichnm-menu .sub-menu > li:focus-within > .sub-menu {
+    display: none;
+  }
+
   .ichnm-menu .sub-menu,
   .ichnm-menu .sub-menu .sub-menu {
     position: static;
-    display: flex;
+    display: none;
     box-shadow: none;
     border: 0;
     border-left: 2px solid rgba(255, 255, 255, 0.18);
@@ -420,6 +514,11 @@ html.theme-night body.home .ichnm-chrome.is-scrolled .ichnm-mark {
     min-width: 0;
     max-width: none;
     background: transparent;
+  }
+
+  .ichnm-menu .menu-item.is-open > .sub-menu,
+  .ichnm-menu .menu-item-has-children.is-open > .sub-menu {
+    display: flex;
   }
 }
 
@@ -668,7 +767,7 @@ body.single {
 
 .ichnm-stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.5rem 3rem;
 }
 
@@ -891,11 +990,18 @@ body.single {
 /* —— Footer (ticket 27: preview contour) —— */
 .ichnm-footer,
 .ichnm-footer-extra {
-  background: var(--ichnm-navy-deep);
-  color: #fff;
+  background: #061018;
+  color: #f0f6fb;
   padding: 2.5rem 0 0;
   margin-top: 0;
   font-size: 0.92rem;
+  border-top: 3px solid var(--ichnm-accent);
+}
+
+html.theme-night .ichnm-footer,
+html.theme-night .ichnm-footer-extra {
+  background: #02080e;
+  border-top-color: color-mix(in srgb, var(--ichnm-accent) 75%, #fff);
 }
 
 .ichnm-footer a,
@@ -1008,9 +1114,10 @@ body.single {
 }
 
 .footer-pictograms {
-  background: #071018;
+  background: #040b12;
   padding: 1.1rem 0 1.4rem;
   margin-top: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .picto-strip {
@@ -1144,11 +1251,24 @@ body.single {
   width: 4.5rem;
   height: 4.5rem;
   border-radius: 0;
-  background: var(--ichnm-muted);
+  background:
+    linear-gradient(160deg, rgba(40, 167, 234, 0.16), rgba(15, 42, 67, 0.08)),
+    repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(15, 42, 67, 0.04) 8px, rgba(15, 42, 67, 0.04) 9px);
   color: var(--ichnm-navy);
   font-family: var(--ichnm-font-display);
   font-weight: 700;
   font-size: 1.1rem;
+}
+
+.ichnm-person-card-photo.photo-slot {
+  min-height: 0;
+  padding: 0;
+  width: 4.5rem;
+  height: 4.5rem;
+}
+
+.ichnm-person-card-photo.photo-slot span {
+  font-size: 1.05rem;
 }
 
 .ichnm-person-card-body {
@@ -1299,7 +1419,15 @@ body.single {
   font-size: clamp(1.7rem, 3vw, 2.35rem);
   letter-spacing: -0.025em;
   line-height: 1.15;
-  color: var(--ichnm-navy);
+  color: var(--ichnm-ink);
+}
+
+html.theme-night .ichnm-page-head h1,
+html.theme-night .ichnm-page-body h2,
+html.theme-night .ichnm-single-body h2,
+html.theme-night .page .entry-content h2,
+html.theme-night .single-department .entry-content h2 {
+  color: var(--ink);
 }
 
 .ichnm-page-intro {
@@ -1317,7 +1445,7 @@ body.single {
   font-size: clamp(1.25rem, 2vw, 1.5rem);
   letter-spacing: -0.02em;
   line-height: 1.25;
-  color: var(--ichnm-navy);
+  color: var(--ichnm-ink);
 }
 
 .ichnm-page-body h2:first-child,
@@ -1353,6 +1481,226 @@ body.single {
   .ichnm-structure-labs {
     columns: 1;
   }
+}
+
+/* Structure tiles (ticket 42) — preview lab-grid / dir-grid */
+.lab-grid,
+.dir-grid,
+.ichnm-structure-grid,
+.ichnm-lab-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.lab-grid a,
+.dir-grid a,
+.ichnm-structure-grid a,
+.ichnm-lab-tile-grid a {
+  display: block;
+  background: var(--ichnm-paper);
+  box-shadow: var(--ichnm-shadow);
+  padding: 1.15rem 1.25rem;
+  text-decoration: none;
+  color: var(--ichnm-ink);
+  min-height: 5.5rem;
+  font-family: var(--ichnm-font-display);
+  font-weight: 600;
+  line-height: 1.35;
+  transition: transform 160ms ease, color 160ms ease;
+}
+
+.lab-grid a:hover,
+.dir-grid a:hover,
+.ichnm-structure-grid a:hover,
+.ichnm-lab-tile-grid a:hover {
+  transform: translateY(-2px);
+  color: var(--ichnm-navy);
+}
+
+.ichnm-structure-head {
+  margin: 0.4rem 0 0;
+  font-family: var(--ichnm-font-body, Roboto, sans-serif);
+  font-weight: 400;
+  font-size: 0.88rem;
+  color: var(--palette5);
+}
+
+html.theme-night .ichnm-structure-head,
+html.theme-night .ichnm-structure-role,
+html.theme-night .lab-grid a,
+html.theme-night .dir-grid a,
+html.theme-night .ichnm-structure-grid a,
+html.theme-night .ichnm-lab-tile-grid a {
+  color: var(--ink);
+}
+
+html.theme-night .ichnm-structure-head {
+  color: var(--palette4);
+}
+
+.ichnm-structure-role {
+  display: inline;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
+/* Thin-film department under Лаборатории (tickets 55 / 71). */
+.ichnm-thin-film-group {
+  margin: 0 0 1.25rem;
+  padding: 0.35rem 0 0.15rem 0;
+  /* Ticket 71: no vertical accent stripe (lab tile accents remain). */
+  border-left: 0;
+}
+
+.ichnm-thin-film-label {
+  margin: 0 0 0.65rem;
+  font-family: var(--ichnm-font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ichnm-ink);
+}
+
+html.theme-night .ichnm-thin-film-label {
+  color: var(--ink);
+}
+
+/* Lab accent line on structure + catalogue tiles (ticket 57). */
+.ichnm-lab-tile > a,
+.ichnm-catalogue-card[data-lab-slug],
+.cover-card[data-lab-slug],
+.lab-equip-card[data-lab-slug] {
+  border-top: 3px solid var(--lab-accent, var(--ichnm-accent));
+}
+
+.ichnm-structure-group {
+  display: grid;
+  gap: 0;
+  background: var(--ichnm-paper);
+  box-shadow: var(--ichnm-shadow);
+  border-top: 3px solid var(--lab-accent, var(--ichnm-accent));
+}
+
+.ichnm-structure-group > a {
+  box-shadow: none;
+  min-height: 0;
+}
+
+.ichnm-structure-group > a + a,
+.ichnm-structure-sub {
+  border-top: 1px solid var(--ichnm-line);
+  font-weight: 500;
+  font-size: 0.95rem;
+  min-height: 0;
+  padding-top: 0.85rem;
+  padding-bottom: 0.95rem;
+}
+
+.ichnm-coop-place,
+.ichnm-catalogue-card .ichnm-coop-place {
+  margin: 0.75rem 1.1rem 0;
+  font-size: 0.82rem;
+  color: var(--palette5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.ichnm-map-place {
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+  color: var(--palette5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.ichnm-pubs-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem);
+  gap: 1.5rem 2rem;
+  align-items: start;
+}
+
+.ichnm-pubs-sidebar {
+  position: sticky;
+  top: 5.5rem;
+}
+
+.ichnm-pubs-sidebar .ichnm-pub-chart {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .ichnm-pubs-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ichnm-pubs-sidebar {
+    position: static;
+    order: -1;
+  }
+}
+
+.pub-year {
+  margin: 1.35rem 0 1.85rem;
+}
+
+.pub-year h2 {
+  font-family: var(--ichnm-font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.55rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--ichnm-line);
+}
+
+.lab-hero {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0 0 2rem;
+}
+
+.lab-hero-photo .photo-slot {
+  min-height: 16rem;
+  aspect-ratio: 16 / 9;
+}
+
+.lab-hero-copy h2 {
+  margin-top: 0;
+}
+
+@media (min-width: 820px) {
+  .lab-hero {
+    grid-template-columns: minmax(18rem, 1.35fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .lab-hero-photo .photo-slot {
+    min-height: 18rem;
+  }
+}
+
+html.theme-night .lab-grid a,
+html.theme-night .dir-grid a,
+html.theme-night .ichnm-structure-grid a,
+html.theme-night .ichnm-lab-tile-grid a,
+html.theme-night .ichnm-structure-group {
+  background: var(--ichnm-paper);
+  color: var(--ichnm-ink);
+}
+
+html.theme-night .lab-grid a:hover,
+html.theme-night .dir-grid a:hover,
+html.theme-night .ichnm-structure-grid a:hover,
+html.theme-night .ichnm-lab-tile-grid a:hover {
+  color: var(--ichnm-accent);
 }
 
 /* Cooperation section: pops must escape the map box (ticket 21). */
@@ -1640,6 +1988,30 @@ body.single {
   margin-bottom: 1.5rem;
 }
 
+.ichnm-pubs-hub .ichnm-crumbs {
+  margin-top: 0.35rem;
+  margin-bottom: 1.15rem;
+  padding-left: 0;
+}
+
+.ichnm-detail-hero-narrow {
+  max-width: 42rem;
+  margin: 0 0 1.25rem;
+}
+
+.ichnm-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem);
+  gap: 1.5rem 2rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .ichnm-detail-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 .ichnm-hub-links {
   columns: 2;
   gap: 1.25rem;
@@ -1730,8 +2102,6 @@ body.single {
 
 .ichnm-menu-toggle {
   display: none;
-  align-items: center;
-  justify-content: center;
 }
 
 .ichnm-bvi {
@@ -1739,6 +2109,42 @@ body.single {
   z-index: 2;
   display: inline-flex;
   align-items: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ichnm-bvi-plugin-host {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.ichnm-bvi-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  padding-left: 0.55rem;
+  padding-right: 0.55rem;
+}
+
+.ichnm-bvi-toggle .ichnm-bvi-icon {
+  display: inline-block;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin: 0;
+  background: currentColor;
+  /* Larger eye mark; same tool frame (ticket 69). */
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 5c-5 0-9 4.5-10 7 1 2.5 5 7 10 7s9-4.5 10-7c-1-2.5-5-7-10-7zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-2.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 5c-5 0-9 4.5-10 7 1 2.5 5 7 10 7s9-4.5 10-7c-1-2.5-5-7-10-7zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-2.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.ichnm-bvi-toggle .ichnm-bvi-label {
+  display: none;
 }
 
 .ichnm-bvi .bvi-shortcode,
@@ -1749,13 +2155,19 @@ body.single {
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  min-height: 44px;
-  padding: 0.45rem 0.7rem;
-  border: 1px solid var(--ichnm-header-btn-border);
+  min-height: 2.5rem;
+  min-width: 2.5rem;
+  max-width: none;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--header-btn-border, var(--ichnm-header-btn-border));
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 0.35rem;
   background: transparent;
   color: inherit !important;
   text-decoration: none !important;
-  font: 600 0.78rem/1.2 inherit;
+  font: 600 0.78rem/1.2 var(--ichnm-font-display);
+  letter-spacing: normal;
   cursor: pointer;
   touch-action: manipulation;
   vertical-align: middle;
@@ -2003,6 +2415,14 @@ html.bvi-active .footer-pictograms {
   background: var(--ichnm-navy-deep);
   transform-origin: top center;
   pointer-events: none;
+  /* Hidden by default so removing js-motion (BVI on→off) cannot leave a solid navy pane. */
+  display: none;
+}
+
+/* Show only while the page-open wipe is armed / running. */
+html.js-motion:not(.is-entered) .ichnm-page-veil,
+html.js-motion.is-entered .ichnm-page-veil {
+  display: block;
 }
 
 html.js-motion.is-entered .ichnm-page-veil {
@@ -2033,6 +2453,34 @@ html.js-motion.is-entered .ichnm-home .ichnm-stats {
 html.js-motion.is-entered .ichnm-home .ichnm-home-band {
   animation: ichnm-rise-in 0.5s 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+
+html.js-motion body:not(.home) .ichnm-page-hero,
+html.js-motion body:not(.home) .page-hero,
+html.js-motion .ichnm-page .ichnm-page-hero,
+html.js-motion .ichnm-page .entry-header,
+html.js-motion .ichnm-vitrine,
+html.js-motion .ichnm-page .entry-content > * {
+  opacity: 0;
+  transform: translateY(0.85rem);
+}
+
+html.js-motion.is-entered body:not(.home) .ichnm-page-hero,
+html.js-motion.is-entered body:not(.home) .page-hero,
+html.js-motion.is-entered .ichnm-page .ichnm-page-hero,
+html.js-motion.is-entered .ichnm-page .entry-header {
+  animation: ichnm-rise-in 0.55s 0.12s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+html.js-motion.is-entered .ichnm-vitrine,
+html.js-motion.is-entered .ichnm-page .entry-content > *:nth-child(1) { animation: ichnm-rise-in 0.5s 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+html.js-motion.is-entered .ichnm-page .entry-content > *:nth-child(2) { animation: ichnm-rise-in 0.5s 0.24s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+html.js-motion.is-entered .ichnm-page .entry-content > *:nth-child(3) { animation: ichnm-rise-in 0.5s 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+html.js-motion.is-entered .ichnm-page .entry-content > *:nth-child(4) { animation: ichnm-rise-in 0.5s 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+html.js-motion.is-entered .ichnm-page .entry-content > *:nth-child(5) { animation: ichnm-rise-in 0.5s 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+html.js-motion.is-entered .ichnm-page .entry-content > *:nth-child(6) { animation: ichnm-rise-in 0.5s 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+html.js-motion.is-entered .ichnm-page .entry-content > *:nth-child(7) { animation: ichnm-rise-in 0.5s 0.54s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+html.js-motion.is-entered .ichnm-page .entry-content > *:nth-child(8) { animation: ichnm-rise-in 0.5s 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+html.js-motion.is-entered .ichnm-page .entry-content > *:nth-child(n+9) { animation: ichnm-rise-in 0.5s 0.66s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 
 @keyframes ichnm-rise-in {
   from { opacity: 0; transform: translateY(1rem); }
@@ -2078,7 +2526,6 @@ html.is-bvi .ichnm-home .ichnm-home-band {
 }
 
 .ichnm-tool-btn,
-.ichnm-menu-toggle,
 .ichnm-write-btn,
 .tool-btn {
   appearance: none;
@@ -2086,9 +2533,32 @@ html.is-bvi .ichnm-home .ichnm-home-band {
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  min-height: 44px;
-  padding: 0.45rem 0.7rem;
+  min-height: 2.5rem;
+  min-width: 2.5rem;
+  padding: 0.4rem 0.65rem;
   border: 1px solid var(--header-btn-border, var(--ichnm-header-btn-border));
+  border-radius: 0.35rem;
+  background: transparent;
+  color: var(--header-fg, #fff);
+  text-decoration: none;
+  font: 600 0.78rem/1.2 var(--ichnm-font-display);
+  cursor: pointer;
+  touch-action: manipulation;
+  vertical-align: middle;
+  transition: transform 100ms ease-out, background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.ichnm-menu-toggle {
+  appearance: none;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 2.5rem;
+  min-width: 2.5rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--header-btn-border, var(--ichnm-header-btn-border));
+  border-radius: 0.35rem;
   background: transparent;
   color: var(--header-fg, #fff);
   text-decoration: none;
@@ -2342,6 +2812,20 @@ body.single .entry-header {
   margin: 0 0 1.5rem;
 }
 
+.leader-profile-media {
+  display: grid;
+  gap: 1rem;
+}
+
+.leader-profile-media .ichnm-person-metrics {
+  margin: 0;
+}
+
+.leader-profile-media .ichnm-person-metrics h2 {
+  margin-top: 0;
+  font-size: 1.05rem;
+}
+
 .leader-photo {
   display: grid;
   place-items: center;
@@ -2408,7 +2892,9 @@ body.single .entry-header {
 .ichnm-about-figure {
   margin: 0;
   border: 1px solid var(--ichnm-line);
-  background: #fff;
+  background:
+    linear-gradient(160deg, rgba(40, 167, 234, 0.12), rgba(15, 42, 67, 0.06)),
+    var(--ichnm-muted);
 }
 
 .ichnm-about-figure img {
@@ -2416,13 +2902,20 @@ body.single .entry-header {
   width: 100%;
   height: auto;
   aspect-ratio: 4 / 3;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  background: transparent;
 }
 
 .ichnm-about-figure figcaption {
   padding: 0.55rem 0.7rem 0.7rem;
   font-size: 0.86rem;
-  color: #4a5568;
+  color: var(--palette5);
+}
+
+html.theme-night .ichnm-about-figure figcaption,
+html.theme-night figcaption {
+  color: var(--palette4);
 }
 
 @media (max-width: 700px) {
@@ -2622,9 +3115,21 @@ body.single .entry-header {
   width: 5rem;
   height: 5rem;
   border-radius: 0;
-  background: var(--ichnm-navy);
-  color: #fff;
+  background:
+    linear-gradient(160deg, rgba(40, 167, 234, 0.16), rgba(15, 42, 67, 0.08)),
+    repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(15, 42, 67, 0.04) 8px, rgba(15, 42, 67, 0.04) 9px);
+  color: var(--ichnm-navy);
   font-weight: 700;
+}
+
+.people-list .ichnm-person-card-photo.photo-slot {
+  min-height: 0;
+  padding: 0;
+}
+
+.people-list .ichnm-person-card-photo.photo-slot span {
+  color: var(--ichnm-navy);
+  font-size: 1.15rem;
 }
 
 .lab-contacts {
@@ -2874,6 +3379,33 @@ html.theme-night .photo-slot,
 html.theme-night .photo-slot span,
 html.theme-night .pub-chart figcaption,
 html.theme-night .ichnm-pub-chart figcaption,
+html.theme-night .leader-card,
+html.theme-night .leader-card a,
+html.theme-night .leader-role,
+html.theme-night .info-card,
+html.theme-night .info-card p,
+html.theme-night .info-card .leader-role,
+html.theme-night .people-list .ichnm-person-card,
+html.theme-night .people-list .ichnm-person-card a,
+html.theme-night .ichnm-person-card-name,
+html.theme-night .ichnm-person-card-phone,
+html.theme-night .ichnm-person-card-email,
+html.theme-night .lab-grid a,
+html.theme-night .entry-title,
+html.theme-night .ichnm-page-hero h1,
+html.theme-night .page-hero h1,
+html.theme-night .ichnm-page .entry-content,
+html.theme-night .ichnm-page .entry-content h1,
+html.theme-night .ichnm-page .entry-content h2,
+html.theme-night .ichnm-page .entry-content h3,
+html.theme-night .ichnm-page .entry-content p,
+html.theme-night .ichnm-vitrine,
+html.theme-night .ichnm-unit-page,
+html.theme-night .lab-equip-card,
+html.theme-night .lab-equip-card h3,
+html.theme-night .lab-equip-card p {
+  color: var(--ink);
+}
 html.theme-night .lab-equip-card,
 html.theme-night .lab-equip-card h3,
 html.theme-night .info-card h3,
@@ -2986,6 +3518,59 @@ html.is-bvi .cookie-banner {
   box-shadow: none !important;
 }
 
+/* Theme BVI fallback (ticket 51) — high-contrast page shell when plugin absent */
+html.is-bvi,
+html.is-bvi body,
+html.bvi-active,
+html.bvi-active body {
+  background: #fff !important;
+  color: #000 !important;
+}
+
+html.is-bvi .ichnm-chrome,
+html.bvi-active .ichnm-chrome,
+html.is-bvi .ichnm-footer,
+html.bvi-active .ichnm-footer {
+  background: #fff !important;
+  color: #000 !important;
+  border-color: #000 !important;
+}
+
+html.is-bvi a,
+html.bvi-active a {
+  color: #0000ee !important;
+}
+
+html.is-bvi .ichnm-tool-btn,
+html.bvi-active .ichnm-tool-btn,
+html.is-bvi .ichnm-bvi-toggle,
+html.bvi-active .ichnm-bvi-toggle,
+html.is-bvi .ichnm-lang-switch a,
+html.bvi-active .ichnm-lang-switch a {
+  color: #000 !important;
+  border-color: #000 !important;
+  background: #fff !important;
+}
+
+html.is-bvi .ichnm-bvi-toggle .ichnm-bvi-icon,
+html.bvi-active .ichnm-bvi-toggle .ichnm-bvi-icon {
+  background: #000 !important;
+}
+
+html.is-bvi .ichnm-chrome .ichnm-identity-text,
+html.bvi-active .ichnm-chrome .ichnm-identity-text,
+html.is-bvi .ichnm-brand-wordmark,
+html.bvi-active .ichnm-brand-wordmark {
+  color: #000 !important;
+}
+
+html.is-bvi .hero-lattice,
+html.bvi-active .hero-lattice,
+html.is-bvi .ichnm-page-veil,
+html.bvi-active .ichnm-page-veil {
+  display: none !important;
+}
+
 @media (max-width: 720px) {
   .cookie-banner {
     left: 0;
@@ -3001,3 +3586,174 @@ html.is-bvi .cookie-banner {
     grid-template-columns: 1fr;
   }
 }
+
+/* —— Acceptance vitrine / BVI / maps (tickets 67–80) —— */
+
+.ichnm-brand-wordmark {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ichnm-brand-wordmark:hover {
+  color: var(--ichnm-accent);
+}
+
+.ichnm-person-card-email {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.88rem;
+  color: #4a5568;
+}
+
+.ichnm-lab-team {
+  border-top: 3px solid var(--lab-accent, var(--ichnm-accent));
+  padding-top: 0.75rem;
+}
+
+.ichnm-lab-tile-grid .ichnm-lab-tile > a,
+.ichnm-lab-tile > a {
+  border-top: 3px solid var(--lab-accent, var(--ichnm-accent));
+}
+
+.ichnm-contacts-maps {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+  align-items: stretch;
+}
+
+.ichnm-yandex-map {
+  min-height: 320px;
+  background: var(--ichnm-paper);
+  box-shadow: var(--ichnm-shadow);
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .ichnm-contacts-maps {
+    grid-template-columns: 1fr;
+  }
+}
+
+html.theme-night .leader-role,
+html.theme-night .ichnm-structure-role,
+html.theme-night .ichnm-person-card-role,
+html.theme-night .ichnm-catalogue-meta,
+html.theme-night .ichnm-pub-year,
+html.theme-night .pub-year {
+  color: #c8d7e8;
+}
+
+.ichnm-demo-mark {
+  font-size: 0.9rem;
+  color: var(--palette5);
+}
+
+.conf-card h3,
+.conf-card .ichnm-catalogue-title,
+.ichnm-coop-place {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.ichnm-pubs-sidebar .ichnm-lab-plaque {
+  display: block;
+  height: 0.35rem;
+  margin: 0 0 0.75rem;
+  background: var(--lab-accent, var(--ichnm-accent));
+}
+
+/* Documents: normal tile grid, not cover-card photo checkerboard (ticket 61). */
+.ichnm-doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 1.75rem;
+}
+
+.ichnm-doc-grid .ichnm-doc-tile,
+a.ichnm-doc-tile {
+  display: block;
+  background: var(--ichnm-paper);
+  box-shadow: var(--ichnm-shadow);
+  padding: 1.15rem 1.25rem;
+  text-decoration: none;
+  color: var(--ichnm-ink);
+  font-family: var(--ichnm-font-display);
+  font-weight: 600;
+  line-height: 1.35;
+  min-height: 4.5rem;
+}
+
+.ichnm-doc-grid .ichnm-doc-tile .photo-slot {
+  display: none;
+}
+
+html.theme-night .ichnm-doc-grid .ichnm-doc-tile,
+html.theme-night a.ichnm-doc-tile {
+  background: #132536;
+  color: var(--ink);
+}
+
+/* AIST archive first line without overflow (ticket 64). */
+.conf-card .ichnm-catalogue-meta,
+.ichnm-catalogue-card.conf-card > p:first-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* In-site PDF viewer + download (ticket 66). */
+.ichnm-pdf-viewer {
+  margin: 1.25rem 0 1.75rem;
+  border: 1px solid var(--ichnm-line);
+  background: var(--ichnm-paper);
+  box-shadow: var(--ichnm-shadow);
+}
+
+.ichnm-pdf-viewer iframe,
+.ichnm-pdf-viewer embed,
+.ichnm-pdf-viewer object {
+  display: block;
+  width: 100%;
+  min-height: 70vh;
+  border: 0;
+}
+
+.ichnm-pdf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0.75rem 0 1.5rem;
+}
+
+.ichnm-cta-appeals {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.55rem 1.15rem;
+  margin: 0.35rem 0 1rem;
+  border: 1px solid var(--ichnm-accent);
+  border-radius: 0.35rem;
+  background: var(--ichnm-accent);
+  color: #fff !important;
+  font-family: var(--ichnm-font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none !important;
+}
+
+.ichnm-cta-appeals:hover {
+  background: var(--ichnm-accent-hover);
+  border-color: var(--ichnm-accent-hover);
+  color: #fff !important;
+}
+
+.ichnm-about-science-cta {
+  margin: 1.25rem 0 1.75rem;
+}
+

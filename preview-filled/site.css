@@ -1679,10 +1679,16 @@ a.leader-card:hover {
 .form button:hover { background: var(--accent-hover); }
 
 .ichnm-footer {
-  background: var(--navy-deep);
-  color: #fff;
+  background: #061018;
+  color: #f0f6fb;
   padding: 2.5rem 0 2.75rem;
   font-size: 0.92rem;
+  border-top: 3px solid var(--accent);
+}
+
+html.theme-night .ichnm-footer {
+  background: #02080e;
+  border-top-color: color-mix(in srgb, var(--accent) 75%, #fff);
 }
 
 .ichnm-footer a { color: #fff; }
@@ -2473,9 +2479,10 @@ html.theme-night .cover-card .cover-meta {
 }
 
 .footer-pictograms {
-  background: #071018;
+  background: #040b12;
   padding: 1.1rem 0 1.4rem;
   margin-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .picto-strip {

@@ -53,6 +53,8 @@ function ichnm_migrated_copy_path(): string
 
 require_once __DIR__ . '/includes/content-sync.php';
 require_once __DIR__ . '/includes/colleague-packet.php';
+require_once __DIR__ . '/includes/person-admin.php';
+require_once __DIR__ . '/includes/catalogue-admin.php';
 require_once __DIR__ . '/includes/polylang-setup.php';
 require_once __DIR__ . '/includes/roles.php';
 require_once __DIR__ . '/includes/feedback.php';
@@ -136,25 +138,32 @@ function ichnm_home_copy(): array
 
 function ichnm_register_post_types(): void
 {
+    // [plural, singular, rewrite slug, has_archive, menu_position]
     $types = [
-        'news' => ['Новости', 'Новость', 'news', false],
+        'news' => ['Новости', 'Новость', 'news', false, 20],
         // Public URLs match honest preview: /conferences/{slug}/ (not /event/).
-        'event' => ['Мероприятия', 'Мероприятие', 'conferences', false],
-        'media_about' => ['СМИ о нас', 'Публикация СМИ', 'media-about', true],
-        'publication' => ['Публикации', 'Публикация', 'publication', false],
-        'department' => ['Подразделения', 'Подразделение', 'labs', true],
-        'person' => ['Персоналии', 'Персона', 'people', true],
+        'event' => ['Мероприятия', 'Мероприятие', 'conferences', false, 21],
+        'media_about' => ['СМИ о нас', 'Публикация СМИ', 'media-about', true, 22],
+        'publication' => ['Публикации', 'Публикация', 'publication', false, 23],
+        'department' => ['Подразделения', 'Подразделение', 'labs', true, 24],
+        'person' => ['Персоналии', 'Персона', 'people', true, 25],
+        // Lab catalogue CPTs (hubs remain pages; singles share path bases). Ticket 82.
+        'direction' => ['Направления', 'Направление', 'science', false, 26],
+        'facility' => ['Оборудование', 'Прибор', 'facilities', false, 27],
+        'development' => ['Разработки', 'Разработка', 'developments', false, 28],
     ];
     foreach ($types as $id => $pair) {
         register_post_type($id, [
             'labels' => [
                 'name' => $pair[0],
                 'singular_name' => $pair[1],
+                'add_new_item' => 'Добавить: ' . $pair[1],
+                'edit_item' => 'Редактировать: ' . $pair[1],
             ],
             'public' => true,
             'has_archive' => $pair[3],
             'show_in_rest' => true,
-            'menu_position' => 20,
+            'menu_position' => $pair[4],
             'supports' => ['title', 'editor', 'excerpt', 'thumbnail', 'custom-fields'],
             'rewrite' => ['slug' => $pair[2]],
             'capability_type' => 'post',
@@ -247,8 +256,16 @@ function ichnm_add_menu_branch(int $menu_id, array $items, int $parent_id = 0): 
                 $args['menu-item-url'] = home_url('/labs/' . rawurlencode((string) ($item['slug'] ?? '')) . '/');
             }
         } elseif ($kind === 'folder') {
+            // Folder stays label-like in IA, but pointer opens first-child shortcut when href set (ticket 70).
+            $folder_target = trim((string) ($item['href'] ?? ''));
+            if ($folder_target === '' && $id === 'research') {
+                $folder_target = 'science';
+            }
+            $folder_page = $folder_target !== '' ? get_page_by_path($folder_target) : null;
             $args['menu-item-type'] = 'custom';
-            $args['menu-item-url'] = '#';
+            $args['menu-item-url'] = $folder_page instanceof WP_Post
+                ? (string) get_permalink($folder_page)
+                : ($folder_target !== '' ? home_url('/' . rawurlencode($folder_target) . '/') : '#');
         } elseif ($feed && ($archive = get_post_type_archive_link($feed))) {
             $args['menu-item-type'] = 'custom';
             $args['menu-item-url'] = $archive;
@@ -411,10 +428,46 @@ add_shortcode('ichnm_minsk_map', 'ichnm_minsk_map_shortcode');
 function ichnm_feedback_redirect_target(): string
 {
     $redirect = function_exists('ichnm_translated_page')
-        ? ichnm_translated_page('feedback')
-        : get_page_by_path('feedback');
-    return $redirect instanceof WP_Post ? (string) get_permalink($redirect) : home_url('/feedback/');
+        ? ichnm_translated_page('contacts')
+        : get_page_by_path('contacts');
+    $base = $redirect instanceof WP_Post ? (string) get_permalink($redirect) : home_url('/contacts/');
+    return $base . '#feedback';
 }
+
+/**
+ * Legacy IA URLs → merged pages (tickets 41, 50).
+ */
+function ichnm_parity_redirects(): void
+{
+    if (is_admin() || wp_doing_ajax() || wp_doing_cron()) {
+        return;
+    }
+    if (!is_singular('page')) {
+        return;
+    }
+    $post = get_queried_object();
+    if (!$post instanceof WP_Post) {
+        return;
+    }
+    $slug = (string) $post->post_name;
+    $base = preg_replace('/-(en|be|zh)$/', '', $slug) ?: $slug;
+    $lang_suffix = ($slug !== $base && preg_match('/-(en|be|zh)$/', $slug, $m)) ? $m[0] : '';
+
+    if ($base === 'about-overview') {
+        $target = get_page_by_path('about' . $lang_suffix) ?: get_page_by_path('about');
+        $url = $target instanceof WP_Post ? (string) get_permalink($target) : home_url('/about/');
+        wp_safe_redirect($url, 301);
+        exit;
+    }
+    if ($base === 'feedback' || $base === 'requisites') {
+        $target = get_page_by_path('contacts' . $lang_suffix) ?: get_page_by_path('contacts');
+        $url = $target instanceof WP_Post ? (string) get_permalink($target) : home_url('/contacts/');
+        $url .= '#' . $base;
+        wp_safe_redirect($url, 301);
+        exit;
+    }
+}
+add_action('template_redirect', 'ichnm_parity_redirects', 5);
 
 function ichnm_handle_feedback(): void
 {

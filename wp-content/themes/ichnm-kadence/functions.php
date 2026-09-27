@@ -7,6 +7,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once get_stylesheet_directory() . '/includes/class-ichnm-nav-walker.php';
+
 add_filter('wp_resource_hints', static function (array $urls, string $relation_type): array {
     if ($relation_type === 'preconnect') {
         $urls[] = 'https://fonts.googleapis.com';
@@ -95,10 +97,12 @@ function ichnm_chrome_strings(?string $lang = null): array
         'ru' => [
             'lang_aria' => 'Язык',
             'bvi' => 'Версия для слабовидящих',
+            'bvi_short' => 'BVI',
             'search' => 'Поиск',
             'sitemap' => 'Карта сайта',
             'theme_day' => 'Дневная тема',
             'theme_night' => 'Ночная тема',
+            'theme_auto' => 'Авто (по времени)',
             'write' => 'Написать нам',
             'menu' => 'Меню',
             'search_aria' => 'Поиск',
@@ -147,10 +151,12 @@ function ichnm_chrome_strings(?string $lang = null): array
         'en' => [
             'lang_aria' => 'Language',
             'bvi' => 'Visually impaired version',
+            'bvi_short' => 'BVI',
             'search' => 'Search',
             'sitemap' => 'Sitemap',
             'theme_day' => 'Light mode',
             'theme_night' => 'Dark mode',
+            'theme_auto' => 'Auto (by time)',
             'write' => 'Contact us',
             'menu' => 'Menu',
             'search_aria' => 'Search',
@@ -199,10 +205,12 @@ function ichnm_chrome_strings(?string $lang = null): array
         'be' => [
             'lang_aria' => 'Мова',
             'bvi' => 'Версія для слабавідушчых',
+            'bvi_short' => 'BVI',
             'search' => 'Пошук',
             'sitemap' => 'Карта сайта',
             'theme_day' => 'Дзённы рэжым',
             'theme_night' => 'Начны рэжым',
+            'theme_auto' => 'Аўта (па часе)',
             'write' => 'Напісаць нам',
             'menu' => 'Меню',
             'search_aria' => 'Пошук',
@@ -251,10 +259,12 @@ function ichnm_chrome_strings(?string $lang = null): array
         'zh' => [
             'lang_aria' => '语言',
             'bvi' => '视力障碍版本',
+            'bvi_short' => 'BVI',
             'search' => '搜索',
             'sitemap' => '网站地图',
             'theme_day' => '浅色模式',
             'theme_night' => '深色模式',
+            'theme_auto' => '自动（按时间）',
             'write' => '联系我们',
             'menu' => '菜单',
             'search_aria' => '搜索',
@@ -607,7 +617,7 @@ function ichnm_render_identity(): void
     echo '<img class="ichnm-mark" src="' . esc_url(get_stylesheet_directory_uri() . '/assets/ichnm-mark.svg') . '" width="230" height="193" alt="Эмблема ИХНМ">';
     echo '</a>';
     echo '<div class="ichnm-identity-text">';
-    echo '<strong>' . esc_html($short) . '</strong>';
+    echo '<a class="ichnm-brand-wordmark" href="' . esc_url($home) . '"><strong>' . esc_html($short) . '</strong></a>';
     echo '<a href="' . esc_url($nas) . '">' . esc_html($ui['nas']) . '</a>';
     echo '</div></div>';
 }
@@ -633,12 +643,21 @@ function ichnm_render_language_switch(): void
     // Preview order: search → sitemap → theme → BVI → write → languages.
     echo '<button type="button" class="ichnm-tool-btn tool-btn" data-ichnm-search-open aria-controls="ichnm-site-search">' . esc_html($ui['search']) . '</button>';
     echo '<a class="ichnm-tool-btn tool-btn" href="' . esc_url($sitemap_href) . '">' . esc_html($ui['sitemap']) . '</a>';
-    echo '<button type="button" class="ichnm-tool-btn tool-btn" data-theme-toggle aria-pressed="false" data-label-day="' . esc_attr($ui['theme_day']) . '" data-label-night="' . esc_attr($ui['theme_night']) . '">' . esc_html($ui['theme_night']) . '</button>';
+    echo '<button type="button" class="ichnm-tool-btn tool-btn" data-theme-toggle aria-pressed="false" data-theme-mode="day" data-label-day="' . esc_attr($ui['theme_day']) . '" data-label-night="' . esc_attr($ui['theme_night']) . '">' . esc_html($ui['theme_night']) . '</button>';
+    // Same chrome as other tools (ticket 52). Plugin shortcode stays for API; visual is our tool-btn.
+    // Icon-only BVI control (ticket 69); aria-label keeps accessible name.
+    echo '<button type="button" class="ichnm-tool-btn tool-btn ichnm-bvi-toggle" data-bvi-toggle aria-pressed="false" title="'
+        . esc_attr($ui['bvi']) . '" aria-label="' . esc_attr($ui['bvi']) . '">'
+        . '<span class="ichnm-bvi-icon" aria-hidden="true"></span></button>';
     if (shortcode_exists('bvi')) {
-        echo '<div class="ichnm-bvi">' . do_shortcode('[bvi text="' . esc_attr($ui['bvi']) . '"]') . '</div>';
+        echo '<div class="ichnm-bvi ichnm-bvi-plugin-host" hidden aria-hidden="true">';
+        echo do_shortcode('[bvi text="' . esc_attr($ui['bvi_short']) . '"]');
+        echo '</div>';
     }
-    $feedback = ichnm_translated_page('feedback');
-    $feedback_href = $feedback instanceof WP_Post ? get_permalink($feedback) : home_url('/feedback/');
+    $feedback = ichnm_translated_page('contacts');
+    $feedback_href = $feedback instanceof WP_Post
+        ? (string) get_permalink($feedback) . '#feedback'
+        : home_url('/contacts/#feedback');
     echo '<a class="ichnm-tool-btn tool-btn" href="' . esc_url($feedback_href) . '">' . esc_html($ui['write']) . '</a>';
     if ($langs) {
         echo '<nav class="ichnm-lang-switch" aria-label="' . esc_attr($ui['lang_aria']) . '">';
@@ -688,6 +707,7 @@ function ichnm_render_primary_menu(): void
         'fallback_cb' => false,
         'depth' => 3,
         'menu_class' => 'ichnm-menu-list',
+        'walker' => new ICNM_Nav_Walker(),
     ];
     if ($menu) {
         $args['menu'] = (int) $menu->term_id;
@@ -728,7 +748,8 @@ function ichnm_render_search_overlay(): void
  */
 function ichnm_theme_boot_script(): void
 {
-    echo '<script>(function(){try{if(document.cookie.indexOf("ichnm-cookies=")!==-1||localStorage.getItem("ichnm-cookies")){document.documentElement.classList.add("cookies-ok")}}catch(e){}try{var t=localStorage.getItem("ichnm-theme");var h=new Date().getHours();var night=t==="night"||(t!=="day"&&(h>=21||h<7));if(night)document.documentElement.classList.add("theme-night")}catch(e){}try{var d=document.documentElement;var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;var bvi=d.classList.contains("bvi-active")||d.classList.contains("is-bvi")||/(?:^|;\\s*)bvi[^=]*=/.test(document.cookie||"");if(!reduce&&!bvi)d.classList.add("js-motion")}catch(e){}})();</script>' . "\n";
+    // Theme: day|night only; empty/legacy auto → clock default (ticket 53).
+    echo '<script>(function(){try{if(document.cookie.indexOf("ichnm-cookies=")!==-1||localStorage.getItem("ichnm-cookies")){document.documentElement.classList.add("cookies-ok")}}catch(e){}try{var t=localStorage.getItem("ichnm-theme");var h=new Date().getHours();var mode=(t==="day"||t==="night")?t:((h>=21||h<7)?"night":"day");if(mode==="night")document.documentElement.classList.add("theme-night");document.documentElement.dataset.themeMode=mode}catch(e){}try{var d=document.documentElement;if(localStorage.getItem("ichnm-bvi")==="1"){d.classList.add("is-bvi","bvi-active")}var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;var bvi=d.classList.contains("bvi-active")||d.classList.contains("is-bvi")||/(?:^|;\\s*)bvi[^=]*=/.test(document.cookie||"");if(!reduce&&!bvi)d.classList.add("js-motion")}catch(e){}})();</script>' . "\n";
 }
 add_action('wp_head', 'ichnm_theme_boot_script', 0);
 
@@ -871,7 +892,6 @@ function ichnm_render_footer(): void
     if (is_array($pictograms) && $pictograms) {
         echo '<div class="footer-pictograms" aria-label="' . esc_attr($ui['footer_pictograms']) . '">';
         echo '<div class="wrap">';
-        echo '<p class="footer-heading">' . esc_html($ui['footer_pictograms']) . '</p>';
         echo '<ul class="picto-strip">';
         foreach ($pictograms as $pic) {
             if (!is_array($pic) || empty($pic['href'])) {

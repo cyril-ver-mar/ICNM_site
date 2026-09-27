@@ -8,10 +8,14 @@ while (have_posts()) {
     the_post();
     $hub = function_exists('ichnm_hub_kicker') ? ichnm_hub_kicker('structure') : ['label' => 'Структура', 'href' => home_url('/structure/')];
     $home_href = function_exists('pll_home_url') ? (string) pll_home_url() : home_url('/');
+    $about = function_exists('ichnm_translated_page') ? ichnm_translated_page('about') : get_page_by_path('about');
+    $about_href = $about instanceof WP_Post ? (string) get_permalink($about) : home_url('/about/');
     ?>
     <main class="ichnm-page ichnm-unit-page wrap">
       <nav class="ichnm-crumbs" aria-label="Навигация">
         <a href="<?php echo esc_url($home_href); ?>">Главная</a>
+        <span class="ichnm-crumbs-sep"> / </span>
+        <a href="<?php echo esc_url($about_href); ?>">Об институте</a>
         <span class="ichnm-crumbs-sep"> / </span>
         <a href="<?php echo esc_url($hub['href']); ?>"><?php echo esc_html($hub['label']); ?></a>
         <span class="ichnm-crumbs-sep"> / </span>

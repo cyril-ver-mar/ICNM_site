@@ -69,24 +69,34 @@
     });
   }
 
-  function applyTheme(night, persist) {
-    root.classList.toggle("theme-night", night);
-    if (themeBtn) {
-      themeBtn.setAttribute("aria-pressed", night ? "true" : "false");
-      themeBtn.textContent = night
-        ? themeBtn.getAttribute("data-label-day") || "Дневная тема"
-        : themeBtn.getAttribute("data-label-night") || "Ночная тема";
-    }
-    if (persist) {
-      try {
-        localStorage.setItem(THEME_KEY, night ? "night" : "day");
-      } catch (err) {}
-    }
-  }
-
   function nightByClock() {
     const h = new Date().getHours();
     return h >= 21 || h < 7;
+  }
+
+  function effectiveNight(mode) {
+    if (mode === "night") return true;
+    if (mode === "day") return false;
+    return nightByClock();
+  }
+
+  function applyThemeMode(mode, persist) {
+    const night = effectiveNight(mode);
+    root.classList.toggle("theme-night", night);
+    root.dataset.themeMode = mode;
+    if (themeBtn) {
+      themeBtn.setAttribute("data-theme-mode", mode);
+      themeBtn.setAttribute("aria-pressed", night ? "true" : "false");
+      const day = themeBtn.getAttribute("data-label-day") || "Дневная тема";
+      const nightLabel = themeBtn.getAttribute("data-label-night") || "Ночная тема";
+      const autoLabel = themeBtn.getAttribute("data-label-auto") || "Авто (по времени)";
+      themeBtn.textContent = mode === "night" ? day : mode === "auto" ? autoLabel : nightLabel;
+    }
+    if (persist) {
+      try {
+        localStorage.setItem(THEME_KEY, mode);
+      } catch (err) {}
+    }
   }
 
   const savedTheme = (function () {
@@ -96,12 +106,15 @@
       return null;
     }
   })();
-  if (savedTheme === "night") applyTheme(true, false);
-  else if (savedTheme === "day") applyTheme(false, false);
-  else applyTheme(nightByClock(), false);
+  applyThemeMode(
+    savedTheme === "day" || savedTheme === "night" || savedTheme === "auto" ? savedTheme : "auto",
+    false
+  );
   if (themeBtn) {
     themeBtn.addEventListener("click", function () {
-      applyTheme(!root.classList.contains("theme-night"), true);
+      const cur = themeBtn.getAttribute("data-theme-mode") || "auto";
+      const next = cur === "day" ? "night" : cur === "night" ? "auto" : "day";
+      applyThemeMode(next, true);
     });
   }
 

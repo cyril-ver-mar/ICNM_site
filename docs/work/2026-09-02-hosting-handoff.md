@@ -26,8 +26,8 @@
 
 ### Сид контента
 
-- Константа `ICHNM_CONTENT_SEED_VERSION` в `wp-content/plugins/ichnm-site/includes/content-sync.php` — сейчас **32** (colleague packet ingest; visual class hooks для packs/person/catalogues/contacts).
-- Локальный Docker (`http://localhost:8080`): option `ichnm_content_seed_version` = **32** (= const; форс-синк не нужен, 2026-09-17).
+- Константа `ICHNM_CONTENT_SEED_VERSION` в `wp-content/plugins/ichnm-site/includes/content-sync.php` — сейчас **37** (lab catalogue CPTs: direction / facility / development).
+- Локальный Docker (`http://localhost:8080`): при отставании option — `wp eval 'ichnm_sync_content(true);'` (или `scripts/local-setup.sh`).
 - После деплоя на PHP при отставании option: `wp eval 'ichnm_sync_content(true);'` (или `scripts/local-setup.sh`). Пакет коллег: после дропа в `assets/incoming/` достаточно `wp eval 'ichnm_apply_colleague_packet();'`.
 
 ### Docker volumes (данные не в git)

@@ -1,35 +1,29 @@
 <?php
 /**
  * Combined news hub: institute news + «СМИ о нас».
+ * No lead prose / date TOC (ticket 49).
  */
 get_header();
 
 $hub = function_exists('ichnm_hub_strings') ? ichnm_hub_strings() : [];
+$home_href = function_exists('pll_home_url') ? (string) pll_home_url() : home_url('/');
 
 while (have_posts()) {
     the_post();
     ?>
     <main class="ichnm-news-hub wrap">
+      <nav class="ichnm-crumbs" aria-label="Навигация">
+        <a href="<?php echo esc_url($home_href); ?>">Главная</a>
+        <span class="ichnm-crumbs-sep"> / </span>
+        <span aria-current="page"><?php the_title(); ?></span>
+      </nav>
       <header class="ichnm-page-head">
         <h1><?php the_title(); ?></h1>
-        <div class="ichnm-page-intro">
-          <?php
-          $raw = (string) get_the_content(null, false);
-          $raw = preg_replace('/<!--\s*ichnm:news-hub\s*-->/', '', $raw) ?? $raw;
-          echo apply_filters('the_content', $raw);
-          ?>
-        </div>
       </header>
-
-      <nav class="section-jump" aria-label="На этой странице">
-        <a href="#ichnm-news-institute"><?php echo esc_html($hub['institute_news'] ?? 'Новости Института'); ?></a>
-        <a href="#ichnm-news-media"><?php echo esc_html($hub['media_about'] ?? 'СМИ о нас'); ?></a>
-      </nav>
 
       <section class="ichnm-home-band" aria-labelledby="ichnm-news-institute">
         <div class="ichnm-band-head">
           <h2 id="ichnm-news-institute"><?php echo esc_html($hub['institute_news'] ?? 'Новости Института'); ?></h2>
-          <a class="ichnm-band-more" href="#ichnm-news-institute"><?php echo esc_html($hub['to_feed'] ?? 'К ленте'); ?></a>
         </div>
         <?php
         $institute = new WP_Query([

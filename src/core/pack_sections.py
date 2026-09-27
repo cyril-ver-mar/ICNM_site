@@ -34,16 +34,36 @@ def section_ids_in_html(html: str) -> list[str]:
     return _SECTION_ID_RE.findall(html)
 
 
+def filled_lab_pack_section_ids(lab: Mapping[str, Any]) -> tuple[str, ...]:
+    """Section ids that should render for a lab (ticket 74: hide empty)."""
+    out: list[str] = ["about", "contacts"]
+    if lab.get("directions"):
+        out.append("directions")
+    if lab.get("projects"):
+        out.append("projects")
+    if lab.get("equipment"):
+        out.append("equipment")
+    if lab.get("developments") or lab.get("services"):
+        out.append("services")
+    staff = list(lab.get("staff_ids") or [])
+    if lab.get("head_id") or staff:
+        out.append("staff")
+    if lab.get("publications"):
+        out.append("pubs")
+    # Keep locked relative order.
+    order = {sid: i for i, sid in enumerate(LAB_PACK_SECTION_IDS)}
+    return tuple(sorted(set(out), key=lambda s: order.get(s, 99)))
+
+
 def lab_pack_skeleton_html(lab: Mapping[str, Any] | None = None) -> str:
     """Minimal lab pack HTML with required nav anchors and section ids.
 
-    Empty slots are intentional: the contract is the section set, not filled copy.
+    When ``lab`` is passed, only non-empty collections are rendered (ticket 74).
+    Without a lab, the full locked section set is emitted (contract smoke).
     """
-    _ = lab  # fixture may pass a real lab; content does not affect required ids
-    nav = "".join(f'<a href="#{sid}">{sid}</a>' for sid in LAB_PACK_SECTION_IDS)
-    sections = "".join(
-        f'<section id="{sid}"><h2>{sid}</h2></section>' for sid in LAB_PACK_SECTION_IDS
-    )
+    ids = filled_lab_pack_section_ids(lab) if lab is not None else LAB_PACK_SECTION_IDS
+    nav = "".join(f'<a href="#{sid}">{sid}</a>' for sid in ids)
+    sections = "".join(f'<section id="{sid}"><h2>{sid}</h2></section>' for sid in ids)
     return (
         f'<nav class="lab-local" aria-label="lab">{nav}</nav>'
         f"{sections}"

@@ -23,7 +23,12 @@ def test_model_exposes_education_documents_vacancies_tree():
     assert [child.id for child in education.children] == list(EDUCATION_CHILD_IDS)
     documents = model.menu_item("documents")
     assert [child.id for child in documents.children] == list(DOCUMENTS_CHILD_IDS)
+    assert "e-appeals" not in {child.id for child in documents.children}
     assert "Реквизиты" not in {child.title for child in documents.children}
+    about = model.menu_item("about")
+    about_ids = [child.id for child in about.children]
+    assert "e-appeals" in about_ids
+    assert about_ids.index("documents") < about_ids.index("e-appeals")
     assert model.menu_item(VACANCIES_ID).id == VACANCIES_ID
     assert model.menu_item("requisites").id == "requisites"
     contacts = model.menu_item("contacts")

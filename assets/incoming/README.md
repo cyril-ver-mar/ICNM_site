@@ -4,6 +4,8 @@
 
 Чеклист и правила: [`docs/work/notes/colleague-packet.md`](../../docs/work/notes/colleague-packet.md).
 
+Excel-шаблоны для заполнения (персоналии, лаборатории, разработки, направления, кадры, инженер/ОТ, профсоюз): [`docs/work/colleague-packet/`](../../docs/work/colleague-packet/README.md).
+
 ## Куда что
 
 | Подкаталог | Содержимое | Не класть |

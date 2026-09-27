@@ -55,7 +55,10 @@ function ichnm_setup_polylang_languages(): void
     $options['force_lang'] = 1;
     $options['rewrite'] = true;
     $options['browser'] = false;
-    $options['post_types'] = ['news', 'event', 'media_about', 'publication', 'department', 'person'];
+    $options['post_types'] = [
+        'news', 'event', 'media_about', 'publication', 'department', 'person',
+        'direction', 'facility', 'development',
+    ];
     update_option('polylang', $options);
 
     if (method_exists(PLL()->model, 'clean_languages_cache')) {
@@ -161,7 +164,10 @@ function ichnm_assign_default_language_to_existing(): void
     if (!function_exists('pll_set_post_language') || !function_exists('pll_get_post_language')) {
         return;
     }
-    $types = ['page', 'news', 'event', 'media_about', 'publication', 'department', 'person'];
+    $types = [
+        'page', 'news', 'event', 'media_about', 'publication', 'department', 'person',
+        'direction', 'facility', 'development',
+    ];
     foreach ($types as $type) {
         $posts = get_posts([
             'post_type' => $type,

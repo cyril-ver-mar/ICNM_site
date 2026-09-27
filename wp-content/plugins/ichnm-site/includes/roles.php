@@ -1,7 +1,8 @@
 <?php
 /**
- * Feed-editor role: CRUD on news / events / media_about / publications only.
- * No rights to edit vitrine pages, structure CPTs, or Appearance chrome (menus/themes).
+ * Feed-editor role: CRUD on news / events / media_about / publications
+ * and lab catalogue CPTs (direction / facility / development).
+ * No rights to edit vitrine pages, department/person, or Appearance chrome.
  */
 
 if (!defined('ABSPATH')) {
@@ -11,12 +12,12 @@ if (!defined('ABSPATH')) {
 /** @return list<string> */
 function ichnm_feed_post_types(): array
 {
-    return ['news', 'event', 'media_about', 'publication'];
+    return ['news', 'event', 'media_about', 'publication', 'direction', 'facility', 'development'];
 }
 
 /**
  * Caps granted to Редактор лент ИХНМ.
- * Feed CPTs use capability_type=post, so post caps cover all four types;
+ * Feed CPTs use capability_type=post, so post caps cover all feed types;
  * map_meta_cap then denies non-feed post types.
  *
  * @return array<string, bool>
@@ -166,6 +167,7 @@ function ichnm_post_is_locked_for_feed_editor(?WP_Post $post): bool
         return false;
     }
     // Pages (vitrines/hubs/utilities/shells), department, person, default post, menus, etc.
+    // Catalogue CPTs are feed types (unlocked above).
     return true;
 }
 
@@ -228,7 +230,7 @@ add_filter('wp_insert_post_data', static function (array $data, array $postarr):
     }
     if (!in_array($type, ichnm_feed_post_types(), true)) {
         wp_die(
-            esc_html('Редактор лент ИХНМ публикует только новости, мероприятия, «СМИ о нас» и публикации.'),
+            esc_html('Редактор лент ИХНМ публикует новости, мероприятия, «СМИ о нас», публикации и каталог лабораторий (направления, оборудование, разработки).'),
             esc_html('Доступ ограничен'),
             ['response' => 403]
         );
@@ -278,7 +280,7 @@ add_action('load-post-new.php', static function (): void {
     $type = isset($_GET['post_type']) ? sanitize_key((string) $_GET['post_type']) : 'post';
     if (!in_array($type, ichnm_feed_post_types(), true)) {
         wp_die(
-            esc_html('Редактор лент ИХНМ создаёт только новости, мероприятия, «СМИ о нас» и публикации.'),
+            esc_html('Редактор лент ИХНМ создаёт новости, мероприятия, «СМИ о нас», публикации и записи каталога лабораторий.'),
             esc_html('Доступ ограничен'),
             ['response' => 403]
         );

@@ -18,13 +18,22 @@ EDUCATION_CHILD_IDS: tuple[str, ...] = (
     "doctorate",
     "defense-council",
     "internships",
-    "courses",
 )
 
 DOCUMENTS_CHILD_IDS: tuple[str, ...] = (
     "charter",
     "anti-corruption",
-    "e-appeals",
+    "for-staff",
+    "pvtr",
+    "ethics",
+    "personal-data",
+    "video-surveillance",
+    "collective-agreement",
+)
+
+SCIENCE_EXTRA_CHILD_IDS: tuple[str, ...] = (
+    "student-nir",
+    "graduate-employment",
 )
 
 EDUCATION_DOCUMENTS_VACANCIES_IDS: tuple[str, ...] = (
@@ -32,6 +41,7 @@ EDUCATION_DOCUMENTS_VACANCIES_IDS: tuple[str, ...] = (
     *EDUCATION_CHILD_IDS,
     DOCUMENTS_HUB_ID,
     *DOCUMENTS_CHILD_IDS,
+    "e-appeals",
     VACANCIES_ID,
 )
 
@@ -52,7 +62,17 @@ PAGE_FILE_SLOTS: dict[str, tuple[str, ...]] = {
         "Специальности.pdf",
     ),
     "internships": ("Положение о стажировках.pdf",),
-    "courses": ("Программы курсов.pdf",),
+    "for-staff": (
+        "Справка с места работы — порядок.pdf",
+        "Справка из трудовой книжки — порядок.pdf",
+        "Справка о зарплате — порядок.pdf",
+        "Пособия — порядок.pdf",
+    ),
+    "pvtr": ("Правила внутреннего трудового распорядка.pdf",),
+    "ethics": ("Кодекс научной этики НАН Беларуси (ссылка или PDF).pdf",),
+    "personal-data": ("Политика обработки персональных данных.pdf",),
+    "video-surveillance": ("Положение о видеонаблюдении.pdf",),
+    "collective-agreement": ("Коллективный договор.pdf",),
 }
 
 _FISH_MARKERS = (

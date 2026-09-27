@@ -6,6 +6,8 @@
 
 Конвейер (ticket 33): `ichnm_apply_colleague_packet()` / полный `ichnm_sync_content(true)` читает слоты и обновляет витрины. Python-шов: `src/core/colleague_packet.py`.
 
+**Шаблоны таблиц для сотрудников** (персоналии, лаборатории, разработки, направления, кадры, инженер/ОТ, профсоюз): [`docs/work/colleague-packet/`](../colleague-packet/README.md) — Excel с памяткой и колонками RU/EN/BE/ZH. Пересборка: `python scripts/build_colleague_templates.py`.
+
 ## Чеклист
 
 | # | Что нужно | Куда класть | Куда уедет после приёмки | Статус |
@@ -13,10 +15,12 @@
 | 1 | PDF **устава** | `assets/incoming/documents/` (`ustav.pdf` / `charter.pdf`) | Документы → Устав (полка `is-filled`) | ☐ ждём файл → sync |
 | 2 | PDF **антикоррупции** | `assets/incoming/documents/` (`anticorruption.pdf`) | Документы → Антикоррупция | ☐ ждём файл → sync |
 | 3 | PDF / текст **электронных обращений** | `assets/incoming/documents/` (`e-appeals.pdf`) | Документы → Электронные обращения | ☐ ждём файл → sync |
-| 4 | **Ростеры** лабораторий (полные составы) | `assets/incoming/rosters/` | люди / `people/{id}/`, вкладки лабораторий | ☐ ждём файл → см. путь ниже |
+| 4 | **Ростеры / персоналии / лаборатории** (шаблоны xlsx) | заполнить `docs/work/colleague-packet/templates/*.xlsx` → копия в `assets/incoming/rosters/` | люди / `people/{id}/`, вкладки лабораторий, CPT каталогов | ☐ ждём файл → см. путь ниже |
 | 5 | **Таблица публикаций** (csv/json; xlsx→csv) | `assets/incoming/publications/` | CPT `publication`, хаб `/publications/` | ☐ ждём файл → sync |
 | 6 | **Вектор эмблемы НАН** (SVG предпочтительно) | `assets/incoming/brand/` | тема `assets/nas-emblem.svg` + шапка | ☐ ждём файл → sync |
 | 7 | **URL соцсетей ИХНМ** | `assets/incoming/social/urls.txt` *или* письмом | footer (`ichnm_effective_icnm_social`) | ☐ ждём файл → sync |
+| 8 | **Разработки / направления** (шаблоны 03–04) | `docs/work/colleague-packet/templates/` → `assets/incoming/rosters/` | CPT `development` / `direction` | ☐ ждём файл |
+| 9 | **Кадры / инженер / ОТ / профсоюз** (шаблоны 05–07) | туда же | admin-unit packs + union | ☐ ждём файл |
 
 Реквизиты — под Контакты, не в Документы. Марка ИХНМ уже в `assets/brand/` (`ichnm-mark.svg`); новый AI/SVG класть сюда только если замена.
 

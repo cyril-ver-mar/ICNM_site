@@ -16,10 +16,14 @@ while (have_posts()) {
     $lang = function_exists('pll_current_language') ? (string) pll_current_language('slug') : 'ru';
     $suffix = $lab_word[$lang] ?? $lab_word['ru'];
     $home_href = function_exists('pll_home_url') ? (string) pll_home_url() : home_url('/');
+    $about = function_exists('ichnm_translated_page') ? ichnm_translated_page('about') : get_page_by_path('about');
+    $about_href = $about instanceof WP_Post ? (string) get_permalink($about) : home_url('/about/');
     ?>
     <main class="ichnm-single ichnm-single-lab wrap is-lab-site">
       <nav class="ichnm-crumbs" aria-label="Навигация">
         <a href="<?php echo esc_url($home_href); ?>">Главная</a>
+        <span class="ichnm-crumbs-sep"> / </span>
+        <a href="<?php echo esc_url($about_href); ?>">Об институте</a>
         <span class="ichnm-crumbs-sep"> / </span>
         <a href="<?php echo esc_url($hub['href']); ?>"><?php echo esc_html($hub['label']); ?></a>
         <span class="ichnm-crumbs-sep"> / </span>

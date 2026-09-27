@@ -116,9 +116,15 @@ function ichnm_document_shelf_html(string $page_id, array $labels, array $attach
         if ($label === '') {
             $label = basename($path);
         }
-        $items .= '<li class="file-slot is-filled">';
-        $items .= '<a href="' . esc_url($href) . '">' . esc_html($label) . '</a>';
-        $items .= '<small>Скачать</small></li>';
+        // In-site view + separate download (ticket 66).
+        $items .= '<li class="file-slot is-filled ichnm-pdf-slot">';
+        $items .= '<div class="ichnm-pdf-viewer">';
+        $items .= '<iframe src="' . esc_url($href) . '#view=FitH" title="'
+            . esc_attr($label) . '" loading="lazy"></iframe></div>';
+        $items .= '<p class="ichnm-pdf-actions"><a class="ichnm-pill ichnm-pill-primary" href="'
+            . esc_url($href) . '" download>' . esc_html('Скачать') . '</a>';
+        $items .= '<a class="ichnm-pill" href="' . esc_url($href) . '" target="_blank" rel="noopener noreferrer">'
+            . esc_html($label) . '</a></p></li>';
         foreach (array_slice($labels, 1) as $extra) {
             $extra = trim((string) $extra);
             if ($extra === '') {

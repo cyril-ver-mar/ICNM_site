@@ -1,4 +1,4 @@
-"""Person-page affiliations and metrics contracts (ticket 03)."""
+"""Person-page affiliations and metrics contracts (tickets 03 / 59 / 60)."""
 
 from __future__ import annotations
 
@@ -8,8 +8,10 @@ from src.core.person_page import (
     METRIC_LABELS,
     affiliations_html,
     affiliations_items,
+    filled_optional_sections,
     metric_fields,
     metrics_html,
+    optional_sections_html,
     person_list_card_html,
     profile_href,
     visible_metric_networks,
@@ -38,25 +40,26 @@ def test_orcid_bare_id_becomes_profile_url():
     assert profile_href("google_scholar", "bare-id") == ""
 
 
-def test_empty_networks_are_skipped_order_preserved():
+def test_empty_networks_and_orphan_numbers_are_skipped():
     person = {
         "profiles": {
             "researchgate": "https://www.researchgate.net/profile/Example",
             "orcid": "https://orcid.org/0000-0001-6505-3929",
         },
         "bibliometrics": {
+            # Orphan numbers without a profile URL must not render (ticket 59).
             "scopus_author": {"h_index": 12, "citations": 400},
         },
     }
     rows = visible_metric_networks(person)
-    assert [r["field"] for r in rows] == ["orcid", "scopus_author", "researchgate"]
-    assert "google_scholar" not in [r["field"] for r in rows]
-    assert "elibrary" not in [r["field"] for r in rows]
+    assert [r["field"] for r in rows] == ["orcid", "researchgate"]
+    assert "scopus_author" not in [r["field"] for r in rows]
 
 
-def test_metrics_html_omits_empty_and_shows_labels_in_order():
+def test_metrics_html_links_label_and_omits_empty():
     person = {
         "orcid": "0000-0001-6505-3929",
+        "profiles": {"elibrary": "https://elibrary.ru/author_profile.asp?id=1"},
         "bibliometrics": {"elibrary": {"h_index": 3}},
     }
     html = metrics_html(person)
@@ -64,7 +67,10 @@ def test_metrics_html_omits_empty_and_shows_labels_in_order():
     assert "ORCID" in html
     assert "orcid.org/0000-0001-6505-3929" in html
     assert "eLIBRARY / РИНЦ" in html
-    assert "h-индекс 3" in html
+    assert "h-индекс: 3" in html
+    assert "metrics-note" not in html
+    assert "Профиль" not in html
+    assert ">профиль<" not in html.lower()
     assert "Google Scholar" not in html
     assert "Scopus Author" not in html
     assert "ResearchGate" not in html
@@ -73,10 +79,26 @@ def test_metrics_html_omits_empty_and_shows_labels_in_order():
     assert pos_orcid < pos_elib
 
 
-def test_metrics_html_empty_state_when_no_data():
-    html = metrics_html({})
-    assert "Профили и показатели ещё не указаны" in html
-    assert metrics_html({}, include_empty_state=False) == ""
+def test_metrics_html_hides_when_empty_by_default():
+    assert metrics_html({}) == ""
+    assert "Профили и показатели ещё не указаны" in metrics_html(
+        {}, include_empty_state=True
+    )
+
+
+def test_optional_sections_only_if_filled_no_lab_sync():
+    person = {
+        "awards": ["Медаль НАН"],
+        "person_sections": {"interests": ["LbL", "биополимеры"]},
+        "projects": [],
+    }
+    filled = filled_optional_sections(person)
+    assert [s["key"] for s in filled] == ["awards", "interests"]
+    html = optional_sections_html(person)
+    assert "Награды" in html
+    assert "Медаль НАН" in html
+    assert "Исследовательские интересы" in html
+    assert "Научные проекты" not in html
 
 
 def test_multi_affiliations_link_to_units_and_labs():

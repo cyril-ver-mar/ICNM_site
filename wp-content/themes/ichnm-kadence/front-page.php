@@ -22,8 +22,8 @@ $structure_teaser = (string) ($copy['structure_teaser'] ?? '');
 $developments_teaser = (string) ($copy['developments_teaser'] ?? '');
 
 $about = function_exists('ichnm_translated_page')
-    ? (ichnm_translated_page('about-overview') ?: ichnm_translated_page('about'))
-    : (get_page_by_path('about-overview') ?: get_page_by_path('about'));
+    ? ichnm_translated_page('about')
+    : get_page_by_path('about');
 $structure = function_exists('ichnm_translated_page') ? ichnm_translated_page('structure') : get_page_by_path('structure');
 $science = function_exists('ichnm_translated_page') ? ichnm_translated_page('science') : get_page_by_path('science');
 $developments = function_exists('ichnm_translated_page') ? ichnm_translated_page('developments') : get_page_by_path('developments');
@@ -52,9 +52,8 @@ $home_ui = [
         'developments' => 'Разработки',
         'write' => 'Написать нам',
         'stats' => 'Краткие сведения',
-        'years' => 'лет институту (с %s)',
+        'years' => 'лет институту',
         'labs' => 'лабораторий в структуре сайта',
-        'langs' => 'языковых контура структуры',
         'directions' => 'Основные направления',
         'dir_1' => 'Тонкоплёночные и наноструктурированные материалы',
         'dir_1p' => 'Органические плёнки и наноструктуры с заданными свойствами.',
@@ -84,9 +83,8 @@ $home_ui = [
         'developments' => 'Developments',
         'write' => 'Contact us',
         'stats' => 'At a glance',
-        'years' => 'years since %s',
+        'years' => 'years of the institute',
         'labs' => 'laboratories on the site',
-        'langs' => 'structure language shells',
         'directions' => 'Main research areas',
         'dir_1' => 'Thin-film and nanostructured materials',
         'dir_1p' => 'Organic films and nanostructures with tailored properties.',
@@ -116,9 +114,8 @@ $home_ui = [
         'developments' => 'Распрацоўкі',
         'write' => 'Напісаць нам',
         'stats' => 'Кароткія звесткі',
-        'years' => 'гадоў інстытуту (з %s)',
+        'years' => 'гадоў інстытуту',
         'labs' => 'лабараторый у структуры сайта',
-        'langs' => 'моўных контураў структуры',
         'directions' => 'Асноўныя напрамкі',
         'dir_1' => 'Тонкаплёнкавыя і нанаструктураваныя матэрыялы',
         'dir_1p' => 'Арганічныя плёнкі і нанаструктуры з зададзенымі ўласцівасцямі.',
@@ -148,9 +145,8 @@ $home_ui = [
         'developments' => '研发成果',
         'write' => '联系我们',
         'stats' => '概况数字',
-        'years' => '自 %s 年建所',
+        'years' => '建所年数',
         'labs' => '网站结构中的实验室',
-        'langs' => '结构语言壳层',
         'directions' => '主要方向',
         'dir_1' => '薄膜与纳米结构材料',
         'dir_1p' => '具有指定性能的有机薄膜与纳米结构。',
@@ -199,15 +195,11 @@ $t = $home_ui[$lang] ?? $home_ui['ru'];
     <div class="wrap ichnm-stats-grid stats-grid">
       <div class="ichnm-stat stat">
         <span class="ichnm-stat-value stat-value"><?php echo esc_html((string) $years); ?></span>
-        <span class="ichnm-stat-label"><?php echo esc_html(sprintf($t['years'], (string) $founded)); ?></span>
+        <span class="ichnm-stat-label"><?php echo esc_html($t['years']); ?></span>
       </div>
       <div class="ichnm-stat stat">
         <span class="ichnm-stat-value stat-value"><?php echo esc_html((string) $labs_count); ?></span>
         <span class="ichnm-stat-label"><?php echo esc_html($t['labs']); ?></span>
-      </div>
-      <div class="ichnm-stat stat">
-        <span class="ichnm-stat-value stat-value">4</span>
-        <span class="ichnm-stat-label"><?php echo esc_html($t['langs']); ?></span>
       </div>
     </div>
   </section>

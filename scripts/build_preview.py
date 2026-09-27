@@ -27,6 +27,12 @@ _EXTRA_DIRS = (
 
 
 def _write_tree(out: Path, files: dict[str, str]) -> int:
+    # Drop stale HTML left from older IA (e.g. courses) so staff demo stays current.
+    if out.exists():
+        keep = {out / rel for rel in files}
+        for path in out.rglob("*.html"):
+            if path not in keep:
+                path.unlink(missing_ok=True)
     for rel, html in files.items():
         path = out / rel
         path.parent.mkdir(parents=True, exist_ok=True)

@@ -97,6 +97,7 @@
           "id": "research",
           "title": "Научная деятельность",
           "kind": "folder",
+          "href": "science",
           "children": [
             {"id": "science", "title": "Направления работы", "kind": "vitrine"},
             {"id": "developments", "title": "Разработки", "kind": "vitrine"},
@@ -110,8 +111,7 @@
                 {"id": "aspirantura", "title": "Аспирантура", "kind": "vitrine"},
                 {"id": "doctorate", "title": "Докторантура", "kind": "vitrine"},
                 {"id": "defense-council", "title": "Совет по защитам", "kind": "vitrine"},
-                {"id": "internships", "title": "Стажировки", "kind": "vitrine"},
-                {"id": "courses", "title": "Курсы", "kind": "vitrine"}
+                {"id": "internships", "title": "Стажировки", "kind": "vitrine"}
               ]
             }
           ]
@@ -125,9 +125,15 @@
           "children": [
             {"id": "charter", "title": "Устав", "kind": "vitrine"},
             {"id": "anti-corruption", "title": "Антикоррупция", "kind": "vitrine"},
-            {"id": "e-appeals", "title": "Электронные обращения", "kind": "vitrine"}
+            {"id": "for-staff", "title": "Для сотрудника", "kind": "vitrine"},
+            {"id": "pvtr", "title": "Правила внутреннего трудового распорядка", "kind": "vitrine"},
+            {"id": "ethics", "title": "Этика", "kind": "vitrine"},
+            {"id": "personal-data", "title": "Персональные данные", "kind": "vitrine"},
+            {"id": "video-surveillance", "title": "Видеонаблюдение", "kind": "vitrine"},
+            {"id": "collective-agreement", "title": "Коллективный договор", "kind": "vitrine"}
           ]
         },
+        {"id": "e-appeals", "title": "Электронные обращения", "kind": "vitrine"},
         {"id": "vacancies", "title": "Вакансии", "kind": "vitrine"}
       ]
     },
@@ -142,6 +148,15 @@
       "kind": "feed",
       "children": [
         {"id": "aist", "title": "AIST", "kind": "vitrine"}
+      ]
+    },
+    {
+      "id": "for-students",
+      "title": "Для студентов",
+      "kind": "vitrine",
+      "children": [
+        {"id": "student-nir", "title": "Научно-исследовательская работа студентов", "kind": "vitrine"},
+        {"id": "graduate-employment", "title": "Трудоустройство выпускников", "kind": "vitrine"}
       ]
     },
     {

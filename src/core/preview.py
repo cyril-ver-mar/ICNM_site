@@ -12,8 +12,11 @@ from src.core import i18n, roster
 from src.core.copy import is_filled_copy, load_migrated_copy, page_copy
 from src.core.filled import fish_svg, letter_for_lab
 from src.core.ia_vitrines import PAGE_FILE_SLOTS
+from src.core.lab_accent import THIN_FILM_DEPT_TITLE, lab_accent_token
+from src.core.pack_sections import filled_lab_pack_section_ids
 from src.core.search_index import build_search_index
 from src.core.site_model import MenuItem, SiteModel
+from src.core.structure_vitrines import structure_hub_groups
 
 _HERE = Path(__file__).resolve().parent
 
@@ -29,6 +32,7 @@ _VISIBLE_MENU = frozenset(
         "about",
         "news",
         "events",
+        "for-students",
         "contacts",
     }
 )
@@ -54,6 +58,7 @@ _CHROME: dict[str, dict[str, str]] = {
         "search": "Поиск",
         "sitemap": "Карта сайта",
         "night": "Ночная тема",
+        "auto": "Авто (по времени)",
         "bvi": "Версия для слабовидящих",
         "write": "Написать нам",
         "menu": "Меню",
@@ -91,6 +96,7 @@ _CHROME: dict[str, dict[str, str]] = {
         "search": "Search",
         "sitemap": "Sitemap",
         "night": "Dark mode",
+        "auto": "Auto (by time)",
         "bvi": "Visually impaired version",
         "write": "Write to us",
         "menu": "Menu",
@@ -134,6 +140,7 @@ _CHROME: dict[str, dict[str, str]] = {
         "search": "Пошук",
         "sitemap": "Карта сайта",
         "night": "Начны рэжым",
+        "auto": "Аўта (па часе)",
         "bvi": "Версія для слабавідушчых",
         "write": "Напісаць нам",
         "menu": "Меню",
@@ -177,6 +184,7 @@ _CHROME: dict[str, dict[str, str]] = {
         "search": "搜索",
         "sitemap": "网站地图",
         "night": "深色模式",
+        "auto": "自动（按时间）",
         "bvi": "无障碍版本",
         "write": "联系我们",
         "menu": "菜单",
@@ -515,7 +523,9 @@ _HUB_BLURB = {
     "doctorate": "Правила приёма уточнит учёный секретарь",
     "defense-council": "Специальности и состав — после сверки",
     "internships": "Стажировки для студентов и молодых исследователей",
-    "courses": "Повышение квалификации",
+    "student-nir": "НИР студентов",
+    "graduate-employment": "Трудоустройство выпускников",
+    "for-staff": "Документы и процедуры для сотрудников",
 }
 
 _LIST_AS_CARDS = frozenset({"about"})
@@ -526,11 +536,13 @@ _FISH_FILE_PAGES = {
     "scientific-council": ["Состав учёного совета.pdf", "Регламент.pdf"],
     "defense-council": list(PAGE_FILE_SLOTS["defense-council"]),
     "internships": list(PAGE_FILE_SLOTS["internships"]),
-    "courses": list(PAGE_FILE_SLOTS["courses"]),
     "doctorate": list(PAGE_FILE_SLOTS["doctorate"]),
     "requisites": ["Банковские реквизиты.pdf"],
     "union": ["Положение первичной организации.pdf"],
     "aspirantura": list(PAGE_FILE_SLOTS["aspirantura"]),
+    "for-staff": list(PAGE_FILE_SLOTS["for-staff"]),
+    "pvtr": list(PAGE_FILE_SLOTS["pvtr"]),
+    "collective-agreement": list(PAGE_FILE_SLOTS["collective-agreement"]),
 }
 
 _NBSP = "\u00a0"
@@ -675,6 +687,12 @@ def _render_locale_tree(model: SiteModel, code: str) -> dict[str, str]:
         if item.kind == "folder":
             continue
         put(f"{item.id}.html", _mt(item), _vitrine_body(model, item), item.id)
+    put(
+        "thin-film-department.html",
+        THIN_FILM_DEPT_TITLE,
+        _thin_film_department_body(model),
+        "structure",
+    )
     media_about = MenuItem(
         id="media_about",
         title=i18n.menu_title("media_about", "СМИ о нас"),
@@ -842,18 +860,34 @@ def _item_href(item: MenuItem, depth: int = 0) -> str:
 
 
 def _structure_menu_children(item: MenuItem) -> tuple[MenuItem, ...]:
-    labs: list[MenuItem] = []
-    for lab in load_migrated_copy().get("labs", []):
-        slug = lab.get("slug") or lab["id"]
-        labs.append(
-            MenuItem(
-                id=str(lab["id"]),
-                title=_lt(lab),
-                kind="lab",
-                href=f"labs/{slug}/index.html",
-            )
+    """Labs with thin-film department nest, then admin / community children."""
+    groups = structure_hub_groups(load_migrated_copy().get("labs", []))
+    thin_kids = tuple(
+        MenuItem(
+            id=str(lab["id"]),
+            title=_lt(lab),
+            kind="lab",
+            href=f"labs/{lab.get('slug') or lab['id']}/index.html",
         )
-    return tuple(labs + list(item.children))
+        for lab in groups["thin_film"]
+    )
+    thin_parent = MenuItem(
+        id="thin-film-department",
+        title=THIN_FILM_DEPT_TITLE,
+        kind="vitrine",
+        href="thin-film-department.html",
+        children=thin_kids,
+    )
+    other_labs = tuple(
+        MenuItem(
+            id=str(lab["id"]),
+            title=_lt(lab),
+            kind="lab",
+            href=f"labs/{lab.get('slug') or lab['id']}/index.html",
+        )
+        for lab in groups["other"]
+    )
+    return (thin_parent, *other_labs, *item.children)
 
 
 def _menu_kids(item: MenuItem) -> tuple[MenuItem, ...]:
@@ -1097,8 +1131,12 @@ def _footer(model: SiteModel, depth: int = 0) -> str:
         f'<ul class="ichnm-footer-legal">{site_links}</ul></div>'
         f'<div><p class="footer-heading">{escape(_ui("footer_nas_socials"))}</p>'
         f'<ul class="ichnm-footer-social">{social}</ul>'
-        f"<p>{escape(_ui('footer_webmail'))}</p>"
-        "</div>"
+        + (
+            ""
+            if is_filled_copy()
+            else f"<p>{escape(_ui('footer_webmail'))}</p>"
+        )
+        + "</div>"
         '<div class="footer-place">'
         f'<p class="footer-heading">{escape(_ui("footer_find_us"))}</p>'
         f'<a class="footer-map" href="{page}contacts.html" '
@@ -1108,7 +1146,6 @@ def _footer(model: SiteModel, depth: int = 0) -> str:
         "</div></div>"
         f'<div class="footer-pictograms" aria-label="{escape(_ui("footer_pictograms"))}">'
         '<div class="wrap">'
-        f'<p class="footer-heading">{escape(_ui("footer_pictograms"))}</p>'
         f'<ul class="picto-strip">{pics}</ul>'
         "</div></div></footer>"
     )
@@ -1237,8 +1274,9 @@ def _shell(
         "try{"
         'var t=localStorage.getItem("ichnm-theme");'
         "var h=new Date().getHours();"
-        'var night=t==="night"||(t!=="day"&&(h>=21||h<7));'
-        'if(night)document.documentElement.classList.add("theme-night")'
+        'var night=t==="night"||((t==="auto"||!t||(t!=="day"&&t!=="night"))&&(h>=21||h<7));'
+        'if(night)document.documentElement.classList.add("theme-night");'
+        'document.documentElement.dataset.themeMode=(t==="day"||t==="night"||t==="auto")?t:"auto"'
         "}catch(e){}"
         "try{"
         'var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;'
@@ -1285,7 +1323,7 @@ def _shell(
           <div class="header-utilities">
             <button type="button" class="tool-btn" data-search-open aria-controls="site-search">{escape(_ui("search"))}</button>
             <a class="tool-btn" href="{page}sitemap.html">{escape(_ui("sitemap"))}</a>
-            <button type="button" class="tool-btn" data-theme-toggle aria-pressed="false" data-label-day="{escape(_ui('day'))}" data-label-night="{escape(_ui('night'))}">{escape(_ui("night"))}</button>
+            <button type="button" class="tool-btn" data-theme-toggle aria-pressed="false" data-theme-mode="auto" data-label-day="{escape(_ui('day'))}" data-label-night="{escape(_ui('night'))}" data-label-auto="{escape(_ui('auto'))}">{escape(_ui("night"))}</button>
             <button type="button" class="tool-btn" data-bvi aria-pressed="false" aria-controls="bvi-panel">{escape(_ui("bvi"))}</button>
             <a class="tool-btn" href="{page}feedback.html">{escape(_ui("write"))}</a>
             {_langs(model, current_code=current_code, depth=depth)}
@@ -1658,18 +1696,26 @@ def _conference_body(model: SiteModel, item: dict, depth: int = 2) -> str:
 
 def _cookies_body() -> str:
     prefix = _page_prefix()
-    banner = (
-        _fish_banner()
-        if _LOCALE.get() == "ru"
-        else f'<p class="fish-banner" role="note">{escape(_ui("legal_mock"))}</p>'
-    )
+    banner = ""
+    if not is_filled_copy():
+        banner = (
+            _fish_banner()
+            if _LOCALE.get() == "ru"
+            else f'<p class="fish-banner" role="note">{escape(_ui("legal_mock"))}</p>'
+        )
+    analytics = _ui("cookies_p_analytics")
+    if is_filled_copy() and _LOCALE.get() == "ru":
+        analytics = (
+            "Аналитические cookie на рабочем сайте подключаются только после "
+            "решения института. Сейчас категория выключена."
+        )
     return (
         f"{banner}"
         f"<p>{escape(_ui('cookies_p1'))}</p>"
         f"<h2>{escape(_ui('cookies_h_needed'))}</h2>"
         f"<p>{escape(_ui('cookies_p_needed'))}</p>"
         f"<h2>{escape(_ui('cookies_h_analytics'))}</h2>"
-        f"<p>{escape(_ui('cookies_p_analytics'))}</p>"
+        f"<p>{escape(analytics)}</p>"
         f'<p><a href="{_ui_href("personal-data.html", prefix)}">{escape(_ui("cookies_personal_link"))}</a> · '
         f'<a href="{prefix}e-appeals.html">{escape(_ui("cookies_appeals_link"))}</a></p>'
     )
@@ -1677,14 +1723,21 @@ def _cookies_body() -> str:
 
 def _personal_data_body() -> str:
     prefix = _page_prefix()
-    banner = (
-        '<p class="fish-banner">Макет. Не используйте формулировку как утверждённый документ.</p>'
-        if _LOCALE.get() == "ru"
-        else f'<p class="fish-banner" role="note">{escape(_ui("legal_mock"))}</p>'
-    )
+    banner = ""
+    if not is_filled_copy():
+        banner = (
+            '<p class="fish-banner">Макет. Не используйте формулировку как утверждённый документ.</p>'
+            if _LOCALE.get() == "ru"
+            else f'<p class="fish-banner" role="note">{escape(_ui("legal_mock"))}</p>'
+        )
+    p2 = _ui("personal_p2")
+    if is_filled_copy() and _LOCALE.get() == "ru":
+        p2 = (
+            "Обращения по персональным данным — через электронные обращения или форму обратной связи."
+        )
     return (
         f"<p>{_t(_ui('personal_operator'))}</p>"
-        f"<p>{escape(_ui('personal_p2'))}</p>"
+        f"<p>{escape(p2)}</p>"
         f"{banner}"
         f'<p><a href="{_ui_href("cookies.html", prefix)}">{escape(_ui("cookies_page_title"))}</a></p>'
     )
@@ -1758,15 +1811,10 @@ def _home_body(model: SiteModel) -> str:
     founded = int(copy.get("founded_year", 1998))
     years = date.today().year - founded
     note = ""
-    if _LOCALE.get() != "ru" and _st("copy_note"):
+    if not is_filled_copy() and _LOCALE.get() != "ru" and _st("copy_note"):
         note = f'<p class="fish-banner" role="note">{escape(_st("copy_note"))}</p>'
-    ribbon = (
-        f'<p class="filled-ribbon" role="note">{escape(_st("filled_ribbon"))}</p>'
-        if is_filled_copy()
-        else note
-    )
     return (
-        f"{ribbon}"
+        f"{note}"
         '<section class="hero ichnm-home-block" data-ichnm-block="official_intro">'
         '<canvas class="hero-lattice" width="1290" height="720" aria-hidden="true"></canvas>'
         '<div class="wrap hero-layout"><div class="hero-copy">'
@@ -1782,11 +1830,11 @@ def _home_body(model: SiteModel) -> str:
         f'<section class="stats-band" aria-label="{escape(_st("stats_label"))}">'
         '<div class="wrap stats-grid">'
         f'<article class="stat" data-count-to="{years}" data-suffix="+" tabindex="0" '
-        f'aria-label="{years} {_st("years_aria")}, {founded}—{date.today().year}">'
+        f'aria-label="{years} {_st("years_aria")}">'
         f'<p class="stat-value" aria-hidden="true"><span class="stat-num">{years}</span>'
         '<span class="stat-suffix">+</span></p>'
         f"<h2>{escape(_st('years_work'))}</h2>"
-        f'<p class="stat-note">{founded} — {date.today().year}</p></article>'
+        "</article>"
         f'<article class="stat" data-count-to="{len(labs)}" tabindex="0" '
         f'aria-label="{len(labs)} {_st("labs_aria")}">'
         f'<p class="stat-value" aria-hidden="true"><span class="stat-num">{len(labs)}</span></p>'
@@ -1966,6 +2014,8 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
     copied = page_copy(item.id)
     chunks: list[str] = []
     for para in copied.get("paragraphs", []):
+        if is_filled_copy() and _looks_pending(str(para)):
+            continue
         chunks.append(f"<p>{_t(para)}</p>")
     heading = {
         "about": _st("awards"),
@@ -1989,33 +2039,42 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
             "</div>"
         )
     elif copied.get("list") and item.id not in {"structure"}:
-        items = "".join(f"<li>{escape(row)}</li>" for row in copied["list"])
-        chunks.append(f'<ul class="plain-list">{items}</ul>')
+        rows = [
+            row
+            for row in copied["list"]
+            if not (is_filled_copy() and _looks_pending(str(row)))
+        ]
+        if rows:
+            items = "".join(f"<li>{escape(row)}</li>" for row in rows)
+            chunks.append(f'<ul class="plain-list">{items}</ul>')
     if item.id == "structure":
-        labs = load_migrated_copy().get("labs", [])
-        if labs:
-            chunks.append(f"<h2>{escape(_st('labs_heading'))}</h2>")
-            lab_links = "".join(
-                f'<li><a href="labs/{escape(lab.get("slug") or lab["id"])}/index.html">'
-                f'{_t(_lt(lab))}</a></li>'
-                for lab in labs
-            )
-            chunks.append(f'<ul class="lab-grid">{lab_links}</ul>')
-        chunks.append(f"<h2>{escape(_st('admin_heading'))}</h2>")
-        admin_ids = _admin_unit_ids()
-        admin_children = tuple(child for child in item.children if child.id in admin_ids)
-        community_children = tuple(
-            child for child in item.children if child.id in roster.community_unit_ids()
-        )
-        chunks.append(_hub_cards(admin_children, heading=""))
-        if community_children:
-            chunks.append(f"<h2>{escape(_st('community_heading'))}</h2>")
-            chunks.append(_hub_cards(community_children, heading=""))
+        chunks.append(_structure_hub_preview())
     if item.id == "union":
         chunks.append(
             f'<p><a href="https://profnan.by/">{escape(_st("union_nas_note"))}</a> '
             f"{escape(_st('union_nas_aside'))}</p>"
         )
+        union_people = load_migrated_copy().get("union_people") or []
+        if union_people:
+            chunks.append('<div class="people-list">')
+            for person in union_people:
+                pid = str(person.get("id") or "")
+                name = str(person.get("name") or "").strip()
+                if not name:
+                    continue
+                chunks.append(
+                    _person_card(
+                        name=name,
+                        role=person.get("role") or "",
+                        initials=person.get("initials", ""),
+                        href=roster.person_href(pid) if pid else "",
+                        lines=[
+                            f"{_st('tel')}{person.get('phone', '')}" if person.get("phone") else "",
+                            person.get("email") or "",
+                        ],
+                    )
+                )
+            chunks.append("</div>")
     if item.id == "young-scientists":
         chunks.append('<div class="people-list">')
         smu = roster.people_for_unit("young-scientists") or list(roster.SMU_PEOPLE)
@@ -2036,18 +2095,37 @@ def _vitrine_inner(model: SiteModel, item: MenuItem) -> str:
         labels = list(page_copy(item.id).get("file_slots") or []) or list(
             _FISH_FILE_PAGES.get(item.id) or []
         )
-        chunks.insert(0, _fish_banner())
+        if not is_filled_copy():
+            chunks.insert(0, _fish_banner())
         chunks.append(_file_slots(labels))
     empty_slot = str(page_copy(item.id).get("empty_slot") or "").strip()
-    if empty_slot and item.id != "vacancies":
+    if empty_slot and item.id != "vacancies" and not is_filled_copy():
         chunks.append(f'<p class="empty-state">{escape(empty_slot)}</p>')
     if item.children and item.id != "structure":
         chunks.append(_hub_cards(item.children))
     if not chunks:
+        if is_filled_copy():
+            return ""
         chunks.append(
             f'<p class="placeholder">{escape(_st("placeholder"))}</p>'
         )
     return "".join(chunks)
+
+
+def _looks_pending(text: str) -> bool:
+    lower = text.lower()
+    markers = (
+        "появится",
+        "появятся",
+        "передаст",
+        "после передачи",
+        "пока института",
+        "honest",
+        "макет.",
+        "рыба:",
+        "наполненный макет",
+    )
+    return any(m in lower for m in markers)
 
 
 def _vitrine_body(model: SiteModel, item: MenuItem) -> str:
@@ -2257,11 +2335,24 @@ def _person_body(model: SiteModel, person: dict, depth: int = 0) -> str:
         if aff_items
         else ""
     )
-    bio = "".join(f"<p>{escape(para)}</p>" for para in person.get("bio") or [])
+    bio_paras = list(person.get("bio") or [])
+    if is_filled_copy():
+        bio_paras = [
+            p
+            for p in bio_paras
+            if "появятся" not in str(p)
+            and "появится" not in str(p)
+            and "передаст" not in str(p)
+        ]
+    bio = "".join(f"<p>{escape(para)}</p>" for para in bio_paras)
     interests = "".join(f"<li>{escape(row)}</li>" for row in person.get("interests") or [])
     pub_items = []
     for row in person.get("publications") or []:
         if isinstance(row, str):
+            if is_filled_copy() and (
+                "появятся" in row or "появится" in row or "передаст" in row
+            ):
+                continue
             pub_items.append(f"<li>{escape(row)}</li>")
         else:
             pub_items.append(_publication_line(row, depth, show_lab=False))
@@ -2278,16 +2369,16 @@ def _person_body(model: SiteModel, person: dict, depth: int = 0) -> str:
         aff_block,
         _person_metrics(model, person),
     ]
-    if person.get("bio"):
+    if person.get("bio") and bio:
         profile_bits.append(f"<h2>{escape(_st('biography'))}</h2>")
         profile_bits.append(bio)
     if person.get("interests"):
         profile_bits.append(f"<h2>{escape(_st('interests'))}</h2>")
         profile_bits.append(f'<ul class="plain-list">{interests}</ul>')
-    if person.get("publications"):
+    if pubs:
         profile_bits.append(f"<h2>{escape(_st('selected_pubs'))}</h2>")
         profile_bits.append(f'<ul class="plain-list">{pubs}</ul>')
-    if person.get("sources_note"):
+    if person.get("sources_note") and not is_filled_copy():
         profile_bits.append(f"<p class=\"leader-source\">{escape(person['sources_note'])}</p>")
     profile_bits.append(f'<p><a href="{prefix}structure.html">{escape(_st("to_structure"))}</a></p>')
     profile_bits.append("</div></div>")
@@ -2427,10 +2518,15 @@ def _person_metrics(model: SiteModel, person: dict) -> str:
         label = _METRIC_LABELS.get(field, field)
         rows.append(f"<dt>{escape(label)}</dt><dd>{' · '.join(bits) or '—'}</dd>")
     if not rows:
+        if is_filled_copy():
+            return ""
         return _empty_state(_st("metrics_empty"), _st("metrics_empty_text"))
+    note = ""
+    if not is_filled_copy():
+        note = f'<p class="metrics-note">{escape(_st("metrics_note"))}</p>'
     return (
         f"<h2>{escape(_st('metrics'))}</h2>"
-        f"<p class=\"metrics-note\">{escape(_st('metrics_note'))}</p>"
+        f"{note}"
         f'<dl class="metrics-list">{"".join(rows)}</dl>'
     )
 
@@ -2599,7 +2695,10 @@ def _world_map() -> str:
 
 def _council_listing() -> str:
     copy = page_copy("scientific-council")
-    parts = [_fish_banner()]
+    parts = []
+    banner = _fish_banner()
+    if banner:
+        parts.append(banner)
     parts.extend(f"<p>{escape(para)}</p>" for para in copy.get("paragraphs", []))
     cards = []
     for person in load_migrated_copy().get("council_people", []):
@@ -2670,9 +2769,9 @@ def _admin_unit_inner(unit_id: str) -> str:
 
 
 def _fish_banner() -> str:
-    key = "fish_filled" if is_filled_copy() else "fish_honest"
-    cls = "fish-banner is-filled" if is_filled_copy() else "fish-banner"
-    return f'<p class="{cls}" role="note">{escape(_st(key))}</p>'
+    if is_filled_copy():
+        return ""
+    return f'<p class="fish-banner" role="note">{escape(_st("fish_honest"))}</p>'
 
 
 def _file_slots(labels: list[str]) -> str:
@@ -2680,8 +2779,7 @@ def _file_slots(labels: list[str]) -> str:
         items = "".join(
             f'<li class="file-slot is-filled">'
             f'<img src="{escape(_fish_src("document", label))}" alt="" width="64" height="64">'
-            f"<span>{escape(label)}</span>"
-            f"<small>{escape(_st('mock_file'))}</small></li>"
+            f"<span>{escape(label)}</span></li>"
             for label in labels
         )
     else:
@@ -2691,6 +2789,113 @@ def _file_slots(labels: list[str]) -> str:
             for label in labels
         )
     return f'<ul class="file-shelf" aria-label="{escape(_st("file_slots"))}">{items}</ul>'
+
+
+def _structure_lab_tile(lab: dict) -> str:
+    slug = str(lab.get("slug") or lab.get("id") or "")
+    title = _lt(lab)
+    accent = lab_accent_token(slug)
+    accent_attr = f' style="--lab-accent:{escape(accent)}"' if accent else ""
+    head_name = ""
+    head_id = str(lab.get("head_id") or "").strip()
+    if head_id:
+        head = roster.person(head_id)
+        if head:
+            head_name = str(head.get("name") or "").strip()
+    head_html = ""
+    if head_name and not head_name.startswith("Фамилия"):
+        head_html = (
+            f'<p class="ichnm-structure-head">'
+            f'<span class="ichnm-structure-role">заведующий</span> {escape(head_name)}</p>'
+        )
+    return (
+        f'<li class="ichnm-lab-tile" data-lab-slug="{escape(slug)}"{accent_attr}>'
+        f'<a href="labs/{escape(slug)}/index.html">{escape(title)}{head_html}</a></li>'
+    )
+
+
+def _structure_hub_preview() -> str:
+    copy = load_migrated_copy()
+    groups = structure_hub_groups(copy.get("labs") or [])
+    parts = [f"<h2>{escape(_st('labs_heading'))}</h2>"]
+    parts.append('<div class="ichnm-thin-film-group">')
+    parts.append(
+        f'<p class="ichnm-thin-film-label">'
+        f'<a href="thin-film-department.html">{escape(str(groups["thin_film_title"]))}</a></p>'
+    )
+    parts.append('<ul class="lab-grid ichnm-structure-grid">')
+    for lab in groups["thin_film"]:
+        parts.append(_structure_lab_tile(lab))
+    parts.append("</ul></div>")
+    if groups["other"]:
+        parts.append('<ul class="lab-grid ichnm-structure-grid">')
+        for lab in groups["other"]:
+            parts.append(_structure_lab_tile(lab))
+        parts.append("</ul>")
+    parts.append(f"<h2>{escape(_st('admin_heading'))}</h2>")
+    parts.append('<ul class="dir-grid ichnm-structure-grid">')
+    for unit in copy.get("admin_units") or []:
+        uid = str(unit.get("id") or "")
+        if not uid:
+            continue
+        title = str(unit.get("title") or uid)
+        head_name = ""
+        people = unit.get("people") or []
+        if people and isinstance(people[0], dict):
+            head_name = str(people[0].get("name") or "").strip()
+            if head_name.startswith("Фамилия"):
+                head_name = ""
+        parts.append(f'<li><a href="{escape(uid)}.html">{escape(title)}')
+        if head_name:
+            parts.append(f'<p class="ichnm-structure-head">{escape(head_name)}</p>')
+        parts.append("</a></li>")
+    parts.append("</ul>")
+    parts.append(f"<h2>{escape(_st('community_heading'))}</h2>")
+    parts.append('<ul class="dir-grid ichnm-structure-grid">')
+    chairs = {
+        "union": "Южик Любовь Ивановна",
+        "young-scientists": "",
+    }
+    if is_filled_copy():
+        chairs["young-scientists"] = "Ильина Инна Ивановна"
+    for cid, title in (
+        ("union", i18n.menu_title("union", "Профсоюз")),
+        ("young-scientists", i18n.menu_title("young-scientists", "Совет молодых учёных")),
+    ):
+        parts.append(f'<li><a href="{escape(cid)}.html">{escape(title)}')
+        chair = chairs.get(cid) or ""
+        if chair:
+            parts.append(
+                f'<p class="ichnm-structure-head">'
+                f'<span class="ichnm-structure-role">председатель</span> '
+                f"{escape(chair)}</p>"
+            )
+        parts.append("</a></li>")
+    parts.append("</ul>")
+    return "".join(parts)
+
+
+def _thin_film_department_body(model: SiteModel) -> str:
+    _begin_page(0)
+    copy = load_migrated_copy()
+    groups = structure_hub_groups(copy.get("labs") or [])
+    page = page_copy("thin-film-department")
+    paras = "".join(f"<p>{escape(p)}</p>" for p in page.get("paragraphs") or [])
+    if not paras:
+        paras = f"<p>{escape(THIN_FILM_DEPT_TITLE)}</p>"
+    tiles = "".join(_structure_lab_tile(lab) for lab in groups["thin_film"])
+    inner = (
+        f"{paras}"
+        f"<h2>{escape(_st('labs_heading'))}</h2>"
+        f'<ul class="lab-grid ichnm-structure-grid">{tiles}</ul>'
+        f'<p class="unit-back"><a href="structure.html">{escape(_st("back_to_units"))}</a></p>'
+    )
+    return _with_page_hero(
+        THIN_FILM_DEPT_TITLE,
+        inner,
+        trail=_trail(model, "thin-film-department", THIN_FILM_DEPT_TITLE),
+        wide=True,
+    )
 
 
 def _publications_inner() -> str:
@@ -2723,13 +2928,20 @@ def _publications_inner() -> str:
             f'<span class="chart-year">{year}</span></button></li>'
         )
     payload = json.dumps(data, ensure_ascii=False)
-    note = escape(str(data.get("note", "")))
+    note = str(data.get("note") or "").strip()
+    note_html = ""
+    if note and not is_filled_copy():
+        note_html = f'<p class="fish-banner" role="note">{escape(note)}</p>'
     catalog = _publications_grouped(roster.institute_publications(), 0, show_lab=True)
     if not catalog:
-        catalog = f"<p>{escape(_st('pub_list_pending'))}</p>"
+        catalog = (
+            ""
+            if is_filled_copy()
+            else f"<p>{escape(_st('pub_list_pending'))}</p>"
+        )
     return (
         f'<script type="application/json" id="pub-year-data">{payload}</script>'
-        f'<p class="fish-banner" role="note">{note}</p>'
+        f"{note_html}"
         '<figure class="pub-chart">'
         f"<figcaption>{escape(_st('articles_by_year'))}</figcaption>"
         f'<p class="chart-readout" aria-live="polite">{escape(_st("chart_hint"))}</p>'
@@ -2742,7 +2954,6 @@ def _publications_inner() -> str:
         "</div>"
         "</figure>"
         f"<h2>{escape(_st('pubs_labs'))}</h2>"
-        f"{_fish_banner()}"
         f"{catalog}"
     )
 
@@ -2750,7 +2961,7 @@ def _publications_inner() -> str:
 def _lab_projects_block(lab: dict) -> str:
     rows = lab.get("projects") or []
     if not rows:
-        return f"<p>{escape(_st('lab_projects_pending'))}</p>"
+        return "" if is_filled_copy() else f"<p>{escape(_st('lab_projects_pending'))}</p>"
     chunks: list[str] = []
     for status, heading in (
         ("active", "lab_projects_active"),
@@ -2776,7 +2987,15 @@ def _lab_projects_block(lab: dict) -> str:
             f"<h3>{escape(_st(heading))}</h3>"
             f'<div class="conf-grid">{"".join(cards)}</div>'
         )
-    return "".join(chunks) if chunks else f"<p>{escape(_st('lab_projects_pending'))}</p>"
+    if chunks:
+        return "".join(chunks)
+    return "" if is_filled_copy() else f"<p>{escape(_st('lab_projects_pending'))}</p>"
+
+
+def _pending(key: str) -> str:
+    if is_filled_copy():
+        return ""
+    return f"<p>{escape(_st(key))}</p>"
 
 
 def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
@@ -2816,7 +3035,7 @@ def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
     directions = (
         f'<div class="cover-grid is-3">{"".join(direction_cards)}</div>'
         if direction_cards
-        else f"<p>{escape(_st('directions_pending'))}</p>"
+        else _pending("directions_pending")
     )
     equip_items = []
     for item in lab.get("equipment") or []:
@@ -2834,7 +3053,7 @@ def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
     equipment = (
         f'<ul class="lab-equip">{"".join(equip_items)}</ul>'
         if equip_items
-        else f"<p>{escape(_st('equipment_pending'))}</p>"
+        else _pending("equipment_pending")
     )
     service_cards = []
     for item in lab.get("developments") or []:
@@ -2849,76 +3068,115 @@ def _lab_body(model: SiteModel, lab: dict, depth: int = 0) -> str:
     services = (
         f'<div class="cover-grid is-3">{"".join(service_cards)}</div>'
         if service_cards
-        else f"<p>{escape(_st('services_pending'))}</p>"
+        else _pending("services_pending")
     )
     pubs = _publications_grouped(lab.get("publications") or [], depth, show_lab=False)
     if not pubs:
-        pubs = f"<p>{escape(_st('lab_pubs_pending'))}</p>"
+        pubs = _pending("lab_pubs_pending")
     projects = _lab_projects_block(lab)
-    phone = lab.get("phone") or "+375 (17) 000-00-00"
-    email = lab.get("email") or "lab@ichnm.by"
+    phone = lab.get("phone") or ("+375 (17) 000-00-00" if not is_filled_copy() else "")
+    email = lab.get("email") or ("lab@ichnm.by" if not is_filled_copy() else "")
     head_line = roster.head_contact_line(lab)
+    about_src = lab.get("about_filled") or lab.get("about") or ""
+    if about_src:
+        about_html = f"<p>{escape(about_src)}</p>"
+    elif is_filled_copy():
+        about_html = f"<p>{escape(_st('lab_about_placeholder'))}</p>"
+    else:
+        about_html = (
+            f"<p>{escape(_st('lab_about_placeholder'))}</p>"
+            f"<p>{escape(_st('lab_about_fish'))}</p>"
+        )
+    section_ids = (
+        filled_lab_pack_section_ids(lab)
+        if is_filled_copy()
+        else (
+            "about",
+            "directions",
+            "projects",
+            "equipment",
+            "services",
+            "staff",
+            "pubs",
+            "contacts",
+        )
+    )
+    nav_labels = {
+        "about": _st("lab_about"),
+        "directions": _st("lab_directions"),
+        "projects": _st("lab_projects"),
+        "equipment": _st("lab_equipment"),
+        "services": _st("lab_services"),
+        "staff": _st("lab_team"),
+        "pubs": _st("lab_pubs"),
+        "contacts": _st("lab_contacts"),
+    }
+    nav = "".join(
+        f'<a href="#{sid}">{escape(nav_labels[sid])}</a>'
+        for sid in section_ids
+        if sid in nav_labels
+    )
+    bodies = {
+        "about": (
+            '<section id="about" class="lab-split">'
+            f'{_photo_slot(_lt(lab), kicker[:2] if kicker else "ЛБ", kind="cover")}'
+            "<div>"
+            f"<h2>{escape(_st('lab_about'))}</h2>"
+            f"{about_html}</div></section>"
+        ),
+        "directions": (
+            f'<section id="directions"><h2>{escape(_st("lab_directions"))}</h2>'
+            f"{directions}</section>"
+            if directions
+            else ""
+        ),
+        "projects": (
+            f'<section id="projects"><h2>{escape(_st("lab_projects"))}</h2>'
+            f"{projects}</section>"
+            if projects
+            else ""
+        ),
+        "equipment": (
+            f'<section id="equipment"><h2>{escape(_st("lab_equipment"))}</h2>'
+            f"{equipment}</section>"
+            if equipment
+            else ""
+        ),
+        "services": (
+            f'<section id="services"><h2>{escape(_st("lab_services"))}</h2>'
+            f"{services}</section>"
+            if services
+            else ""
+        ),
+        "staff": (
+            f'<section id="staff"><h2>{escape(_st("our_team"))}</h2>'
+            f'<div class="staff-tab"><p>{escape(_st("staff_tab_note"))}</p>'
+            f'<div class="people-list">{"".join(people)}</div></div></section>'
+            if people
+            else ""
+        ),
+        "pubs": (
+            f'<section id="pubs"><h2>{escape(_st("selected_pubs"))}</h2>{pubs}</section>'
+            if pubs
+            else ""
+        ),
+        "contacts": (
+            '<section id="contacts" class="lab-contacts">'
+            f"<h2>{escape(_st('lab_contacts'))}</h2>"
+            f"<p>{escape(_st('address_label'))}{_t(_st('address_full'))}</p>"
+            + (f"<p>{escape(_st('tel'))}{_t(str(phone))}</p>" if phone else "")
+            + (f"<p>E-mail: {escape(str(email))}</p>" if email else "")
+            + (f"<p>{escape(_st('head_label'))}{_t(head_line)}</p>" if head_line else "")
+            + "</section>"
+        ),
+    }
     inner = (
         f"{_fish_banner()}"
         f'<p class="unit-back"><a href="{prefix}structure.html">{escape(_st("back_to_units"))}</a></p>'
-        f'<nav class="lab-local" aria-label="{escape(_st("lab_local"))}">'
-        f'<a href="#about">{escape(_st("lab_about"))}</a>'
-        f'<a href="#directions">{escape(_st("lab_directions"))}</a>'
-        f'<a href="#projects">{escape(_st("lab_projects"))}</a>'
-        f'<a href="#equipment">{escape(_st("lab_equipment"))}</a>'
-        f'<a href="#services">{escape(_st("lab_services"))}</a>'
-        f'<a href="#staff">{escape(_st("lab_team"))}</a>'
-        f'<a href="#pubs">{escape(_st("lab_pubs"))}</a>'
-        f'<a href="#contacts">{escape(_st("lab_contacts"))}</a>'
-        "</nav>"
-        '<section id="about" class="lab-split">'
-        f'{_photo_slot(_lt(lab), kicker[:2] if kicker else "ЛБ", kind="cover")}'
-        "<div>"
-        f"<h2>{escape(_st('lab_about'))}</h2>"
-        + (
-            f"<p>{escape(lab.get('about_filled') or lab.get('about') or '')}</p>"
-            if (lab.get("about_filled") or lab.get("about"))
-            else (
-                f"<p>{escape(_st('lab_about_placeholder'))}</p>"
-                f"<p>{escape(_st('lab_about_fish'))}</p>"
-            )
-        )
-        + "</div></section>"
-        '<section id="directions">'
-        f"<h2>{escape(_st('lab_directions'))}</h2>"
-        f"{directions}</section>"
-        '<section id="projects">'
-        f"<h2>{escape(_st('lab_projects'))}</h2>"
-        f"{projects}</section>"
-        '<section id="equipment">'
-        f"<h2>{escape(_st('lab_equipment'))}</h2>"
-        f"{equipment}</section>"
-        '<section id="services">'
-        f"<h2>{escape(_st('lab_services'))}</h2>"
-        f"{services}</section>"
-        '<section id="staff">'
-        f"<h2>{escape(_st('our_team'))}</h2>"
-        '<div class="staff-tab">'
-        f"<p>{escape(_st('staff_tab_note'))}</p>"
-        f'<div class="people-list">{"".join(people)}</div>'
-        "</div></section>"
-        '<section id="pubs">'
-        f"<h2>{escape(_st('selected_pubs'))}</h2>"
-        f"{pubs}"
-        "</section>"
-        '<section id="contacts" class="lab-contacts">'
-        f"<h2>{escape(_st('lab_contacts'))}</h2>"
-        f"<p>{escape(_st('address_label'))}{_t(_st('address_full'))}</p>"
-        f"<p>{escape(_st('tel'))}{_t(str(phone))}</p>"
-        f"<p>E-mail: {escape(str(email))}</p>"
-        + (f"<p>{escape(_st('head_label'))}{_t(head_line)}</p>" if head_line else "")
-        + "</section>"
+        f'<nav class="lab-local" aria-label="{escape(_st("lab_local"))}">{nav}</nav>'
+        + "".join(bodies.get(sid, "") for sid in section_ids)
     )
-    extra = (
-        f'<p class="lab-kicker">{kicker}</p>'
-        if kicker
-        else ""
-    )
+    extra = f'<p class="lab-kicker">{kicker}</p>' if kicker else ""
     trail = _trail(model, lab["id"], _lt(lab), depth=depth)
     return (
         f'<header class="page-hero"><div class="wrap">{trail}'
@@ -2967,7 +3225,14 @@ def _media_about_inner() -> str:
 
 def _leadership_inner(item: MenuItem) -> str:
     copy = page_copy(item.id)
-    parts = [f"<p>{_t(para)}</p>" for para in copy.get("paragraphs", [])]
+    paras = list(copy.get("paragraphs") or [])
+    if is_filled_copy():
+        paras = [
+            p
+            for p in paras
+            if "появятся" not in str(p) and "передаст" not in str(p)
+        ]
+    parts = [f"<p>{_t(para)}</p>" for para in paras]
     cards: list[str] = []
     for person in roster.leadership_people():
         cards.append(
