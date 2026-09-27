@@ -1,37 +1,43 @@
 # Шаблоны данных для коллег
 
-Excel-файлы, которые заполняют сотрудники института. Потом разработчик переносит строки в `migrated_copy.json` / WP CPT.
+Word-файлы (`.docx`), которые заполняют сотрудники института. Потом разработчик переносит строки в `migrated_copy.json` / WP CPT.
+
+**Живой макет (рыба):** https://cyril-ver-mar.github.io/ICNM_site/preview-filled/
+
+**Письмо-рассылка (копия, исходник `docs/Mail.docx` не трогаем):** [`Mail-rasylka.docx`](Mail-rasylka.docx)
 
 ## Файлы
 
 | Файл | Содержание |
 |------|------------|
-| `templates/01-personalia.xlsx` | Персоналии (`people/{id}/`, метрики, опциональные секции) |
-| `templates/02-laboratories.xlsx` | Лаборатории + лист проектов |
-| `templates/03-developments.xlsx` | CPT «Разработки» |
-| `templates/04-science-directions.xlsx` | CPT «Направления работы» |
-| `templates/05-hr.xlsx` | Отдел кадров |
-| `templates/06-engineering-labor-protection.xlsx` | Главный инженер + охрана труда |
-| `templates/07-union.xlsx` | Профсоюз |
+| `templates/01-personalia.docx` | Персоналии (`people/{id}/`, метрики, опциональные секции, **все** affiliations) |
+| `templates/02-laboratories.docx` | Лаборатории + проекты |
+| `templates/03-developments.docx` | CPT «Разработки» |
+| `templates/04-science-directions.docx` | CPT «Направления работы» |
+| `templates/05-hr.docx` | Отдел кадров |
+| `templates/06-engineering-labor-protection.docx` | Главный инженер + охрана труда |
+| `templates/07-union.docx` | Профсоюз |
 
-В каждом файле лист **«Памятка»** (зачем / куда на сайте / как выглядит) и таблицы с колонками **RU / EN / BE / ZH**.
+В начале каждой **памятки**: скриншоты из `preview-filled` (`templates/_screens/`), предупреждение про **RU / EN / BE / ZH** (пустой язык → машинный перевод) и про **несколько ролей** одного человека. Дальше — справочник полей с русскими подписями и пустые блоки для заполнения.
 
-**Если язык не заполнен — будет машинный перевод.** Это явно написано жёлтым блоком на листе «Памятка».
+Старые `.xlsx` больше не используются (Word — основной формат).
 
 ## Как заполнять
 
-1. Откройте нужный `.xlsx` в Excel / LibreOffice / Numbers.
-2. Прочитайте «Памятку».
-3. Заполняйте лист «Данные» (и доп. листы, если есть). Русский — обязательный минимум.
-4. Положите заполненный файл в `assets/incoming/rosters/` (или пришлите разработчику).
-5. Фото — отдельными файлами с именами из колонки `photo_filename`.
+1. Откройте нужный `.docx` в Microsoft Word / LibreOffice / Pages.
+2. Прочитайте памятку и посмотрите скриншоты.
+3. Заполните блоки «Данные…». Русский — обязательный минимум.
+4. Верните файл разработчику письмом **или** положите в `assets/incoming/rosters/`.
+5. Фото — отдельными файлами; имя = поле «Имя файла фото» (латиницей).
 
 PDF устава / антикоррупции / соцсети / эмблема НАН — по-прежнему через слоты `assets/incoming/` (см. `docs/work/notes/colleague-packet.md`).
 
-## Пересобрать шаблоны
+## Пересобрать шаблоны и скриншоты
 
 ```bash
 # из корня репозитория, в venv:
-pip install -r requirements-dev.txt   # нужен openpyxl
-python scripts/build_colleague_templates.py
+pip install -r requirements-dev.txt   # python-docx
+python scripts/capture_colleague_screens.py   # Chrome headless → _screens/*.png
+python scripts/build_colleague_templates.py   # → templates/*.docx
+python scripts/build_colleague_mail.py        # → Mail-rasylka.docx (копия письма)
 ```
