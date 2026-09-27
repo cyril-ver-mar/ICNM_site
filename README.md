@@ -2,7 +2,9 @@
 
 Official WordPress + Kadence site for the Institute of Chemistry of New Materials (NAS Belarus).
 
-**Как открыть сайт:** [docs/КАК-ОТКРЫТЬ-САЙТ.md](docs/КАК-ОТКРЫТЬ-САЙТ.md)
+**Как открыть сайт:** [docs/КАК-ОТКРЫТЬ-САЙТ.md](docs/КАК-ОТКРЫТЬ-САЙТ.md)  
+**Наполненный макет онлайн:** https://cyril-ver-mar.github.io/ICNM_site/preview-filled/  
+**Шаблоны для коллег (Word):** [docs/work/colleague-packet/](docs/work/colleague-packet/README.md)
 
 Product locks: `docs/DECISIONS.md`. Glossary: `docs/CONTEXT.md`. Spec: `docs/work/specs/2026-08-30-ichnm-public-site-v1.md`.
 
