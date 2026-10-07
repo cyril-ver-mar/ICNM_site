@@ -1770,6 +1770,27 @@ html.theme-night .ichnm-footer {
   font-size: 0.88rem;
 }
 
+.ichnm-contacts-maps {
+  display: block;
+  margin: 0 auto 1.5rem;
+  max-width: 100%;
+}
+
+.ichnm-yandex-map {
+  width: 100%;
+  min-height: 360px;
+  background: var(--paper);
+  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.12));
+  overflow: hidden;
+}
+
+.ichnm-yandex-map iframe {
+  display: block;
+  width: 100%;
+  min-height: 360px;
+  border: 0;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));

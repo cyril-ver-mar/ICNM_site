@@ -585,15 +585,54 @@
       }
     }
 
+    function syncVisibility(rect) {
+      const box = rect || host.getBoundingClientRect();
+      visible =
+        box.width > 1 &&
+        box.height > 1 &&
+        box.bottom > 0 &&
+        box.top < (window.innerHeight || document.documentElement.clientHeight);
+    }
+
     function resize() {
       const rect = host.getBoundingClientRect();
+      const width = Math.max(0, Math.round(rect.width));
+      const height = Math.max(0, Math.round(rect.height));
+      // Never bake a 0×0 bitmap/style — that sticks until reload if the host
+      // recovers without another size notification.
+      if (width < 2 || height < 2) {
+        syncVisibility(rect);
+        return;
+      }
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.max(1, Math.round(rect.width * dpr));
-      canvas.height = Math.max(1, Math.round(rect.height * dpr));
-      canvas.style.width = rect.width + "px";
-      canvas.style.height = rect.height + "px";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      buildGrid(rect.width, rect.height);
+      const bw = Math.max(1, Math.round(width * dpr));
+      const bh = Math.max(1, Math.round(height * dpr));
+      // Let CSS (inset/100%) size the canvas; fixed inline px locked stale sizes.
+      if (canvas.style.width || canvas.style.height) {
+        canvas.style.width = "";
+        canvas.style.height = "";
+      }
+      if (canvas.width !== bw || canvas.height !== bh) {
+        canvas.width = bw;
+        canvas.height = bh;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        buildGrid(width, height);
+        for (let i = 0; i < waves.length; i++) {
+          waves[i].maxR = maxReach(waves[i].x, waves[i].y);
+        }
+      } else {
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      syncVisibility(rect);
+    }
+
+    let resizeRaf = 0;
+    function scheduleResize() {
+      if (resizeRaf) return;
+      resizeRaf = requestAnimationFrame(function () {
+        resizeRaf = 0;
+        resize();
+      });
     }
 
     function sampleAtom(atom) {
@@ -733,18 +772,26 @@
     }
 
     resize();
-    window.addEventListener("resize", resize);
-    if ("ResizeObserver" in window) new ResizeObserver(resize).observe(host);
+    window.addEventListener("resize", scheduleResize);
+    window.addEventListener("orientationchange", scheduleResize);
+    if ("ResizeObserver" in window) new ResizeObserver(scheduleResize).observe(host);
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function (entries) {
-        visible = entries.some(function (entry) {
+        const onScreen = entries.some(function (entry) {
           return entry.isIntersecting;
         });
+        if (onScreen) {
+          visible = true;
+          scheduleResize();
+          return;
+        }
+        syncVisibility();
       }).observe(host);
     }
     raf = requestAnimationFrame(draw);
     window.addEventListener("pagehide", function () {
       cancelAnimationFrame(raf);
+      if (resizeRaf) cancelAnimationFrame(resizeRaf);
     });
 
     return {
